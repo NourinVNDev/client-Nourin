@@ -1,0 +1,22 @@
+/* Remove blue highlight effect from active/selected dates */
+.react-calendar__tile {
+    @apply bg-transparent hover:bg-transparent focus:outline-none; /* No background or focus ring */
+  }
+  
+  .react-calendar__tile--active {
+    @apply bg-transparent text-inherit; /* No active background */
+  }
+  
+  .react-calendar__tile--active:hover {
+    @apply bg-transparent; /* No hover effect for active tiles */
+  }
+  
+  .react-calendar__tile--range {
+    @apply bg-transparent; /* No range background */
+  }
+  
+  /* Custom class for highlighted dates */
+  .highlighted-date {
+    @apply relative; /* Use this to apply green dot or additional styling */
+  }
+  
