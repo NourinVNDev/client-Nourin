@@ -51,7 +51,7 @@ export default function Features() {
   
     const result = await getEventDataFromDB(categoryId);
     
-    // console.log('From Component:', result);
+    console.log('From Component:', result);
   
     // if (result && result.length > 0) {
       navigate(`/user/categoryBasedData/${categoryId}`);
