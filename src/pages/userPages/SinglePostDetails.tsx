@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../../components/userComponents/Headers";
 import SocialEvents1 from "../../assets/SocialEvents1.avif";
@@ -6,9 +6,11 @@ import Footer from "../../components/userComponents/Footer";
 import Calendar, { CalendarProps } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { Link } from "react-router-dom";
-
+import { CheckOfferAvailable } from "../../service/userServices/userOffer";
+import { OfferData } from "../../validations/userValid/TypeValid";
 const SinglePostDetails = () => {
   const location = useLocation();
+  const [offerData, setOfferData] = useState<OfferData|null>(null);
   // const searchParams = new URLSearchParams(location.search);
   // const data = searchParams.get("data");
   const data = JSON.stringify(location.state?.data);
@@ -22,6 +24,32 @@ const SinglePostDetails = () => {
   const initialEndDate = parsedData?.data?.result.savedEvent.endDate
     ? new Date(parsedData.data?.result.savedEvent.endDate)
     : new Date();
+    const actualAmount = (
+      Number(parsedData?.data?.result?.savedEvent?.Amount) - 
+      (Number(parsedData?.data?.result?.savedEvent?.Amount) * Number(offerData?.discount_value)) / 100
+    ).toFixed(2);
+    
+    useEffect(() => {
+      const isOfferAvailable = async () => {
+        try {
+          const result = await CheckOfferAvailable(parsedData.data?.result.savedEvent.title);
+            console.log("finding the result:",result);
+            
+          if (result?.success) { // Check if the request was successful
+            setOfferData(result.data); // Store offer data in state
+        console.log("Offer stored in state:", result.data);
+          } else {
+            console.log("No offers available.");
+          }
+          
+        } catch (error) {
+          console.error("Error checking offer availability:", error);
+        }
+      };
+    
+      isOfferAvailable();
+    }, []); // Add parsedData as a dependency
+    
 
   // State for the calendar date range
   const [dateRange, setDateRange] = useState<[Date, Date]>([initialStartDate, initialEndDate]);
@@ -87,13 +115,13 @@ const SinglePostDetails = () => {
                 </button>
                 <button
                   className={`text-lg font-semibold px-4 py-2 rounded ${
-                    activeTab === "gallery"
+                    activeTab === "Offer-info"
                       ? "bg-purple-700 text-white"
                       : "text-gray-700 hover:bg-gray-200"
                   }`}
-                  onClick={() => setActiveTab("gallery")}
+                  onClick={() => setActiveTab("Offer-info")}
                 >
-                  Gallery
+                  Offer-Information
                 </button>
               </div>
 
@@ -107,8 +135,26 @@ const SinglePostDetails = () => {
                           {parsedData?.data?.result.savedEvent.eventName || "Event Name"}
                         </span>
                         <span className="text-lg text-violet-700 font-semibold">
-                          ₹{parsedData?.data?.result.savedEvent.Amount || "Price"}
-                        </span>
+        
+                         
+                          
+                          {parsedData?.data?.result?.savedEvent?.Amount && offerData?.discount_value && actualAmount 
+                            ? (
+                              <>
+                                <s>₹{parsedData?.data?.result?.savedEvent?.Amount || "0"}</s>
+                                <span> → ₹{actualAmount}</span>
+                              </>
+                            ) 
+                            :
+                            <span> ₹{parsedData?.data?.result?.savedEvent?.Amount || "0"}</span>}
+                            </span>
+
+
+
+
+
+
+
                         <span className="text-lg text-green-600 font-semibold">
                           {parsedData?.data?.result.savedEvent.companyName || "Company Name"}
                         </span>
@@ -186,15 +232,61 @@ const SinglePostDetails = () => {
                     </p>
                   </div>
                 )}
-                {activeTab === "gallery" && (
-                  <div className="p-6 bg-gray-100 rounded-lg shadow-md">
-                    <h2 className="text-xl font-bold mb-2">Gallery</h2>
-                    <p className="text-gray-600">
-                    
-                        "Gallery items will be displayed here."
-                    </p>
+                  {activeTab === "Offer-info" && (
+            <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+              <h2 className="text-xl font-bold mb-4 text-black">Offer Information</h2>
+
+              {offerData ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">Offer Name:</span>
+                    <span className="text-lg text-violet-700 font-semibold">{offerData.offerName}</span>
                   </div>
-                )}
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">Discount On:</span>
+                    <span className="text-lg text-violet-700 font-semibold">{offerData.discount_on}</span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">Discount Value:</span>
+                    <span className="text-lg text-violet-700 font-semibold">{offerData.discount_value}%</span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">Start Date:</span>
+                    <span className="text-lg text-green-600 font-semibold">
+                      {new Date(offerData.startDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">End Date:</span>
+                    <span className="text-lg text-red-600 font-semibold">
+                      {new Date(offerData.endDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800">Actual Amount:</span>
+                    <span className="text-lg text-violet-700 font-semibold">₹{actualAmount}</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-600">No active offers available.</p>
+              )}
+            </div>
+          )}
+
+
               </div>
             </div>
                 

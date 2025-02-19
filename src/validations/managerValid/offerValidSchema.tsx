@@ -5,9 +5,11 @@ export const offerValidSchema = Yup.object({
   discount_on: Yup.string().required("Discount On is required"),
   discount_value: Yup.number()
     .min(0, "Discount must be at least 0%")
-    .max(100, "Discount cannot exceed 100%")
+    .max(90, "Discount cannot exceed 90%")
     .required("Discount Value is required"),
-  startDate: Yup.date().required("Start Date is required"),
+  startDate: Yup.date().required("Start Date is required")
+  .transform((value, originalValue) => (originalValue ? new Date(originalValue) : null))
+  .min(new Date(), "Start date must be in the future"),
   endDate: Yup.date()
     .min(Yup.ref("startDate"), "End Date must be after Start Date")
     .required("End Date is required"),

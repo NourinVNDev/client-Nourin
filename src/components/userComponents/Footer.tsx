@@ -9,7 +9,7 @@ export default function Footer() {
           <div>
             <h3 className="text-3xl font-extrabold text-blue-500 mb-4">MeetCraft</h3>
             <p className="text-gray-400 text-lg">
-              Book your trip in minutes, get full control for much longer.
+            Create, innovate, and embrace a journey of endless possibilities.
             </p>
           </div>
 

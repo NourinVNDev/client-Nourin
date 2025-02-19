@@ -47,6 +47,15 @@ const ManagerAllEvents = () => {
   const eventsPerPage = 5;
   const navigate=useNavigate();
 
+
+  const formatDate = (dateString:string) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with leading zero if needed
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed) and pad
+    const year = date.getFullYear(); // Get full year
+    return `${day}-${month}-${year}`; // Return formatted date
+  };
+
   useEffect(() => {
     const fetchAllEvents = async () => {
       try {
@@ -146,7 +155,7 @@ navigate(`/editEventDetails/${id}`);
                       {event.location.address}, {event.location.city}
                     </td>
                     <td className="border border-gray-300 px-4 py-3">
-                      {new Date(event.startDate).toLocaleDateString()}
+                    {formatDate(event.startDate)}
              </td>
              
                     <td className="border border-gray-300 px-4 py-3">

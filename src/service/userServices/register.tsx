@@ -3,7 +3,24 @@ axios.defaults.withCredentials=true;
 import API from "../../utils/axiosInstance";
 
 
+const fetchSocialEventDetails=async()=>{
+    try {
+        const response = await API('/fetchEventData', {
+        
+        });
 
+        const data=response.data;
+        console.log("Data",data);
+        return data;
+        
+
+
+    } catch (error) {
+        console.error("Error during event fetching:", error);
+        return undefined; // Or throw an error if you want to handle it upstream
+    }
+
+}
 const register = async (formData: { [key: string]: string }) => {
     console.log("formData from client service", formData.email);
     try {
@@ -250,4 +267,4 @@ console.log(response?.data.data)
 
 
 
-export { register, verifyOtp,userLogin,GoogleAuth,forgotPassword,verifyOtpForForgot,resetPassword,getEventDataFromDB,handleProfileData,getCategoryDataDetails,handleProfileDetails,generateOtp,verifyOtpForPassword,handleResetPassword};
+export { fetchSocialEventDetails,register, verifyOtp,userLogin,GoogleAuth,forgotPassword,verifyOtpForForgot,resetPassword,getEventDataFromDB,handleProfileData,getCategoryDataDetails,handleProfileDetails,generateOtp,verifyOtpForPassword,handleResetPassword};

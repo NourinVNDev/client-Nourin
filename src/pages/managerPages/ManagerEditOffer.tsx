@@ -98,7 +98,7 @@ console.log("Discount value before submit:", values.discount_value);
                 <div>
                   <label className="block text-sm font-medium text-black">Offer Name:</label>
                   <input
-                    disabled
+                   
                     type="text"
                     name="offerName"
                     value={formik.values.offerName}
@@ -110,6 +110,7 @@ console.log("Discount value before submit:", values.discount_value);
                 <div>
                   <label className="block text-sm font-medium text-black">Discount On:</label>
                   <select
+                   disabled
                     name="discount_on"
                     value={formik.values.discount_on}
                     onChange={formik.handleChange}
@@ -141,14 +142,14 @@ console.log("Discount value before submit:", values.discount_value);
                   <p className="text-red-500 text-sm">{formik.errors.discount_value}</p>
                 )}
               </div>
-
-              <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-black">Start Date:</label>
                 <DatePicker
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   selected={formik.values.startDate ? new Date(formik.values.startDate) : null}
                   onChange={(date) => formik.setFieldValue("startDate", date)}
-                  dateFormat="yyyy-MM-dd"
+                  dateFormat="dd-MM-yy"
                   required
                 />
                 {formik.touched.startDate && formik.errors.startDate && (
@@ -156,18 +157,19 @@ console.log("Discount value before submit:", values.discount_value);
                 )}
               </div>
 
-              <div>
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-black">End Date:</label>
                 <DatePicker
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   selected={formik.values.endDate ? new Date(formik.values.endDate) : null}
                   onChange={(date) => formik.setFieldValue("endDate", date)}
-                  dateFormat="yyyy-MM-dd"
+                  dateFormat="dd-MM-yyyy"
                   required
                 />
                 {formik.touched.endDate && formik.errors.endDate && (
                   <p className="text-red-500 text-sm">{formik.errors.endDate}</p>
                 )}
+              </div>
               </div>
 
               <div>

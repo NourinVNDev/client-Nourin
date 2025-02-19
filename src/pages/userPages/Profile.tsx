@@ -113,7 +113,8 @@ const ProfilePage = () => {
                     </div>
 
                     {/* Email (Disabled) */}
-                    <div className="flex flex-col">
+                    <div className="flex space-x-4">
+                    <div className="flex flex-col w-1/2">
                       <label className="font-medium text-gray-700">Email:</label>
                       <input
                         type="email"
@@ -125,7 +126,7 @@ const ProfilePage = () => {
                     </div>
 
                     {/* Phone Number */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col w-1/2">
                       <label className="font-medium text-gray-700">Phone:</label>
                       <input
                         type="text"
@@ -138,6 +139,7 @@ const ProfilePage = () => {
                       {formik.touched.phoneNo && formik.errors.phoneNo && (
                         <p className="text-red-500 text-xs">{formik.errors.phoneNo}</p>
                       )}
+                    </div>
                     </div>
 
                     {/* Address */}

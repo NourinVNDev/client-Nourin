@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/managerComponents/Header";
 import NavBar from "../../components/managerComponents/NavBar";
 import Footer from "../../components/managerComponents/Footer";
@@ -9,9 +9,10 @@ import { useFormik } from "formik";
 import { OfferFormValues, offerValidSchema } from "../../validations/managerValid/offerValidSchema";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
-
+import { getCategoryEventType } from "../../service/managerServices/handleEventService";
 const ManagerAddOffer = () => {
   const navigate = useNavigate();
+  const [eventType,setEventType]=useState<string[]>([])
 
   const formik = useFormik<OfferFormValues>({
     initialValues: {
@@ -36,11 +37,40 @@ const ManagerAddOffer = () => {
         toast.success("Event added successfully!");
         formik.resetForm();
         navigate("/Manager/offer");
+      }else if(result.message===`An active offer already exists for"${formattedValues.discount_on}"`){
+        console.log("Hello");
+        
+        toast.error('Discount_on is already Present');
+
       } else {
         toast.error(result.message);
       }
     },
   });
+
+
+
+
+  useEffect(()=>{
+    const fetchCategoryName=async ()=>{
+      try {
+        const result = await getCategoryEventType();
+        if (Array.isArray(result)) {
+          const categoryNames = result.map(item => item.categoryName);
+          setEventType(categoryNames);
+        } else {
+          console.error("Invalid categoryName format");
+        }
+      } catch (error) {
+        console.error("Error fetching category event type:", error);
+      }
+
+    }
+
+    fetchCategoryName()
+   
+
+  },[]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -76,20 +106,26 @@ const ManagerAddOffer = () => {
             </div>
 
             {/* Discount On */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Discount On</label>
-              <input
-                type="text"
-                name="discount_on"
-                value={formik.values.discount_on}
-                onChange={formik.handleChange}
-                className="mt-1 p-2 w-full border rounded bg-white text-black"
-                placeholder="Enter applicable items"
-              />
-              {formik.touched.discount_on && formik.errors.discount_on && (
-                <p className="text-red-500 text-sm">{formik.errors.discount_on}</p>
-              )}
-            </div>
+           <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Discount On</label>
+          <select
+            name="discount_on"
+            value={formik.values.discount_on}
+            onChange={formik.handleChange}
+            className={`mt-1 p-2 w-full border rounded bg-white text-black ${formik.touched.discount_on && formik.errors.discount_on ? 'border-red-500' : ''}`}
+          >
+            <option value="" disabled>Select applicable items</option>
+            {eventType.map((item, index) => (
+              <option key={index} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+          {formik.touched.discount_on && formik.errors.discount_on && (
+            <p className="text-red-500 text-sm">{formik.errors.discount_on}</p>
+          )}
+        </div>
+
 
             {/* Discount Value */}
             <div className="mb-4">
@@ -115,7 +151,7 @@ const ManagerAddOffer = () => {
                 className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 selected={formik.values.startDate ? new Date(formik.values.startDate) : null}
                 onChange={(date) => formik.setFieldValue("startDate", date)} // Update formik value
-                dateFormat="yyyy-MM-dd"
+                dateFormat="dd-MM-yyyy"
               
               />
               {formik.touched.startDate && formik.errors.startDate && (
@@ -130,7 +166,7 @@ const ManagerAddOffer = () => {
                 className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 selected={formik.values.endDate ? new Date(formik.values.endDate) : null}
                 onChange={(date) => formik.setFieldValue("endDate", date)} // Update formik value
-                dateFormat="yyyy-MM-dd"
+                dateFormat="dd-MM-yyyy"
                 
               />
               {formik.touched.endDate && formik.errors.endDate && (

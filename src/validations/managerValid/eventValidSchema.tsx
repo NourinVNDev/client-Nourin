@@ -43,7 +43,6 @@ export interface eventFormValues {
     tags: string[];    // Specify the type for tags
     images: (File | string)[]; // Include both File and string types for images
     noOfPerson: number;
-    noOfDays: number;
     destination: string;
     Included: string[]; // Specify the type for Included items
     notIncluded: string[]; // Specify the type for Not Included items

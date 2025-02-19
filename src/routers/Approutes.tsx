@@ -40,12 +40,14 @@ import EventHistory from "../pages/userPages/EventHistory";
 import EventBooking from "../pages/userPages/EventBooking";
 import TodaysRequest from "../pages/managerPages/TodaysRequest";
 import TotalBooking from "../pages/managerPages/TotalBooking";
+import EntryHome from "../pages/userPages/EntryHome";
 interface RouteConfig {
     path: string;
     element: React.ReactNode;
   }
   const Approutes: RouteConfig[] = [
-    { path: '/', element: <Login />},
+    { path: '/', element: <EntryHome/>},
+    {path:'/login',element:<Login/>},
     {path :'/register',element:<Register/>},
     {path:'/home',element:<PrivateRoute><HomePage/></PrivateRoute>},
     {path:'/forgot-password',element:<ForgotPassword/>},

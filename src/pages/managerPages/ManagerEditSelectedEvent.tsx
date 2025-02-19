@@ -6,6 +6,7 @@ import Header from "../../components/managerComponents/Header";
 import Footer from "../../components/managerComponents/Footer";
 import NavBar from "../../components/managerComponents/NavBar";
 import toast, { Toaster } from "react-hot-toast";
+import DatePicker from "react-datepicker";
 import { EventData } from "../../validations/userValid/TypeValid";
 import { eventFormValues, eventValidSchema } from "../../validations/managerValid/eventValidSchema";
 import { useFormik } from "formik";
@@ -28,7 +29,6 @@ const ManagerEditSelectedEvents = () => {
       tags: [""],
       images: [] as (File | string)[],
       noOfPerson: 0,
-      noOfDays: 0,
       destination: '',
       Included: [''],
       notIncluded: [''],
@@ -50,7 +50,6 @@ const ManagerEditSelectedEvents = () => {
       formData.append("tags", values.tags.join(","));
       formData.append("destination", values.destination);
       formData.append("noOfPerson", values.noOfPerson.toString());
-      formData.append("noOfDays", values.noOfDays.toString());
       formData.append("amount", values.Amount.toString()); 
       formData.append("Included", values.Included.join(","));
       formData.append("notIncluded", values.notIncluded.join(","));
@@ -96,7 +95,6 @@ const ManagerEditSelectedEvents = () => {
     startDate: "",
     endDate: "",
     noOfPerson: 0,
-    noOfDays: 0,
     time: "",
     Amount: 0,
     destination: "",
@@ -161,7 +159,7 @@ const ManagerEditSelectedEvents = () => {
       formik.setFieldValue(`location.${field}`, value);
     } else if (["Included", "notIncluded", "tags"].includes(name)) {
       formik.setFieldValue(name, value.split(",").map((item) => item.trim())); // Convert input to array
-    } else if (["noOfPerson", "noOfDays", "amount"].includes(name)) {
+    } else if (["noOfPerson", "amount"].includes(name)) {
       const parsedValue = Number(value);
       formik.setFieldValue(name, isNaN(parsedValue) ? 0 : parsedValue); // Handle NaN cases gracefully
     } else {
@@ -170,9 +168,12 @@ const ManagerEditSelectedEvents = () => {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    
     const files = e.target.files;
+    console.log("Checking the photo",files);
+    
     if (files) {
-      const fileArray = Array.from(files); // Convert FileList to Array
+      const fileArray = Array.from(files[0].name); // Convert FileList to Array
       formik.setFieldValue("images", fileArray); // Replace the images array with new images
     }
   };
@@ -269,31 +270,6 @@ const ManagerEditSelectedEvents = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-400">Start Date</label>
-                  <input
-                    type="date"
-                    id="startDate"
-                    name="startDate"
-                    value={formatDateToInput(formik.values.startDate)}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-400">End Date</label>
-                  <input
-                    type="date"
-                    id="endDate"
-                    name="endDate"
-                    value={formatDateToInput(formik.values.endDate)}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                  />
-                </div>
-              </div>
               <div>
                 <label htmlFor="noOfPerson" className="block text-sm font-medium text-gray-400">Number of People</label>
                 <input
@@ -318,6 +294,33 @@ const ManagerEditSelectedEvents = () => {
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
               </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                 <div>
+                         <label htmlFor="startDate" className="block text-sm font-medium text-gray-400">
+                           Start Date
+                         </label>
+                         <DatePicker className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
+                           selected={formik.values.startDate ? new Date(formik.values.startDate) : null}
+                           onChange={(date) => formik.setFieldValue('startDate', date)}
+                           dateFormat="dd-MM-yyyy"
+                           // required
+                         />
+                         {formik.touched.startDate && formik.errors.startDate ? (
+                           <div className="text-red-500 text-sm">{formik.errors.startDate}</div>
+                         ) : null}
+                       </div>
+                <div>
+                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-400">End Date</label>
+                      <DatePicker className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
+                               selected={formik.values.endDate ? new Date(formik.values.endDate) : null}
+                               onChange={(date) => formik.setFieldValue('endDate', date)}
+                               dateFormat="yyyy-MM-dd"
+                               // required
+                             />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="destination" className="block text-sm font-medium text-gray-400">Destination</label>
                 <input
@@ -329,6 +332,18 @@ const ManagerEditSelectedEvents = () => {
                   required
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
+              </div>
+              <div>
+                <label htmlFor="tags" className="block text-sm font-medium text-gray-400">Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  id="tags"
+                  name="tags"
+                  value={formik.values.tags.join(", ")}
+                  onChange={handleInputChange}
+                  className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
+                />
+              </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>

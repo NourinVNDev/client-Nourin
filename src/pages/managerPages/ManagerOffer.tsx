@@ -179,6 +179,12 @@ const ManagerOffers = () => {
                   Discount On
                 </th>
                 <th className="border border-gray-300 px-4 py-2 text-left">
+                  Start Date
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  End Date
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
                   Actions
                 </th>
               </tr>
@@ -199,6 +205,15 @@ const ManagerOffers = () => {
                     <td className="border border-gray-300 px-4 py-2">
                       {offer.discount_on}
                     </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                    {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(offer.startDate))}
+
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                    {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(offer.endDate))}
+
+                    </td>
+
                     <td className="border border-gray-300 px-4 py-2">
                       <button
                         className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"

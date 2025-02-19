@@ -29,13 +29,13 @@ const formik = useFormik<eventFormValues>({
     tags: [""],
     images: [] as (File | string)[],
     noOfPerson: 0,
-    noOfDays: 0,
+
     destination: "",
     Included: [""],
     notIncluded: [""],
     Amount: 0
   },
-  validationSchema:eventValidSchema,
+  // validationSchema:eventValidSchema,
   onSubmit:  (values) => {
     console.log("Form Submitted", values);
     const formData = new FormData();
@@ -52,7 +52,6 @@ const formik = useFormik<eventFormValues>({
     formData.append("tags", values.tags.join(","));
     formData.append("destination", values.destination);
     formData.append("noOfPerson", values.noOfPerson.toString());
-    formData.append("noOfDays", values.noOfDays.toString());
     formData.append("amount", values.Amount.toString()); 
     formData.append("Included", values.Included.join(","));
     formData.append("notIncluded", values.notIncluded.join(","));
@@ -234,6 +233,46 @@ return (
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
+            <label htmlFor="noOfPerson" className="block text-sm font-medium text-gray-400">
+              Number of People
+            </label>
+            <input
+              type="number"
+              id="noOfPerson"
+              name="noOfPerson"
+              value={formik.values.noOfPerson}
+              onChange={formik.handleChange}
+              // onBlur={formik.handleBlur}
+              // required
+              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.noOfPerson && formik.errors.noOfPerson ? 'border-red-500' : ''}`}
+            />
+            {formik.touched.noOfPerson && formik.errors.noOfPerson ? (
+              <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
+            ) : null}
+          </div>
+
+          <div>
+            <label htmlFor="Amount" className="block text-sm font-medium text-gray-400">
+              Amount
+            </label>
+            <input
+              type="number"
+              id="Amount"
+              name="Amount"
+              value={formik.values.Amount}
+              onChange={formik.handleChange}
+              // onBlur={formik.handleBlur}
+              // required
+              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.Amount && formik.errors.Amount ? 'border-red-500' : ''}`}
+            />
+            {formik.touched.Amount && formik.errors.Amount ? (
+              <div className="text-red-500 text-sm">{formik.errors.Amount}</div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-400">
               Start Date
             </label>
@@ -263,63 +302,8 @@ return (
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div>
-            <label htmlFor="noOfPerson" className="block text-sm font-medium text-gray-400">
-              Number of People
-            </label>
-            <input
-              type="number"
-              id="noOfPerson"
-              name="noOfPerson"
-              value={formik.values.noOfPerson}
-              onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.noOfPerson && formik.errors.noOfPerson ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.noOfPerson && formik.errors.noOfPerson ? (
-              <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
-            ) : null}
-          </div>
-          <div>
-            <label htmlFor="noOfDays" className="block text-sm font-medium text-gray-400">
-              Number of Days
-            </label>
-            <input
-              type="number"
-              id="noOfDays"
-              name="noOfDays"
-              value={formik.values.noOfDays}
-              onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.noOfDays && formik.errors.noOfDays ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.noOfDays && formik.errors.noOfDays ? (
-              <div className="text-red-500 text-sm">{formik.errors.noOfDays}</div>
-            ) : null}
-          </div>
-          <div>
-            <label htmlFor="Amount" className="block text-sm font-medium text-gray-400">
-              Amount
-            </label>
-            <input
-              type="number"
-              id="Amount"
-              name="Amount"
-              value={formik.values.Amount}
-              onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.Amount && formik.errors.Amount ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.Amount && formik.errors.Amount ? (
-              <div className="text-red-500 text-sm">{formik.errors.Amount}</div>
-            ) : null}
-          </div>
-        </div>
-
+    
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label htmlFor="destination" className="block text-sm font-medium text-gray-400">
             Destination
@@ -337,6 +321,27 @@ return (
           {formik.touched.destination && formik.errors.destination ? (
             <div className="text-red-500 text-sm">{formik.errors.destination}</div>
           ) : null}
+        </div>
+        <div>
+          <label htmlFor="tags" className="block text-sm font-medium text-gray-400">
+            Tags
+          </label>
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            value={formik.values.tags.join(", ")}
+            onChange={(e) => {
+              const value = e.target.value.split(",").map(item => item.trim());
+              formik.setFieldValue("tags", value);
+            }}
+            className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.tags && formik.errors.tags ? 'border-red-500' : ''}`}
+            placeholder="comma-separated tags"
+          />
+          {formik.touched.tags && formik.errors.tags ? (
+            <div className="text-red-500 text-sm">{formik.errors.tags}</div>
+          ) : null}
+        </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -380,26 +385,7 @@ return (
           </div>
         </div>
 
-        <div>
-          <label htmlFor="tags" className="block text-sm font-medium text-gray-400">
-            Tags
-          </label>
-          <input
-            type="text"
-            id="tags"
-            name="tags"
-            value={formik.values.tags.join(", ")}
-            onChange={(e) => {
-              const value = e.target.value.split(",").map(item => item.trim());
-              formik.setFieldValue("tags", value);
-            }}
-            className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.tags && formik.errors.tags ? 'border-red-500' : ''}`}
-            placeholder="comma-separated tags"
-          />
-          {formik.touched.tags && formik.errors.tags ? (
-            <div className="text-red-500 text-sm">{formik.errors.tags}</div>
-          ) : null}
-        </div>
+   
 
         <div>
           <label htmlFor="images" className="block text-sm font-medium text-gray-400">

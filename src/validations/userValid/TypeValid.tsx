@@ -16,6 +16,7 @@ export type PaymentData = {
     noOfPerson: number;
     noOfDays: number;
     Amount: number;
+    companyName:string
   };
   export type EventData = {
     _id:string;
@@ -31,7 +32,6 @@ export type PaymentData = {
     endDate: string;
     time: string; // Required property
     noOfPerson: number;
-    noOfDays: number; // Required property
     Amount: number; // Ensure this matches the casing in your state
     destination: string;
     Included: string[]; // Ensure this is an array of strings
@@ -62,4 +62,7 @@ export type PaymentData = {
     phoneNo:number,
     address:string
   }
+  
+
+
   
