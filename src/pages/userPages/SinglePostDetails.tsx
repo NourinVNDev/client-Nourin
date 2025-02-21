@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../../components/userComponents/Headers";
 import SocialEvents1 from "../../assets/SocialEvents1.avif";
@@ -6,17 +6,16 @@ import Footer from "../../components/userComponents/Footer";
 import Calendar, { CalendarProps } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { Link } from "react-router-dom";
-import { CheckOfferAvailable } from "../../service/userServices/userOffer";
-import { OfferData } from "../../validations/userValid/TypeValid";
+// import { CheckOfferAvailable } from "../../service/userServices/userOffer";
+// import { OfferData } from "../../validations/userValid/TypeValid";
 const SinglePostDetails = () => {
   const location = useLocation();
-  const [offerData, setOfferData] = useState<OfferData|null>(null);
-  // const searchParams = new URLSearchParams(location.search);
-  // const data = searchParams.get("data");
   const data = JSON.stringify(location.state?.data);
   console.log("Data for checking",data)
   const parsedData = data ? JSON.parse(decodeURIComponent(data)) : null;
   console.log("ParsedData:",parsedData);
+  console.log("Checking Amount",parsedData?.data?.result?.savedEvent?.offerDetails.offerAmount);
+  
 
   const initialStartDate = parsedData?.data?.result.savedEvent.startDate
     ? new Date(parsedData.data?.result.savedEvent.startDate)
@@ -24,32 +23,8 @@ const SinglePostDetails = () => {
   const initialEndDate = parsedData?.data?.result.savedEvent.endDate
     ? new Date(parsedData.data?.result.savedEvent.endDate)
     : new Date();
-    const actualAmount = (
-      Number(parsedData?.data?.result?.savedEvent?.Amount) - 
-      (Number(parsedData?.data?.result?.savedEvent?.Amount) * Number(offerData?.discount_value)) / 100
-    ).toFixed(2);
-    
-    useEffect(() => {
-      const isOfferAvailable = async () => {
-        try {
-          const result = await CheckOfferAvailable(parsedData.data?.result.savedEvent.title);
-            console.log("finding the result:",result);
-            
-          if (result?.success) { // Check if the request was successful
-            setOfferData(result.data); // Store offer data in state
-        console.log("Offer stored in state:", result.data);
-          } else {
-            console.log("No offers available.");
-          }
-          
-        } catch (error) {
-          console.error("Error checking offer availability:", error);
-        }
-      };
-    
-      isOfferAvailable();
-    }, []); // Add parsedData as a dependency
-    
+
+
 
   // State for the calendar date range
   const [dateRange, setDateRange] = useState<[Date, Date]>([initialStartDate, initialEndDate]);
@@ -138,11 +113,11 @@ const SinglePostDetails = () => {
         
                          
                           
-                          {parsedData?.data?.result?.savedEvent?.Amount && offerData?.discount_value && actualAmount 
+                          {parsedData?.data?.result?.savedEvent?.Amount &&  parsedData?.data?.result?.savedEvent?.offerDetails.isOfferAdded=='Offer Added'
                             ? (
                               <>
                                 <s>₹{parsedData?.data?.result?.savedEvent?.Amount || "0"}</s>
-                                <span> → ₹{actualAmount}</span>
+                                <span> → ₹{parsedData?.data?.result?.savedEvent?.offerDetails.offerAmount}</span>
                               </>
                             ) 
                             :
@@ -159,11 +134,6 @@ const SinglePostDetails = () => {
                           {parsedData?.data?.result.savedEvent.companyName || "Company Name"}
                         </span>
                       </div>
-                      {/* <div>
-                        <span className="text-gray-600 text-sm">
-                          Rating: {parsedData?.rating || "No rating available"}
-                        </span>
-                      </div> */}
                       <div>
                         <p className="text-gray-700">
                           {parsedData?.data?.result.savedEvent.content ||
@@ -182,8 +152,8 @@ const SinglePostDetails = () => {
                         <div className="flex justify-between items-center">
                           <h2 className="text-violet-700">Start Date:</h2>
                           <p className="text-gray-700">
-                            {parsedData?.data.startDate 
-                              ? new Date(parsedData.data.startDate).toLocaleDateString('en-US', {
+                            {parsedData.data?.result.savedEvent.startDate
+                              ? new Date(parsedData.data?.result.savedEvent.startDate).toLocaleDateString('en-US', {
                                   year: 'numeric',
                                   month: 'long', // 'short' for abbreviated month names
                                   day: 'numeric',
@@ -195,8 +165,8 @@ const SinglePostDetails = () => {
                         <div className="flex justify-between items-center">
                           <h2 className="text-violet-700">End Date:</h2>
                           <p className="text-gray-700">
-                          {parsedData?.data.endDate 
-                            ? new Date(parsedData.data.endDate).toLocaleDateString('en-US', {
+                          {parsedData.data?.result.savedEvent.endDate
+                            ? new Date(parsedData.data?.result.savedEvent.endDate).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long', // 'short' for abbreviated month names
                                 day: 'numeric',
@@ -236,53 +206,55 @@ const SinglePostDetails = () => {
             <div className="p-6 bg-gray-100 rounded-lg shadow-md">
               <h2 className="text-xl font-bold mb-4 text-black">Offer Information</h2>
 
-              {offerData ? (
+           
+                      
+            {parsedData?.data?.result?.savedEvent?.offer?(
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">Offer Name:</span>
-                    <span className="text-lg text-violet-700 font-semibold">{offerData.offerName}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">Discount On:</span>
-                    <span className="text-lg text-violet-700 font-semibold">{offerData.discount_on}</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">Discount Value:</span>
-                    <span className="text-lg text-violet-700 font-semibold">{offerData.discount_value}%</span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">Start Date:</span>
-                    <span className="text-lg text-green-600 font-semibold">
-                      {new Date(offerData.startDate).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">End Date:</span>
-                    <span className="text-lg text-red-600 font-semibold">
-                      {new Date(offerData.endDate).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">Actual Amount:</span>
-                    <span className="text-lg text-violet-700 font-semibold">₹{actualAmount}</span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-800">Offer Name:</span>
+                  <span className="text-lg text-violet-700 font-semibold">{parsedData?.data?.result?.savedEvent?.offer.offerName}</span>
                 </div>
-              ) : (
-                <p className="text-gray-600">No active offers available.</p>
-              )}
+
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-800">Discount On:</span>
+                  <span className="text-lg text-violet-700 font-semibold">{parsedData?.data?.result?.savedEvent?.offer.discount_on}</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-800">Discount Value:</span>
+                  <span className="text-lg text-violet-700 font-semibold">{parsedData?.data?.result?.savedEvent?.offer.discount_value}%</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-800">Start Date:</span>
+                  <span className="text-lg text-green-600 font-semibold">
+                    {new Date(parsedData?.data?.result?.savedEvent?.offer.startDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-800">End Date:</span>
+                  <span className="text-lg text-red-600 font-semibold">
+                    {new Date(parsedData?.data?.result?.savedEvent?.offer.endDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-gray-800">Actual Amount:</span>
+                  <span className="text-lg text-violet-700 font-semibold">₹{parsedData?.data?.result?.savedEvent?.offerDetails.offerAmount}</span>
+                </div>
+              </div>
+            ):(
+              <p className="text-gray-600">No active offers available.</p>
+            )}
             </div>
           )}
 

@@ -41,6 +41,7 @@ import EventBooking from "../pages/userPages/EventBooking";
 import TodaysRequest from "../pages/managerPages/TodaysRequest";
 import TotalBooking from "../pages/managerPages/TotalBooking";
 import EntryHome from "../pages/userPages/EntryHome";
+import AdminEditCategory from "../pages/adminPages/AdminEditCategory";
 interface RouteConfig {
     path: string;
     element: React.ReactNode;
@@ -60,7 +61,7 @@ interface RouteConfig {
     {path:'/singlePostDetails',element:<PrivateRoute><SinglePostDetails/></PrivateRoute>},
     {path:'/checkEventDetails/:id',element:<PrivateRoute><EventDetails/></PrivateRoute>},
     {path:'/payment-success',element:<PrivateRoute><PaymentSuccess/></PrivateRoute>},
-    {path:'/payment-cancel',element:<PrivateRoute><PaymentCancel/></PrivateRoute>},
+    {path:'/payment-cancel/:bookedId',element:<PrivateRoute><PaymentCancel/></PrivateRoute>},
     {path:'/event-history',element:<PrivateRoute><EventHistory/></PrivateRoute>},
     {path:'/user/chat',element:<PrivateRoute><UserChat/></PrivateRoute>},
     {path:'/user/bookedEvent',element:<PrivateRoute><EventBooking/></PrivateRoute>},
@@ -92,6 +93,7 @@ interface RouteConfig {
     {path:'/admin/users',element:<AdminPrivateRoute><AdminUser/></AdminPrivateRoute>},
     {path:'/admin/managers',element:<AdminPrivateRoute><AdminManager/></AdminPrivateRoute>},
     {path:'/admin/category',element:<AdminPrivateRoute><AdminCategory/></AdminPrivateRoute>},
+    {path:'/admin/editCategory/:id',element:<AdminPrivateRoute><AdminEditCategory/></AdminPrivateRoute>},
     {path:'/admin/addEvents',element:<AdminPrivateRoute><AdminAddCategory/></AdminPrivateRoute>},
     {path:'/adminLogout',element:<AdminLogout/>}
 

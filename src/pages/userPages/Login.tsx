@@ -56,6 +56,7 @@ const Login: React.FC = () => {
                     lastName:result.user.lastName,
                     phoneNo: result.user.phoneNo,
                     email: result.user.email,
+                    profilePhoto:result.user.profilePhoto||'',
                     Address:''
                 };
                 dispatch(setUserDetails(userData));

@@ -24,6 +24,9 @@ const EventDetails = () => {
 
   };  
   const user=useSelector((state:RootState)=>state.user);
+
+  console.log("User Details from store",user.Address);
+  
   const { id } = useParams();
   const [eventData, setEventData] = useState<PaymentData>({
     bookedId:"",
@@ -52,42 +55,6 @@ const EventDetails = () => {
         console.error("Error during payment:", error);
     }
 };
-// useEffect(() => {
-//   const fetchEventData = async () => {
-//     try {
-//       if (user) {
-//         console.log("UserData",user);
-//         setEventData((prevData) => ({
-//           ...prevData, // Keep existing values (including user data)
-//           userId:user._id ||prevData.userId,
-//           firstName: user.firstName || prevData.firstName || "",
-//           lastName: user.lastName || prevData.lastName || "",
-//           email: user.email || prevData.email || "",
-//           phoneNo: Number(user.phoneNo) || prevData.phoneNo || 0,
-//           address: user.Address || prevData.address || "",
-//         }));
-//       }
-
-//       if (!id) {
-//         throw new Error("ID is not found");
-//       }
-
-//       const result = await getEventData(id);
-//       console.log("Results:", result);
-
-//       setEventData((prevData) => ({
-//         ...prevData, // Keep any existing values
-//         categoryName: result.data.title||prevData.categoryName,
-//         ...result.data, // Merge API data
-//       }));
-//       console.log("Logging state data",eventData);
-//     } catch (error) {
-//       console.error("Error fetching event data:", error);
-//     }
-//   };
-
-//   fetchEventData();
-// }, [id, user]); 
 
 useEffect(() => {
   const fetchEventData = async () => {
@@ -95,7 +62,7 @@ useEffect(() => {
       if (!id) throw new Error("ID is not found");
 
       const result = await getEventData(id);
-      console.log("Results:", result);
+      console.log("Results12:", result);
 
       const event = result?.data?.result?.savedEvent || {}; // Extract event data correctly
 
@@ -121,6 +88,7 @@ useEffect(() => {
       console.error("Error fetching event data:", error);
     }
   };
+
 
   fetchEventData();
 }, [id, user]);

@@ -5,12 +5,12 @@ import { addNewCategoryDetails } from "../../service/adminServices/adminCategory
 import  { useState } from "react";
 import toast ,{Toaster} from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-type EventData={
-    categoryName:string,
-    description:string
+type CategoryData={
+  categoryName:string,
+  description:string
 }
 const AdminAddCategory = () => {
-    const [eventCategory, setEventCategory] = useState<EventData>({
+    const [eventCategory, setEventCategory] = useState<CategoryData>({
      categoryName:'',
      description:''
       });

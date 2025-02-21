@@ -129,7 +129,25 @@ const saveBillingDetails=async(formData:billingData)=>{
     }
 }
 
+const updatePaymentStatusService=async(bookedId:string)=>{
+    try {
+        console.log("BookedID",bookedId)
+     
+        const response = await API(`/updatePaymentStatus/${bookedId}`, {
+            method: 'POST',
+           
+        });
+
+        const data = response.data;
+   console.log("Data form client",data);
+        return data; // Return the OTP or any other relevant data
+    } catch (error) {
+        console.error("Error during registration:", error);
+        return undefined; // Or throw an error if you want to handle it upstream
+    }
+}
 
 
 
-export {getEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,saveBillingDetails};
+
+export {getEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,saveBillingDetails,updatePaymentStatusService};

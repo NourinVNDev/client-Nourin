@@ -69,6 +69,11 @@ const  AdminCategory=()=>{
     const handleEventData=()=>{
     navigate('/admin/addEvents')
     }
+
+
+    const handleCategoryEdit=(id:string)=>{
+      navigate(`/admin/editCategory/${id}`)
+    }
     return(
         <div className="w-screen h-screen flex flex-col bg-gray-50">
         {/* Header */}
@@ -85,7 +90,7 @@ const  AdminCategory=()=>{
             {/* User List */}
             <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-xl">
             <div className="flex items-center justify-between mb-4">
-  <h2 className="text-3xl font-extrabold text-gray-900">
+  <h2 className="text-3xl font-extrabold mb-6 text-gray-900 text-cenet">
     Category's List
   </h2>
   <button onClick={handleEventData} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -100,9 +105,9 @@ const  AdminCategory=()=>{
                   <tr className="bg-gradient-to-r from-blue-500 to-blue-600 text-gray">
                     <th className="border border-gray-400 p-3 text-left">Name</th>
                     <th className="border border-gray-400 p-3 text-left">Description</th>
-                    <th className="border border-gray-400 p-3 text-left">Edit</th>
                     <th className="border border-gray-400 p-3 text-left">Status</th>
                     <th className="border border-gray-400 p-3 text-left">Block/unblock</th>
+                    <th className="border border-gray-400 p-3 text-left">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -111,7 +116,7 @@ const  AdminCategory=()=>{
         <tr key={category._id} className="odd:bg-white even:bg-gray-100 hover:bg-blue-50 text-black">
           <td className="border border-gray-400 p-3">{category.categoryName}</td>
           <td className="border border-gray-400 p-3">{category.Description}</td>
-          <td> <button>Edit</button></td>
+        
           <td className="border border-gray-400 p-3">
       {category.isListed ? "Active" : "Inactive"}
     </td>
@@ -133,6 +138,7 @@ const  AdminCategory=()=>{
   )}
 
           </td>
+          <td> <button  className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600" onClick={()=>handleCategoryEdit(category._id)}>Edit</button></td>
         </tr>
       ))
     ) : (

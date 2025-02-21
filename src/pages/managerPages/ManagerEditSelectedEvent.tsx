@@ -173,8 +173,13 @@ const ManagerEditSelectedEvents = () => {
     console.log("Checking the photo",files);
     
     if (files) {
-      const fileArray = Array.from(files[0].name); // Convert FileList to Array
+      const fileArray = Array.from(files); // Convert FileList to Array
       formik.setFieldValue("images", fileArray); // Replace the images array with new images
+      setEventDetails((prev) => ({
+        ...prev, // Keep the existing data
+        images: fileArray, // Update only the images field
+      }));
+      
     }
   };
 

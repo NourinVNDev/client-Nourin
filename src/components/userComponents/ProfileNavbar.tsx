@@ -1,34 +1,57 @@
 import { Link, useLocation } from "react-router-dom";
 import person from "../../assets/person.png";
 import { RootState } from "../../../App/store";
-import { useSelector } from "react-redux";
-import { useState, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useRef, useEffect } from "react";
 import { postUserProfilePicture } from "../../service/userServices/userProfile";
+import { setUserDetails } from "../../../Features/userSlice"; // Import Redux action
+import { AppDispatch } from "../../../App/store";
 
 const ProfileNavbar = () => {
+  const dispatch: AppDispatch = useDispatch();
   const userId = localStorage.getItem("userId");
   const location = useLocation();
-  const firstName = useSelector((state: RootState) => state.user?.firstName ?? "");
+
+  // Get user data from Redux **only once**
+  const user = useSelector((state: RootState) => state.user);
+  const { firstName = "", profilePhoto = "" } = user;
 
   const { profileData = {} } = location.state || {}; // Default profile data
+  const [selectedImage, setSelectedImage] = useState<string>(profilePhoto || profileData.profilePicture || "");
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(
-    profileData.profilePicture || null
-  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update selectedImage when profilePhoto changes
+  useEffect(() => {
+    if (profilePhoto) {
+      setSelectedImage(profilePhoto);
+    }
+  }, [profilePhoto]);
 
   // Handle Image Upload
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setSelectedImage(URL.createObjectURL(file)); // Preview image
+      setSelectedImage(URL.createObjectURL(file)); // Preview before upload
 
-      // Upload the file
       try {
-        if(!userId)return;
+        if (!userId) return;
         const formData = new FormData();
-        formData.append('profilePicture', file);
-        await postUserProfilePicture(formData,userId);
+        formData.append("profilePicture", file);
+        const result = await postUserProfilePicture(formData, userId);
+
+        if (result.message === "Profile Photo Uploaded") {
+          // Merge existing user details with the new profile photo
+
+          console.log("Checking the photo:",result.data.data);
+          
+          const updatedUserProfile = {
+            ...user, // Keep existing details
+            profilePhoto: result.data.data,
+          };
+
+          dispatch(setUserDetails(updatedUserProfile));
+        }
       } catch (error) {
         console.error("Error uploading image:", error);
       }
@@ -49,6 +72,7 @@ const ProfileNavbar = () => {
             src={selectedImage || person}
             alt="Profile"
             className="w-20 h-20 rounded-full object-cover mb-2"
+            onError={(e) => (e.currentTarget.src = person)} // Fallback in case of error
           />
           {/* Hidden File Input */}
           <input

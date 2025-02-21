@@ -1,13 +1,29 @@
-import { useNavigate } from 'react-router-dom';
-
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { updatePaymentStatusService } from '../../service/userServices/userPost';
+import Header from '../../components/userComponents/Headers';
 const PaymentCancel = () => {
+
+  const {bookedId}=useParams();
   const navigate = useNavigate(); // For navigating to the home page
 
   const handleGoHome = () => {
     navigate('/home'); // Redirect to the home page
   };
+  useEffect(()=>{
+    const updatePaymentStatus=async()=>{
+      if(bookedId){
+        const result=await updatePaymentStatusService(bookedId);
+      }
+  
 
+    }
+
+    updatePaymentStatus()
+  },[]);
   return (
+    <div>
+      <Header/>
     <div className="w-screen h-screen flex flex-col items-center justify-center bg-red-100">
       <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm w-full">
         <h1 className="text-3xl font-semibold text-red-600 mb-4">Payment Cancelled</h1>
@@ -21,6 +37,7 @@ const PaymentCancel = () => {
           Go to Home
         </button>
       </div>
+    </div>
     </div>
   );
 };

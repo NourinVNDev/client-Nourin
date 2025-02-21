@@ -1,12 +1,30 @@
 import { Link } from "react-router-dom";
 import person from '../../assets/person.png';
 import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { setUserDetails } from "../../../Features/userSlice"; // Import Redux action
+import { RootState } from "../../../App/store";
+import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 
 export default function Header() {
   const [searchParams] = useSearchParams();
+  const location=useLocation();
   const categories = searchParams.get('categories')?.split(',') || [];
   console.log(categories);
+  const user = useSelector((state: RootState) => state.user);
+  const { profilePhoto = "" } = user;
+  const { profileData = {} } = location.state || {}; // Default profile data
+  const [selectedImage, setSelectedImage] = useState<string>(profilePhoto || profileData.profilePicture || "");
+
+
+  useEffect(()=>{
+    if(profilePhoto){
+      setSelectedImage(profilePhoto);
+    }
+
+  },[profilePhoto])
   return (
     <header className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg">
       <div className="container mx-auto px-6 py-6 flex justify-between items-center">
@@ -33,11 +51,16 @@ export default function Header() {
             <li>
               {/* Profile Image */}
             <Link to='/profile'>
+            {selectedImage?(
             <img
-                  src={person} // Replace with your profile image path
+                  src={selectedImage} // Replace with your profile image path
                   alt="Profile"
                   className="w-8 h-8 rounded-full border-2 border-white hover:border-yellow-400 transition-all duration-300"
-                /></Link>
+                />):(<img
+                src={person} // Replace with your profile image path
+                alt="Profile"
+                className="w-8 h-8 rounded-full border-2 border-white hover:border-yellow-400 transition-all duration-300"
+              />)}</Link>
             
             
             </li>

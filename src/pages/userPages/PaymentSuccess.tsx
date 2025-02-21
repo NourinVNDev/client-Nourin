@@ -1,4 +1,5 @@
 import { useNavigate} from 'react-router-dom';
+import Header from '../../components/userComponents/Headers';
 
 const PaymentSuccess = () => {
   const naavigate = useNavigate(); // For navigating to the home page
@@ -8,6 +9,8 @@ const PaymentSuccess = () => {
   };
 
   return (
+    <div>
+      <Header/>
     <div className="w-screen h-screen flex flex-col items-center justify-center bg-green-100">
       <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm w-full">
         <h1 className="text-3xl font-semibold text-green-600 mb-4">Payment Successful</h1>
@@ -19,6 +22,7 @@ const PaymentSuccess = () => {
           Go to Home
         </button>
       </div>
+    </div>
     </div>
   );
 };

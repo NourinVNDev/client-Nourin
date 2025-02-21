@@ -6,6 +6,7 @@ interface UserState {
   email: string | null;
   phoneNo: string | null;
   Address:string| null;
+  profilePhoto:string|null;
   _id:string|null
 }
 
@@ -17,6 +18,7 @@ const initialState: UserState = {
   email: null,
   phoneNo: null,
   Address:null,
+  profilePhoto:null,
 };
 
 const userSlice = createSlice({
@@ -31,6 +33,7 @@ const userSlice = createSlice({
       state.phoneNo = action.payload.phoneNo;
       state._id=action.payload._id;
       state.Address=action.payload.Address;
+      state.profilePhoto=action.payload.profilePhoto;
     },
     // Clear user details
     clearUserDetails: (state) => {
@@ -39,6 +42,7 @@ const userSlice = createSlice({
       state.phoneNo = null;
       state.lastName=null;
       state.Address=null;
+      state.profilePhoto=null;
     },
     updateAddress: (state, action: PayloadAction<string>) => {
       state.Address = action.payload;

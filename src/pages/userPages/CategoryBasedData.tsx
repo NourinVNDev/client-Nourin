@@ -230,7 +230,11 @@ const CategoryBasedData = () => {
                   <div className="flex-1">
                     <span className="block mb-2 text-gray-700 font-medium hover:text-blue-400">
                       {post.companyName}
+                      <span className="block text-gray-500 text-sm mb-4">
+                        {post.location?.address || "Unknown"}
+                      </span>
                     </span>
+
                     <img
                       src={post.images}
                       className="w-full h-auto object-cover rounded-md mb-4"
@@ -242,9 +246,6 @@ const CategoryBasedData = () => {
                         {post.title}
                       </h2>
                       <p className="text-gray-600 text-sm mb-4">{post.content}</p>
-                      <span className="block text-gray-500 text-sm mb-4">
-                        {post.location?.address || "Unknown"}
-                      </span>
                     </div>
                   </div>
 

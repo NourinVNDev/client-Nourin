@@ -1,13 +1,9 @@
 import ADMIN_API from "../../utils/adminAxiosIntance";
-
 const getCategoryDetails=async()=>{
     try {
        const response = await ADMIN_API('/admin/category', {
                   method: 'GET',
-                  headers: {
-                      'Content-Type': 'application/json',
-                    withCredentials:true
-                  },
+                  withCredentials:true
               });
               const data = response.data;
               console.log("hello", data);
@@ -22,9 +18,6 @@ const updateCategoryBlockStatus = async (categoryId: string, updatedStatus: bool
     try {
         const response = await ADMIN_API('/admin/categoryIsBlock', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
             data: { categoryId, updatedStatus },
             withCredentials: true, // Move this here
         });
@@ -53,7 +46,6 @@ const addNewCategoryDetails=async(formData:{[key:string]:string}):Promise<any>=>
     try {
         const response = await ADMIN_API('/admin/addCategory', {
                    method: 'POST',
-            
                    data:formData,
                    withCredentials:true
                });
@@ -66,6 +58,44 @@ const addNewCategoryDetails=async(formData:{[key:string]:string}):Promise<any>=>
            }
 
 }
-export  {getCategoryDetails,addNewCategoryDetails,updateCategoryBlockStatus};
+
+
+const editSelectedCategory=async(category:string,categoryId:string)=>{
+    
+    try {
+        const response = await ADMIN_API(`/admin/editSingleCategory/${categoryId}`, {
+                   method: 'POST',
+                   withCredentials:true,
+                   data:{category}
+               });
+               const data = response.data;
+               console.log("hello hai", data);
+               return data; // Return the resolved data
+           } catch (error) {
+               console.error('Error fetching category details:', error);
+               return []; // Return an empty array or handle it based on your app's needs
+           }
+
+}
+
+
+const  fetchSelectedCategory=async(categoryId:string)=>{
+
+
+    try {
+        const response = await ADMIN_API(`/admin/fetchSelectedCategory/${categoryId}`, {
+                   method: 'GET',
+                   withCredentials:true
+               });
+               const data = response.data;
+               console.log("hello", data);
+               return data; // Return the resolved data
+           } catch (error) {
+               console.error('Error fetching category details:', error);
+               return []; // Return an empty array or handle it based on your app's needs
+           }
+    
+}
+export  {getCategoryDetails,addNewCategoryDetails,updateCategoryBlockStatus,fetchSelectedCategory,editSelectedCategory};
 
 
