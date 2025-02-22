@@ -6,22 +6,17 @@ import { getEventDataDetails, handleLikePost, handlePostDetails } from '../../se
 import Footer from '../../components/userComponents/Footer';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 import useSocket from '../../utils/SocketContext';
-
 type Like = {
   user: string;
   _id: string;
   createdAt: string;
 };
-
 const CategoryBasedData = () => {
   const { id } = useParams();
   const {socket}=useSocket()
   const navigate = useNavigate();
   const [userName,setUserName]=useState('')
   const userId = localStorage.getItem('userId');
-
-
-
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [interactions, setInteractions] = useState<{ [key: number]: { liked: boolean, newComment: string, comments: string[] } }>({});
@@ -56,20 +51,6 @@ const CategoryBasedData = () => {
     };
     fetchEventDetails();
   }, [id]);
-
-  // useEffect(() => {
-  //   const initialInteractions = parsedData.reduce((acc, post, index) => {
-  //     acc[index] = {
-  //       liked: Array.isArray(post.likes) && post.likes.some((like: Like) => like.user === userId),
-  //       comments: Array.isArray(post.comments) ? post.comments.map((c: any) => c.content) : [],
-  //       newComment: ''
-  //     };
-  //     return acc;
-  //   }, {} as typeof interactions);
-  //   setInteractions(initialInteractions);
-  // }, [parsedData, userId]);
-  
-
   useEffect(() => {
     const initialInteractions = parsedData.reduce((acc, post, index) => {
       acc[index] = {
@@ -111,7 +92,6 @@ const CategoryBasedData = () => {
     });
   
     console.log(`Attempting to ${newLikedStatus ? 'like' : 'unlike'} post with ID: ${postId}`);
-  
     try {
       if (!userId) {
         throw new Error('userId is needed from categoryBasedData');
@@ -184,7 +164,6 @@ const CategoryBasedData = () => {
         console.error("Socket is not connected!");
         return;
     }
-
       socket.emit('post_comment', newComment, userId, postId, (response: { comment: string, userName: string }) => {
         if (response) {
           setUserName(response.userName);
@@ -201,9 +180,6 @@ const CategoryBasedData = () => {
       });
     }
   };
-  
-  
-
   const handleInputChange = (index: number, value: string) => {
     setInteractions((prev) => ({
       ...prev,
@@ -213,7 +189,6 @@ const CategoryBasedData = () => {
       },
     }));
   };
-
   return (
     <div className="min-h-screen bg-blue-50">
       <Header />
@@ -225,8 +200,7 @@ const CategoryBasedData = () => {
               parsedData.map((post: any, index: number) => (
                 <div
                   key={post._id || index}
-                  className="bg-white w-full p-6 rounded-lg shadow-lg border border-gray-200 flex flex-col space-y-4"
-                >
+                  className="bg-white w-full p-6 rounded-lg shadow-lg border border-gray-200 flex flex-col space-y-4">
                   <div className="flex-1">
                     <span className="block mb-2 text-gray-700 font-medium hover:text-blue-400">
                       {post.companyName}
@@ -234,13 +208,22 @@ const CategoryBasedData = () => {
                         {post.location?.address || "Unknown"}
                       </span>
                     </span>
+                    <div className="relative">
+  
+                    {post.offerDetails?.offerPercentage && (
+                      <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
+                        {post.offerDetails.offerPercentage}% OFF
+                      </div>
+                    )}
 
+                    {/* Image */}
                     <img
                       src={post.images}
                       className="w-full h-auto object-cover rounded-md mb-4"
                       alt={post.title}
                       onClick={async () => await handleButtonClick(post._id)}
                     />
+                  </div>
                     <div className="text-center">
                       <h2 className="text-2xl font-bold text-gray-800 mb-2">
                         {post.title}
@@ -248,7 +231,6 @@ const CategoryBasedData = () => {
                       <p className="text-gray-600 text-sm mb-4">{post.content}</p>
                     </div>
                   </div>
-
                   <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                       <button
@@ -257,8 +239,7 @@ const CategoryBasedData = () => {
                           interactions[index]?.liked
                             ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        } shadow-md hover:shadow-lg transform hover:scale-105`}
-                      >
+                        } shadow-md hover:shadow-lg transform hover:scale-105`} >
                         {interactions[index]?.liked ? (
                           <>
                             <FaHeart className="text-3xl animate-pulse" />
@@ -268,13 +249,11 @@ const CategoryBasedData = () => {
                           <FaRegHeart className="text-3xl" />
                         )}
                       </button>
-
                       <div className="flex justify-end">
                         <button onClick={() => toggleCommentBox(index)} className="flex items-center space-x-2 text-black">
                           <FaRegCommentDots className="text-3xl" />
                         </button>
                       </div>
-
                       <Modal isOpen={openModalIndex === index} onClose={closeModal} backdrop="blur" className="rounded-lg shadow-xl border border-gray-200 bg-white max-h-[400px]">
                         <ModalContent>
                           <ModalHeader className="text-lg font-semibold text-gray-900 border-b border-gray-300 py-3">Comments</ModalHeader>
@@ -290,7 +269,6 @@ const CategoryBasedData = () => {
                           )
                           }  
                           </ModalBody>
-
                           <ModalFooter className="flex flex-col items-start gap-2 border-t border-gray-300 p-4">
                             <input
                               value={interactions[index]?.newComment || ''}
@@ -300,15 +278,12 @@ const CategoryBasedData = () => {
                             />
                             <div className=" text-black flex justify-end w-full gap-4 mt-2"> 
                             <button className=' bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded'
-  onClick={() => handleComment(index,post._id)} 
->
+  onClick={() => handleComment(index,post._id)} >
   Add Comment
 </button>
-
  <button 
   className='bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded'
-  onClick={closeModal}
->
+  onClick={closeModal}>
   Stop
 </button> 
                             </div>
@@ -329,6 +304,4 @@ const CategoryBasedData = () => {
     </div>
   );
 };
-
-
 export default CategoryBasedData;

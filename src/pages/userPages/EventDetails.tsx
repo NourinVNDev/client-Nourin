@@ -9,6 +9,7 @@ import { PaymentData } from "../../validations/userValid/TypeValid";
 import { useSelector} from "react-redux";
 import { RootState } from "../../../App/store";
 import { saveBillingDetails } from "../../service/userServices/userPost";
+import toast,{Toaster} from "react-hot-toast";
 
 const EventDetails = () => {
   const [memberName, setMemberName] = useState(""); // State for input field
@@ -16,6 +17,8 @@ const EventDetails = () => {
 
   const handleNoOfPerson = (e: React.FormEvent) => {
     e.preventDefault();
+
+    
     
     if (!memberName.trim()) return; // Prevent empty entries
 
@@ -24,6 +27,7 @@ const EventDetails = () => {
 
   };  
   const user=useSelector((state:RootState)=>state.user);
+  const userId=localStorage.getItem('userId');
 
   console.log("User Details from store",user.Address);
   
@@ -47,6 +51,10 @@ const EventDetails = () => {
   });
   const makePayment = async () => {
     console.log("Match");
+    if (members.length<=0) {
+      toast.error("Add Members Name");
+        return;
+  }
     try {
         // Assuming eventData contains necessary details like product info
         const result = await makeStripePayment(eventData); 
@@ -68,7 +76,7 @@ useEffect(() => {
 
       setEventData((prevData) => ({
         ...prevData,
-        userId: user?._id || prevData.userId,
+        userId: user?._id ||prevData.userId,
         firstName: user?.firstName || prevData.firstName || "",
         lastName: user?.lastName || prevData.lastName || "",
         email: user?.email || prevData.email || "",
@@ -81,7 +89,7 @@ useEffect(() => {
         location: event?.location || prevData.location,
         noOfPerson: event?.noOfPerson || prevData.noOfPerson,
         noOfDays: event?.noOfDays || prevData.noOfDays,
-        Amount: event?.Amount || prevData.Amount,
+        Amount: event?.offerDetails.offerAmount||event.Amount,
 
       }));
     } catch (error) {
@@ -114,8 +122,19 @@ const SaveBillingDetails = async (e: React.FormEvent) => {
   e.preventDefault(); // Prevent page reload
   console.log("Saving billing details...");
 
+  if (!eventData) {
+    console.error("eventData is undefined");
+    return;
+  }
+
+  const eventId = id ?? userId;
+  if (!eventId) {
+    console.error("Neither id nor userId is defined.");
+    return;
+  }
+
   const formData={
-    eventId:id||'',
+    eventId:eventId,
     categoryName:eventData.categoryName,
     userId:eventData.userId,
     firstName:eventData.firstName,
@@ -129,7 +148,7 @@ const SaveBillingDetails = async (e: React.FormEvent) => {
   console.log("Onnce",result.data);
   if (result.success) {
     console.log("Billing details saved successfully:", result.data);
-
+    toast.success('Saved Billing Details');
     setEventData((prevData) => ({
       ...prevData,
       ...result.data.billingDetails, // Corrected field access
@@ -143,6 +162,12 @@ const SaveBillingDetails = async (e: React.FormEvent) => {
   return (
     <div className="min-h-screen bg-blue-50">
       <Header />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000, // Default duration for toasts
+        }}/>
       <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-screen pt-0 pb-10 flex justify-center">
         <div className="flex w-full max-w-screen-xl space-x-8">
           {/* Left Section - Add Members Form and Billing Details */}
@@ -226,11 +251,8 @@ const SaveBillingDetails = async (e: React.FormEvent) => {
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-purple-700 text-white py-2 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  Save Changes
+                <button type="submit" className="w-full bg-purple-700 text-white py-2 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  Save Billing Details
                 </button>
               </form>
             </div>

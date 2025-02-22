@@ -45,23 +45,10 @@ export default function EntryHome() {
         </video>
 
         {/* Content on top of video */}
-        <div className="relative z-10 max-w-3xl px-6">
-          <h2 className="text-5xl font-semibold mb-4">Welcome to MeetCraft</h2>
-          <p className="text-xl mb-6">
-            Where ideas come to life. Join the most exciting hackathons and
-            collaborate with brilliant minds to build something incredible.
-          </p>
-          <p className="text-lg mb-6">
-            Connect with developers, designers, and innovators from around
-            the world. Learn new skills, solve real-world challenges, and
-            showcase your talent.
-          </p>
-          <Link to="/register">
-            <Button className="bg-blue-700 hover:bg-blue-800 py-2 px-6 rounded-lg text-white">
-              Register Now
-            </Button>
-          </Link>
-        </div>
+        <div className="relative z-10 max-w-3xl px-6 -mt-8">
+    <h2 className="text-5xl font-semibold mb-4">Welcome to MeetCraft</h2>
+</div>
+
       </section>
 
       {/* About Section */}

@@ -6,7 +6,7 @@ import { handleProfileDetails, handleProfileData } from '../../service/userServi
 import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../App/store';
-import { updateAddress } from '../../../Features/userSlice';
+import { setUserDetails, updateAddress,updateAddressPhone } from '../../../Features/userSlice';
 import { useFormik } from 'formik';
 import { profileValidSchema } from '../../validations/userValid/profileValidSchema';
 
@@ -14,7 +14,16 @@ const ProfilePage = () => {
   const userId = localStorage.getItem('userId');
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(true);
+  type setUserData={
+    firstName:string,
+    lastName:string,
+    email:string,
+    phoneNo:string,
+    Address:string
+    profilePhoto:string,
+    _id:string
 
+  }
   // Formik Setup
   const formik = useFormik({
     initialValues: {
@@ -29,7 +38,18 @@ const ProfilePage = () => {
       try {
         const result = await handleProfileDetails(values);
         if (result.user) {
-          dispatch(updateAddress(result.user.address));
+          console.log("Result of Profile",result.user);
+          
+          const userData:setUserData={
+            firstName:result.user.firstName,
+            lastName:result.user.lastName,
+            email:result.user.email,
+            phoneNo:result.user.phoneNo,
+            Address:result.user.address,
+            profilePhoto:result.user.profilePhoto||null,
+            _id:result.user._id,
+          }
+          dispatch(setUserDetails(userData));
           toast.success("Profile updated successfully!");
         }
       } catch (error) {
@@ -41,7 +61,10 @@ const ProfilePage = () => {
   // Fetch user data on mount
   useEffect(() => {
     const fetchUserData = async () => {
+      console.log("User Details:",userId);
+      
       if (userId) {
+
         const response = await handleProfileData(userId);
         if (response.message === "User details retrieved successfully.") {
           formik.setValues({

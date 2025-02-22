@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { postUserProfilePicture } from "../../service/userServices/userProfile";
 import { setUserDetails } from "../../../Features/userSlice"; // Import Redux action
 import { AppDispatch } from "../../../App/store";
+import toast,{Toaster} from "react-hot-toast";
 
 const ProfileNavbar = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -42,7 +43,7 @@ const ProfileNavbar = () => {
 
         if (result.message === "Profile Photo Uploaded") {
           // Merge existing user details with the new profile photo
-
+          toast.success('Profile Photo is updated');
           console.log("Checking the photo:",result.data.data);
           
           const updatedUserProfile = {
@@ -64,6 +65,7 @@ const ProfileNavbar = () => {
   };
 
   return (
+  
     <div className="bg-[#f8f8f8] text-black min-h-screen flex flex-col w-64">
       {/* Profile section */}
       <div className="flex flex-col items-center py-6">

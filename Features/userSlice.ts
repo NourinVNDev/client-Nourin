@@ -10,6 +10,13 @@ interface UserState {
   _id:string|null
 }
 
+
+interface LoginAuthState{
+  firstName:string|null;
+  lastName:string|null;
+  email:string|null;
+}
+
 // Initial state
 const initialState: UserState = {
     _id:null,
@@ -20,6 +27,8 @@ const initialState: UserState = {
   Address:null,
   profilePhoto:null,
 };
+
+
 
 const userSlice = createSlice({
   name: 'user',
@@ -37,21 +46,26 @@ const userSlice = createSlice({
     },
     // Clear user details
     clearUserDetails: (state) => {
-      state.firstName = null;
-      state.email = null;
-      state.phoneNo = null;
-      state.lastName=null;
-      state.Address=null;
-      state.profilePhoto=null;
+      return initialState
     },
     updateAddress: (state, action: PayloadAction<string>) => {
+      state.Address = action.payload;
+    },
+    setLoginAuthentication:(state, action: PayloadAction<LoginAuthState>)=>{
+    
+      state.firstName=action.payload.firstName;
+      state.lastName=action.payload.lastName;
+      state.email=action.payload.email;
+
+    },
+    updateAddressPhone:(state, action: PayloadAction<string>) => {
       state.Address = action.payload;
     },
   },
 });
 
 // Export actions
-export const { setUserDetails, clearUserDetails,updateAddress } = userSlice.actions;
+export const { setUserDetails, clearUserDetails,updateAddress,setLoginAuthentication,updateAddressPhone} = userSlice.actions;
 
 // Export reducer
 export default userSlice.reducer;

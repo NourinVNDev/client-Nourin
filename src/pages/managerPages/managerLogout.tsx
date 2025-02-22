@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { clearManagerDetails } from "../../../Features/managerSlice";
 import { useDispatch} from "react-redux";
+import { persistor } from "../../../App/store";
 
 const ManagerLogout=()=>{
     const navigate=useNavigate();
@@ -13,8 +14,10 @@ const ManagerLogout=()=>{
         localStorage.removeItem('managerAuth');
         navigate('/mLogin');
         dispatch(clearManagerDetails());
+        persistor.purge();
 
     },[navigate])
+
     return(
         <div>
 

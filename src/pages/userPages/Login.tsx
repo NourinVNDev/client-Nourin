@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../App/store';
 import { setUserDetails } from '../../../Features/userSlice';
 import toast,{Toaster} from 'react-hot-toast';
+import { setLoginAuthentication } from '../../../Features/userSlice';
 
 
 
@@ -56,8 +57,8 @@ const Login: React.FC = () => {
                     lastName:result.user.lastName,
                     phoneNo: result.user.phoneNo,
                     email: result.user.email,
-                    profilePhoto:result.user.profilePhoto||'',
-                    Address:''
+                    profilePhoto:result.user.profilePhoto||null,
+                    Address:result.user.address||null
                 };
                 dispatch(setUserDetails(userData));
                 localStorage.setItem('userAuth','true');
@@ -81,26 +82,42 @@ const Login: React.FC = () => {
             
             
             }
-        };
-
+        };    
     const login = useGoogleLogin({
         onSuccess: async (response) => {
-            console.log("Google Login Successful:", response);
-           let result= await GoogleAuth(response.code);
-           console.log("MAhn",result);
-            
-           if (result.message === 'Login Successful') {
-            localStorage.setItem('userAuth','true');
-            toast.success("Login SuccessFull")
-            navigate('/home', { replace: true });
-        } else {
-            alert('Username and Password do not match');
-        }
-        },
-         flow: 'auth-code'
-        });
-    
+          console.log("Google Login Successful:", response);
+      
+          // Ensure that you send the response correctly
+          let result = await GoogleAuth(response.code);
+          console.log("GoogleAuth Result:", result);
+      
+          if (result.message === 'Login Successful') {
+            const userData = {
+              firstName: result.data.user.firstName,
+              lastName: result.data.user.lastName,
+              email: result.data.user.email,
+              _id:result.data.user._id,
+              phoneNo:result.data.user.phoneNo||null,
+              Address:result.data.user.address||null,
+              profilePhoto:result.data.user.profilePhoto||null
 
+            };
+      
+            // Log user data before dispatching
+            console.log("Dispatching User Data:", userData);
+      
+            localStorage.setItem('userAuth', 'true');
+            localStorage.setItem('userId', result.data.user._id);
+            dispatch(setUserDetails(userData));
+            toast.success("Login Successful");
+            navigate('/home', { replace: true });
+          } else {
+            toast.error('Username and Password do not match');
+          }
+        },
+        flow: 'auth-code',
+      });
+      
     return (
         <div className="bg-white w-screen min-h-screen flex">
              <Toaster position="top-center" reverseOrder={false}   toastOptions={{

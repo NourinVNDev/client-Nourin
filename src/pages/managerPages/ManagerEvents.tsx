@@ -36,7 +36,7 @@ const formik = useFormik<eventFormValues>({
     Amount: 0
   },
   // validationSchema:eventValidSchema,
-  onSubmit:  (values) => {
+  onSubmit: async (values) => {
     console.log("Form Submitted", values);
     const formData = new FormData();
     
@@ -110,6 +110,8 @@ const files = e.target.files;
 if (files) {
   const fileArray = Array.from(files);
   const newImages = fileArray.filter(file => !imagePreview.includes(URL.createObjectURL(file)));
+  console.log("New Image",newImages);
+  
   formik.setFieldValue("images", [...formik.values.images, ...newImages]);
   const previews = newImages.map(file => URL.createObjectURL(file));
   setImagePreview((prevPreviews) => [...prevPreviews, ...previews]);
@@ -141,8 +143,6 @@ return (
               name="eventName"
               value={formik.values.eventName}
               onChange={formik.handleChange}
-          
-              required
               className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.eventName && formik.errors.eventName ? 'border-red-500' : ''}`}
             />
             {formik.touched.eventName && formik.errors.eventName ? (
@@ -159,7 +159,7 @@ return (
               value={formik.values.title}
               onChange={formik.handleChange}
            
-              required
+             
               className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.title && formik.errors.title ? 'border-red-500' : ''}`}
             >
               <option value="" disabled>Select an option</option>
@@ -355,7 +355,7 @@ return (
               name="Included"
               value={formik.values.Included.join(", ")}
               onChange={(e) => {
-                const value = e.target.value.split(",").map(item => item.trim());
+                const value = e.target.value.split(",").map(item => item.trim()); // Filter out empty strings
                 formik.setFieldValue("Included", value);
               }}
               className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.Included && formik.errors.Included ? 'border-red-500' : ''}`}
@@ -395,11 +395,15 @@ return (
             type="file"
             id="images"
             name="images"
+          
             accept="image/*"
             multiple
             onChange={handleFileChange}
             className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
           />
+          {formik.touched.images && formik.errors.images ? (
+          <div className="text-red-500 text-sm">{formik.errors.images}</div>
+        ) : null}
           {imagePreview.length > 0 && (
             <div className="mt-2">
               {imagePreview.map((src, idx) => (
@@ -414,7 +418,6 @@ return (
         <div className="flex justify-center">
           <button
             type="submit"
-            onClick={() => formik.handleSubmit()}
             className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
           >
             Create Event

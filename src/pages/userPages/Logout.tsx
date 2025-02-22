@@ -3,6 +3,7 @@ import { clearUserDetails } from "../../../Features/userSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import {persistor} from '../../../App/store'
 
 const Logout=()=>{
     const  dispatch=useDispatch()
@@ -14,6 +15,7 @@ const Logout=()=>{
         dispatch(clearUserDetails());
         localStorage.removeItem('userAuth');
         localStorage.removeItem('userId');
+        persistor.purge();
         navigate('/');
 
 
