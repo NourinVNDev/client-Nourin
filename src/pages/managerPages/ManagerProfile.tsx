@@ -111,7 +111,7 @@ const ManagerProfile = () => {
         {/* Navigation Bar */}
         <NavBar />
         <div className="flex flex-col items-center flex-1 bg-gray-100">
-          <div className="mt-10"></div>
+    
           <div className="flex flex-row gap-10 w-full max-w-5xl">
             {/* User Details Form */}
             <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">

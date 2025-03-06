@@ -34,7 +34,9 @@ const ManagerEditSelectedEvents = () => {
       notIncluded: [''],
       Amount: 0
     },
-  // validationSchema:eventValidSchema,
+
+
+  validationSchema:eventValidSchema,
     onSubmit:  (values) => {
       console.log("Form Submitted", values);
       const formData = new FormData();
@@ -84,6 +86,12 @@ const ManagerEditSelectedEvents = () => {
       postEditEventData()
     }
   });
+
+
+  useEffect(() => {
+    console.log("Formik Errors:", formik.errors);
+  }, [formik.errors]);
+  
 
   const [categoryName, setCategoryName] = useState<string[]>([]);
   const [eventDetails, setEventDetails] = useState<EventData>({
@@ -217,6 +225,9 @@ const ManagerEditSelectedEvents = () => {
                     required
                     className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   />
+                      {formik.touched.eventName && formik.errors.eventName ? (
+              <div className="text-red-500 text-sm">{formik.errors.eventName}</div>
+            ) : null}
                 </div>
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium text-gray-400">Title</label>
@@ -235,6 +246,9 @@ const ManagerEditSelectedEvents = () => {
                       </option>
                     ))}
                   </select>
+                  {formik.touched.title && formik.errors.title ? (
+              <div className="text-red-500 text-sm">{formik.errors.title}</div>
+            ) : null}
                 </div>
               </div>
               <div>
@@ -247,6 +261,9 @@ const ManagerEditSelectedEvents = () => {
                   required
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
+                      {formik.touched.content && formik.errors.content ? (
+            <div className="text-red-500 text-sm">{formik.errors.content}</div>
+          ) : null}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
@@ -260,6 +277,9 @@ const ManagerEditSelectedEvents = () => {
                     required
                     className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   />
+                      {formik.touched.location?.address && formik.errors.location?.address ? (
+              <div className="text-red-500 text-sm">{formik.errors.location.address}</div>
+            ) : null}
                 </div>
                 <div>
                   <label htmlFor="city" className="block text-sm font-medium text-gray-400">City</label>
@@ -272,6 +292,9 @@ const ManagerEditSelectedEvents = () => {
                     required
                     className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   />
+                          {formik.touched.location?.city && formik.errors.location?.city ? (
+              <div className="text-red-500 text-sm">{formik.errors.location.city}</div>
+            ) : null}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -286,6 +309,9 @@ const ManagerEditSelectedEvents = () => {
                   required
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
+                        {formik.touched.noOfPerson && formik.errors.noOfPerson ? (
+              <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
+            ) : null}
               </div>
               <div>
                 <label htmlFor="amount" className="block text-sm font-medium text-gray-400">Amount</label>
@@ -298,6 +324,9 @@ const ManagerEditSelectedEvents = () => {
                   required
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
+                         {formik.touched.Amount && formik.errors.Amount ? (
+              <div className="text-red-500 text-sm">{formik.errors.Amount}</div>
+            ) : null}
               </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -323,6 +352,9 @@ const ManagerEditSelectedEvents = () => {
                                dateFormat="yyyy-MM-dd"
                                // required
                              />
+                                   {formik.touched.endDate && formik.errors.endDate ? (
+              <div className="text-red-500 text-sm">{formik.errors.endDate}</div>
+            ) : null}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -337,6 +369,9 @@ const ManagerEditSelectedEvents = () => {
                   required
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
+                {formik.touched.destination && formik.errors.destination ? (
+            <div className="text-red-500 text-sm">{formik.errors.destination}</div>
+          ) : null}
               </div>
               <div>
                 <label htmlFor="tags" className="block text-sm font-medium text-gray-400">Tags (comma-separated)</label>
@@ -348,6 +383,9 @@ const ManagerEditSelectedEvents = () => {
                   onChange={handleInputChange}
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                 />
+                   {formik.touched.tags && formik.errors.tags ? (
+            <div className="text-red-500 text-sm">{formik.errors.tags}</div>
+          ) : null}
               </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -361,6 +399,9 @@ const ManagerEditSelectedEvents = () => {
                     onChange={handleInputChange}
                     className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   />
+                          {formik.touched.Included && formik.errors.Included ? (
+              <div className="text-red-500 text-sm">{formik.errors.Included}</div>
+            ) : null}
                 </div>
                 <div>
                   <label htmlFor="notIncluded" className="block text-sm font-medium text-gray-400">Not Included (comma-separated)</label>
@@ -372,18 +413,10 @@ const ManagerEditSelectedEvents = () => {
                     onChange={handleInputChange}
                     className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   />
+                        {formik.touched.notIncluded && formik.errors.notIncluded ? (
+              <div className="text-red-500 text-sm">{formik.errors.notIncluded}</div>
+            ) : null}
                 </div>
-              </div>
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-400">Tags (comma-separated)</label>
-                <input
-                  type="text"
-                  id="tags"
-                  name="tags"
-                  value={formik.values.tags.join(", ")}
-                  onChange={handleInputChange}
-                  className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                />
               </div>
 
               <div className="mt-4">
@@ -413,6 +446,9 @@ const ManagerEditSelectedEvents = () => {
                           onChange={(e) => handleImageChange(e)}
                           id={`image-upload-${index}`}
                         />
+                              {formik.touched.images && formik.errors.images ? (
+          <div className="text-red-500 text-sm">{formik.errors.images}</div>
+        ) : null}
                         <label
                           htmlFor={`image-upload-${index}`}
                           className="absolute bottom-0 right-0 p-1 bg-blue-500 text-white rounded-full cursor-pointer"
@@ -429,8 +465,8 @@ const ManagerEditSelectedEvents = () => {
                 <button
                   type="submit"
                   className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
-                >
-                  Update Event
+        >
+                   Update  Event
                 </button>
               </div>
             </form>

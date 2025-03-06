@@ -56,7 +56,7 @@ const TotalBooking=()=>{
                         </div>
                     ) : (
                         <div className="bg-white shadow-lg rounded-lg p-6 text-center">
-                            <p className="text-gray-600">No bookings found for today.</p>
+                            <p className="text-gray-600">No bookings found.</p>
                         </div>
                     )}
                 </main>

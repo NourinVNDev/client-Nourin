@@ -29,13 +29,12 @@ const formik = useFormik<eventFormValues>({
     tags: [""],
     images: [] as (File | string)[],
     noOfPerson: 0,
-
     destination: "",
     Included: [""],
     notIncluded: [""],
     Amount: 0
   },
-  // validationSchema:eventValidSchema,
+  validationSchema:eventValidSchema,
   onSubmit: async (values) => {
     console.log("Form Submitted", values);
     const formData = new FormData();

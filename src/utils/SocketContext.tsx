@@ -11,7 +11,6 @@ import React, {
   import { RootState } from "../../App/store"; 
 
 
-
   interface SocketContextType {
     socket: Socket | null;
     onlineUsers: string[] | undefined;
@@ -27,8 +26,10 @@ import React, {
   }) => {
     const socketRef = useRef<Socket | null>(null);
     const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
-    const user = useSelector((state: RootState) => state.user);
-    const manager = useSelector((state: RootState) => state.manager);
+    const user = useSelector((state: RootState) => state.user._id);
+    console.log(user,"userdata")
+    const manager = useSelector((state: RootState) => state.manager._id);
+    console.log(manager,"managerData")
     const loggedUser = user  || manager;
 
 
@@ -43,10 +44,10 @@ import React, {
       useEffect(() => {
         if (loggedUser) {
           const role = getRole();
+          console.log("Role being sent to backend:", role);
           const newSocket = io("http://localhost:3001", { // Replace with your backend URL
             query: {
-              transports: ["websocket"],
-              userId: loggedUser._id,
+              userId: loggedUser,
               role,
             },
           });

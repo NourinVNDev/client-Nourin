@@ -1,9 +1,11 @@
 import React, { useState,useEffect } from "react";
 import '../TailwindSetup.css';
 import connectionImage from '../../../src/assets/new.avif'; 
-import {register,verifyOtp,forgotPassword} from '../../service/userServices/register';
+import {register,verifyOtp,handleResentOtp} from '../../service/userServices/register';
 import { useNavigate } from "react-router-dom";
 import { registerValidation } from "../../validations/userValid/RegisterValid";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Register: React.FC = () => {
 
@@ -24,6 +26,7 @@ const Register: React.FC = () => {
     const [resendVisible, setResendVisible] = useState(false);
    
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [otpError,setOTPError]=useState<string>('')
 
   
       useEffect(() => {
@@ -77,7 +80,7 @@ const Register: React.FC = () => {
             TimerCount();
             setOtp(['', '', '', '', '', '']);
 
-            await forgotPassword(formData.email);
+            await handleResentOtp(formData.email);
           
         } catch (error) {
             console.error("Failed to resend OTP:", error);
@@ -96,7 +99,7 @@ const Register: React.FC = () => {
         e.preventDefault(); // Prevent default form submission behavior
     
         // Validate form data
-        const validationResult = registerValidation(formData);
+        const validationResult = await registerValidation(formData);
 
 
         console.log("error checking",validationResult);
@@ -107,10 +110,13 @@ const Register: React.FC = () => {
             console.log('Form Submitted Successfully');
             try {
                 // Registration logic
-                await register(formData); // Await the register function
+                const result=await register(formData); // Await the register function
+
+                console.log("Result Details:",result);
+                
                 setIsOtp(true);
                 setTimer(30);
-                console.log("User Registered Details:", formData);
+                console.log("User Registered Details:", result.message);
             } catch (error) {
                 console.error("Error registering user:", error);
                 alert("Registration failed. Please try again.");
@@ -146,17 +152,33 @@ const Register: React.FC = () => {
             }
         }
     };
-    const handleVerify = () => {
+    const handleVerify = async() => {
+
+      try {
+        
         const otpValue = otp.join(''); // Combine the OTP values into a single string
         console.log("Verifying OTP:", otpValue);
         // You can add your verification logic here
-        verifyOtp(otpValue,formData);
-        navigate('/');
-        
-    };
+        const result=await verifyOtp(otpValue,formData);
+        if(result.success){
+          navigate('/login');
+        }
+        console.log("Result of  verifyOtp",result);
+      } catch (error) {
+        if(error instanceof axios.AxiosError){
+          console.log(error.response?.data.message,"OTP ERROR")
+          setOTPError(error.response?.data.message)
+          toast.error(error.response?.data.message)
+        }else{
+          console.error("Unexpected error:", error);
+          toast.error("An unexpected error occurred");
+        }
+      }
+    };  
 
     return (
-        <div className="bg-white w-screen min-h-screen flex">
+<div className="w-screen min-h-screen h-screen overflow-hidden">
+<div className="bg-white w-screen min-h-screen flex">
             {/* Conditional Rendering */}
             {!isOtp ? (
                 <>
@@ -168,89 +190,84 @@ const Register: React.FC = () => {
 
                             {/* Form */}
                             <form className="w-full" onSubmit={handleSubmit}>
-                            <div className="mb-4">
-  <label htmlFor="firstName" className="block text-gray-700">First Name</label>
-  <input
-    id="firstName"
-    type="text"
-    className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
-    placeholder="Enter your First Name"
-    value={formData.firstName}
-    onChange={handleData}
-  />
-  {errors.firstName && <p className="text-red-500">{errors.firstName}</p>} {/* Error message for firstName */}
-</div>
+                           <div className="mb-4">
+                          <label htmlFor="firstName" className="block text-gray-700">First Name</label>
+                          <input
+                            id="firstName"
+                            type="text"
+                            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            placeholder="Enter your First Name"
+                            value={formData.firstName}
+                            onChange={handleData}
+                          />
+                          {errors.firstName && <p className="text-red-500">{errors.firstName}</p>} {/* Error message for firstName */}
+                        </div>
 
-<div className="mb-4">
-  <label htmlFor="lastName" className="block text-gray-700">Last Name</label>
-  <input
-    id="lastName"
-    type="text"
-    className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
-    placeholder="Enter your Last Name"
-    value={formData.lastName}
-    onChange={handleData}
-  />
-  {errors.lastName && <p className="text-red-500">{errors.lastName}</p>} {/* Error message for lastName */}
-</div>
+                        <div className="mb-4">
+                          <label htmlFor="lastName" className="block text-gray-700">Last Name</label>
+                          <input
+                            id="lastName"
+                            type="text"
+                            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            placeholder="Enter your Last Name"
+                            value={formData.lastName}
+                            onChange={handleData}
+                          />
+                          {errors.lastName && <p className="text-red-500">{errors.lastName}</p>} {/* Error message for lastName */}
+                        </div>
 
-<div className="mb-4">
-  <label htmlFor="email" className="block text-gray-700">Email</label>
-  <input
-    id="email"
-    type="email"
-    className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
-    placeholder="Enter your Email"
-    value={formData.email}
-    onChange={handleData}
-  />
-  {errors.email && <p className="text-red-500">{errors.email}</p>} {/* Error message for email */}
-</div>
+                        <div className="mb-4">
+                          <label htmlFor="email" className="block text-gray-700">Email</label>
+                          <input
+                            id="email"
+                            type="email"
+                            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            placeholder="Enter your Email"
+                            value={formData.email}
+                            onChange={handleData}
+                          />
+                          {errors.email && <p className="text-red-500">{errors.email}</p>} {/* Error message for email */}
+                        </div>
 
-<div className="mb-4">
-  <label htmlFor="password" className="block text-gray-700">Password</label>
-  <input
-    id="password"
-    type="password"
-    className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
-    placeholder="Enter your Password"
-    value={formData.password}
-    onChange={handleData}
-  />
-  {errors.password && <p className="text-red-500">{errors.password}</p>} {/* Error message for password */}
-</div>
+                        <div className="mb-4">
+                          <label htmlFor="password" className="block text-gray-700">Password</label>
+                          <input
+                            id="password"
+                            type="password"
+                            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            placeholder="Enter your Password"
+                            value={formData.password}
+                            onChange={handleData}
+                          />
+                          {errors.password && <p className="text-red-500">{errors.password}</p>} {/* Error message for password */}
+                        </div>
 
-<div className="mb-4">
-  <label htmlFor="confirmPassword" className="block text-gray-700">Confirm Password</label>
-  <input
-    id="confirmPassword"
-    type="password"
-    className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
-    placeholder="Confirm your Password"
-    value={formData.confirmPassword}
-    onChange={handleData}
-  />
-  {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword}</p>} {/* Error message for confirmPassword */}
-</div>
+                        <div className="mb-4">
+                          <label htmlFor="confirmPassword" className="block text-gray-700">Confirm Password</label>
+                          <input
+                            id="confirmPassword"
+                            type="password"
+                            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            placeholder="Confirm your Password"
+                            value={formData.confirmPassword}
+                            onChange={handleData}
+                          />
+                          {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword}</p>} {/* Error message for confirmPassword */}
+                        </div>
 
-<div className="mb-4">
-  <label htmlFor="phoneNo" className="block text-gray-700">Phone No</label>
-  <input
-    id="phoneNo"
-    type="tel"
-    className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
-    placeholder="Enter your Phone Number"
-    value={formData.phoneNo}
-    onChange={handleData}
-  />
-  {errors.phoneNo && <p className="text-red-500">{errors.phoneNo}</p>} {/* Error message for phoneNo */}
-</div>
-
-                
-
-                    
-
-                                <button
+                        <div className="mb-4">
+                          <label htmlFor="phoneNo" className="block text-gray-700">Phone No</label>
+                          <input
+                            id="phoneNo"
+                            type="tel"
+                            className="w-full p-2 mt-2 border border-gray-300 rounded-md bg-white text-black placeholder -gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            placeholder="Enter your Phone Number"
+                            value={formData.phoneNo}
+                            onChange={handleData}
+                          />
+                          {errors.phoneNo && <p className="text-red-500">{errors.phoneNo}</p>} {/* Error message for phoneNo */}
+                        </div>
+                           <button
                                     type="submit"
                                     className="w-full py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900"
                                 >
@@ -277,7 +294,7 @@ const Register: React.FC = () => {
                             <img
                                 src={connectionImage} // Using the imported image
                                 alt="MeetCraft Image"
-                                className="w-full h-[400px] object-cover mt-7"  // Full width and 400px height
+                                className="w-full object-cover mt-7 max-h-[400px]"  // Full width and 400px height
                             />
                         </div>
                     </div>
@@ -285,11 +302,11 @@ const Register: React.FC = () => {
             ) : (
                 <div className="bg-white w-screen min-h-screen flex">
                     {/* OTP Confirmation Section */}
-                    <div className="bg-gray-100 w-full flex justify-center items-center p-6">
-                        <div className="bg-gray-800 text-white rounded-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-6 shadow-lg">
-                            <h2 className="text-2xl font-semibold mb-4">OTP Sent!</h2>
-                            <p className="mb-4">An OTP has been sent to your email. Please check your inbox.</p>
-
+                    <div className="bg-white-100 w-full flex justify-center items-center p-6">
+                        <div className="bg-white-800 text-white rounded-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-6 shadow-lg">
+                            <h2 className="text-2xl font-semibold mb-4 text-black">OTP Sent!</h2>
+                            <p className="mb-4 text-black">An OTP has been sent to your email. Please check your inbox.</p>
+                            <p className="text-red-500">{otpError}</p>
                             <div className="flex justify-center space-x-2 mb-4">
                                 {/* OTP Input Boxes */}
                                 {otp.map((value, index) => (
@@ -307,19 +324,19 @@ const Register: React.FC = () => {
 
                             <button
                                 onClick={handleVerify} // Call handleVerify on button click
-                                className="w-full py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition duration-200"
+                                className="w-full text-black py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition duration-200"
                             >
                                 Verify OTP
                             </button>
                             {timer > 0 ? (
-                        <p className="text-gray-300 text-center mt-4">
-                            Resend OTP in <span className="font-bold">{timer}</span> seconds
+                        <p className="text-black text-center mt-4 ">
+                            Resend OTP in <span className="font-bold text-black">{timer}</span> seconds
                         </p>
                     ) : (
                         resendVisible && (
                             <button
                                 onClick={handleResendOtp}
-                                className="w-full mt-4 py-2 bg-gray-600 rounded-md hover:bg-gray-500 transition duration-200"
+                                className="w-full mt-4 py-2 text-black bg-gray-600 rounded-md hover:bg-gray-500 transition duration-200"
                             >
                                 Resend OTP
                             </button>
@@ -329,6 +346,7 @@ const Register: React.FC = () => {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     );
 };

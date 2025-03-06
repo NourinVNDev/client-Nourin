@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { FaHeart, FaRegHeart, FaRegCommentDots } from 'react-icons/fa';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/userComponents/Headers';
 import { getEventDataDetails, handleLikePost, handlePostDetails } from '../../service/userServices/userPost';
 import Footer from '../../components/userComponents/Footer';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 import useSocket from '../../utils/SocketContext';
+import { FaSearch } from "react-icons/fa";
+import SocialEvents from '../../assets/SocialEvents.avif'
 type Like = {
   user: string;
   _id: string;
@@ -15,12 +16,22 @@ const CategoryBasedData = () => {
   const { id } = useParams();
   const {socket}=useSocket()
   const navigate = useNavigate();
-  const [userName,setUserName]=useState('')
   const userId = localStorage.getItem('userId');
-  const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [parsedData, setParsedData] = useState<any[]>([]);
+  const [categoryName,setCategoryNames]=useState<string[]>([])
   const [interactions, setInteractions] = useState<{ [key: number]: { liked: boolean, newComment: string, comments: string[] } }>({});
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory,setSelectedCategory]=useState('');
+  const [selectedPrice,setSelectedPrice]=useState('');
+  const [filteredData, setFilteredData] = useState(parsedData); // Store filtered events
+  const handleSearchChange = (e:React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    const filteredEvents = parsedData.filter((post) =>
+      post.location?.address.toLowerCase().includes(query)
+    );
+    setFilteredData(filteredEvents); // Update the filtered data
+  };
   const handleButtonClick = async (postId: string) => {
     try {
       const result = await handlePostDetails(postId);
@@ -44,7 +55,16 @@ const CategoryBasedData = () => {
           return;
         }
         const result = await getEventDataDetails(id);
+        console.log("Nourii Safar",result.user.category.Events);
+        
         setParsedData(result.user.category.Events || []);
+
+       
+   
+        const category = result.user.category; // Access the category object
+        console.log("Better",category);
+        
+        setCategoryNames([category.categoryName]);
       } catch (error) {
         console.error('Error fetching event details:', error);
       }
@@ -150,54 +170,136 @@ const CategoryBasedData = () => {
     };
   }, [parsedData, socket]);
   
-  const toggleCommentBox = (index: number) => {
-    setOpenModalIndex(index);
+
+
+
+
+
+  useEffect(() => {
+    let updatedData = [...parsedData]; // Start with full data
+  
+    // Apply category filter if selected
+    if (selectedCategory) {
+      updatedData = updatedData.filter((post) =>
+        post.title?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+  
+    // Apply search filter if searchQuery exists
+    if (searchQuery) {
+      updatedData = updatedData.filter((post) =>
+        post.location?.address
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      );
+    }
+  
+    console.log(selectedPrice, "soumya");
+  
+    // Apply sorting only if selectedPrice is set
+    if (selectedPrice === "Price: Low - High") {
+      updatedData.sort((a, b) => a.Amount - b.Amount);
+    } else if (selectedPrice === "Price: High - Low") {
+      updatedData.sort((a, b) => b.Amount - a.Amount);
+    }
+  
+    setFilteredData(updatedData); // Set the final processed data
+  }, [parsedData, selectedCategory, selectedPrice, searchQuery]);
+  
+  
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(event.target.value); // Update the selected category state
   };
 
-  const closeModal = () => {
-    setOpenModalIndex(null);
-  };
-  const handleComment = (index: number, postId: string) => {
-    const newComment = interactions[index]?.newComment.trim();
-    if (newComment) {
-      if (!socket) {
-        console.error("Socket is not connected!");
-        return;
-    }
-      socket.emit('post_comment', newComment, userId, postId, (response: { comment: string, userName: string }) => {
-        if (response) {
-          setUserName(response.userName);
-          console.log(response.comment);
-          setInteractions((prev) => ({
-            ...prev,
-            [index]: {
-              ...prev[index],
-              comments: [...prev[index].comments, response.comment], // Append comment from response
-              newComment: '',
-            },
-          }));
-        }
-      });
-    }
-  };
-  const handleInputChange = (index: number, value: string) => {
-    setInteractions((prev) => ({
-      ...prev,
-      [index]: {
-        ...prev[index],
-        newComment: value,
-      },
-    }));
-  };
+
+  const handlePriceChange=(event:React.ChangeEvent<HTMLSelectElement>)=>{
+    setSelectedPrice(event.target.value);
+  }
+
+
+
+
   return (
     <div className="min-h-screen bg-blue-50">
       <Header />
-      <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-screen min-h-screen pt-10 pb-10 flex justify-center">
-        <div className="w-full max-w-4xl flex flex-col items-center">
-          <br /><br />
+      <div className="bg-[#fdeedc] min-h-screen p-8 flex flex-col items-center">
+  {/* Main Content */}
+  <h1 className="text-black text-6xl font-bold mb-4 self-start">Events:</h1>
+  
+  <div className="flex flex-col items-center md:flex-row md:justify-end w-full">
+  {/* Image - Right Aligned, Bigger & More Beautiful */}
+  <img
+    src={SocialEvents}
+    alt="Events"
+    className="w-[400px] md:w-[600px] lg:w-[750px] xl:w-[900px] 
+               h-[200px] md:h-[200px] lg:h-[400px] xl:h-[500px] 
+               object-cover rounded-3xl shadow-2xl border-4 border-white"
+  />
+</div>
+
+
+
+</div>
+
+{/* Search & Filters Section */}
+<div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full min-h-screen pt-10 pb-10 flex justify-center">
+  <div className="w-full max-w-4xl flex flex-col items-center">
+    <div className="relative flex items-center bg-white rounded-full shadow-lg w-full max-w-lg mt-6">
+      <input
+        type="text"
+        placeholder="Search location here..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className="w-full p-4 pr-12  bg-white rounded-full outline-none text-lg text-black"
+      />
+      <button className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+        <FaSearch size={24} />
+      </button>
+    </div>
+
+    {/* Filters - Centered Below Search Bar */}
+    <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
+      {/* Select Event Dropdown */}
+      <div className="flex items-center space-x-3 w-full md:w-auto">
+  <span className="font-semibold text-lg">Select Event:</span>
+  <select
+    className="border px-4 py-2 rounded-lg text-lg w-full bg-white text-black md:w-auto"
+    onChange={handleCategoryChange} // Add onChange handler
+    value={selectedCategory}
+  >
+    <option value="">Select Category</option> {/* Ensure a default option */}
+    {categoryName && categoryName.length > 0 ? (
+      categoryName.map((cat: any, index: number) => (
+        <option key={index} value={cat}>
+          {cat}
+        </option>
+      ))
+    ) : (
+      <option disabled>No categories available</option>
+    )}
+  </select>
+</div>
+
+
+      {/* Sort Dropdown */}
+      <div className="flex items-center space-x-3 w-full md:w-auto">
+        <span className="font-semibold text-lg">Sort By:</span>
+        <select className="border px-4 py-2 rounded-lg bg-white text-black text-lg w-full md:w-auto" onChange={handlePriceChange}
+        value={selectedPrice}>
+          <option>Price: Low - High</option>
+          <option>Price: High - Low</option>
+        </select>
+      </div>
+    </div>
+
+<br /><br />
+
+   
           <div className="w-full px-4 space-y-6">
-            {parsedData && parsedData.length > 0 ? (
-              parsedData.map((post: any, index: number) => (
+
+          {filteredData && filteredData.length> 0 || parsedData && parsedData.length > 0 ? (
+      
+              filteredData.map((post: any, index: number) => (
                 <div
                   key={post._id || index}
                   className="bg-white w-full p-6 rounded-lg shadow-lg border border-gray-200 flex flex-col space-y-4">
@@ -249,54 +351,15 @@ const CategoryBasedData = () => {
                           <FaRegHeart className="text-3xl" />
                         )}
                       </button>
-                      <div className="flex justify-end">
-                        <button onClick={() => toggleCommentBox(index)} className="flex items-center space-x-2 text-black">
-                          <FaRegCommentDots className="text-3xl" />
-                        </button>
-                      </div>
-                      <Modal isOpen={openModalIndex === index} onClose={closeModal} backdrop="blur" className="rounded-lg shadow-xl border border-gray-200 bg-white max-h-[400px]">
-                        <ModalContent>
-                          <ModalHeader className="text-lg font-semibold text-gray-900 border-b border-gray-300 py-3">Comments</ModalHeader>
-                          <ModalBody className="p-5 space-y-4 max-h-[700px] overflow-y-auto">
-                          {interactions[index]?.comments?.length > 0 ? (
-                            interactions[index].comments.map((comment, i) => (
-                              <div key={i} className="p-2 border-b border-gray-200">
-                                <p className="text-gray-700">{comment}</p>
-                              </div>
-                            ))
-                          ) : (
-                            <p className="text-gray-500 italic">No comments yet.</p>
-                          )
-                          }  
-                          </ModalBody>
-                          <ModalFooter className="flex flex-col items-start gap-2 border-t border-gray-300 p-4">
-                            <input
-                              value={interactions[index]?.newComment || ''}
-                              onChange={(e) => handleInputChange(index, e.target.value)}
-                              placeholder="Write a comment..."
-                              className="w-full border rounded-lg p-2 bg-white text-black focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                            <div className=" text-black flex justify-end w-full gap-4 mt-2"> 
-                            <button className=' bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded'
-  onClick={() => handleComment(index,post._id)} >
-  Add Comment
-</button>
- <button 
-  className='bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded'
-  onClick={closeModal}>
-  Stop
-</button> 
-                            </div>
-                          </ModalFooter>
-                        </ModalContent>
-                      </Modal>
                     </div>
                   </div>
                 </div>
               ))
-            ) : (
-              <div className="text-center text-gray-600">No events found.</div>
-            )}
+            )
+            : (
+            <div className="text-center text-gray-600">No events found.</div>
+          )}
+
           </div>
         </div>
       </div>

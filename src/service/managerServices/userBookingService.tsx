@@ -31,4 +31,22 @@ const fetchTotalBooking=async()=>{
         
     }
 }
-export {fetchTodaysBooking,fetchTotalBooking};
+
+const createConversationSchemaOfManager=async(sender:string,receiver:string)=>{
+    console.log("suc");
+    
+    const formData={sender,receiver};
+    console.log("Send",sender,receiver);
+    
+    const response=await MANAGER_API("/create-chatSchema2",{
+        method:'POST',
+        data:formData
+    });
+
+    const data=response.data;
+    console.log("Data of:",data);
+    
+    return data;
+}
+
+export {fetchTodaysBooking,fetchTotalBooking,createConversationSchemaOfManager};

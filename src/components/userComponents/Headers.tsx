@@ -37,11 +37,15 @@ export default function Header() {
         <nav>
           <ul className="flex space-x-8">
             <li>
-              <Link to="/home" className="text-white text-lg font-medium hover:text-yellow-400 transition-all duration-300">
+              <Link to="/getAllEvents" className="text-white text-lg font-medium hover:text-yellow-400 transition-all duration-300">
                 Events
               </Link>
             </li>
-            
+            <li>
+              <Link to="/home" className="text-white text-lg font-medium hover:text-yellow-400 transition-all duration-300">
+                Home
+              </Link>
+            </li>
           
             <li>
               <Link to="/logout" className="text-white text-lg font-medium hover:text-yellow-400 transition-all duration-300">

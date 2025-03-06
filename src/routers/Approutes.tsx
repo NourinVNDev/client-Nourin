@@ -42,13 +42,16 @@ import TodaysRequest from "../pages/managerPages/TodaysRequest";
 import TotalBooking from "../pages/managerPages/TotalBooking";
 import EntryHome from "../pages/userPages/EntryHome";
 import AdminEditCategory from "../pages/adminPages/AdminEditCategory";
+import ManagerChat from "../pages/managerPages/ManagerChat";
+import CheckLoginUser from "../components/userComponents/CheckLogin";
+import AllEventData from "../pages/userPages/AllEventData";
 interface RouteConfig {
     path: string;
     element: React.ReactNode;
   }
   const Approutes: RouteConfig[] = [
     { path: '/', element: <EntryHome/>},
-    {path:'/login',element:<Login/>},
+    {path:'/login',element:<CheckLoginUser><Login/></CheckLoginUser>},
     {path :'/register',element:<Register/>},
     {path:'/home',element:<PrivateRoute><HomePage/></PrivateRoute>},
     {path:'/forgot-password',element:<ForgotPassword/>},
@@ -56,6 +59,7 @@ interface RouteConfig {
     {path:'/reset-password/:email',element:<ResetPassword/>},
     {path:'/profile',element:<PrivateRoute><Profile/></PrivateRoute>},
     {path:'/logout',element:<Logout></Logout>},
+    {path:"/getAllEvents",element:<PrivateRoute><AllEventData></AllEventData></PrivateRoute>},
     {path:'/user/categoryBasedData/:id',element:<PrivateRoute><CategoryBasedData/></PrivateRoute>},
     {path:'/user/resetPassword',element:<PrivateRoute><ResetPasswordALogin/></PrivateRoute>},
     {path:'/singlePostDetails',element:<PrivateRoute><SinglePostDetails/></PrivateRoute>},
@@ -82,6 +86,7 @@ interface RouteConfig {
     {path:'/editEventDetails/:id',element:<ManagerPrivateRoute><ManagerEditSelectedEvents/></ManagerPrivateRoute>},
     {path:'/manager/latestRequest',element:<ManagerPrivateRoute><TodaysRequest/></ManagerPrivateRoute>},
     {path:'/manager/futureBooking',element:<ManagerPrivateRoute><TotalBooking/></ManagerPrivateRoute>},
+    {path:'/manager/chat',element:<ManagerPrivateRoute><ManagerChat/></ManagerPrivateRoute>},
 
 
 

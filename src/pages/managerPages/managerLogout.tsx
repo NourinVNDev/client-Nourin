@@ -12,9 +12,9 @@ const ManagerLogout=()=>{
         Cookies.remove('managerToken');
         Cookies.remove('managerRefreshToken');
         localStorage.removeItem('managerAuth');
-        navigate('/mLogin');
         dispatch(clearManagerDetails());
         persistor.purge();
+        navigate('/mLogin');
 
     },[navigate])
 

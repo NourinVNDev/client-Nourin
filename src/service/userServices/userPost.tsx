@@ -19,6 +19,23 @@ const getEventDataDetails=async (postId:string)=>{
     }
 }
 
+const getAllEventDataDetails=async ()=>{
+    try {
+     
+        const response = await API(`/post/getAllEventData`, {
+            method: 'GET',
+    
+        });
+
+        const data = response.data.data;
+   console.log("Data form unique",data);
+        return data; // Return the OTP or any other relevant data
+    } catch (error) {
+        console.error("Error during registration:", error);
+        return undefined; // Or throw an error if you want to handle it upstream
+    }
+}
+
 
 const handleLikePost=async (index:number,postId:string,userId:string)=>{
     try {
@@ -150,4 +167,4 @@ const updatePaymentStatusService=async(bookedId:string)=>{
 
 
 
-export {getEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,saveBillingDetails,updatePaymentStatusService};
+export {getEventDataDetails,getAllEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,saveBillingDetails,updatePaymentStatusService};

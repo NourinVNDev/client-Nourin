@@ -30,8 +30,10 @@ const register = async (formData: { [key: string]: string }) => {
             data: formData,
         });
 
-        const data = response.data.message; // Assuming 'otpData' is the correct key from your response
-        return data; // Return the OTP or any other relevant data
+        const data = response.data; 
+        console.log("Result from frontend",data);
+        
+        return data;
     } catch (error) {
         console.error("Error during registration:", error);
         return undefined; // Or throw an error if you want to handle it upstream
@@ -51,12 +53,18 @@ const verifyOtp = async (otpData:string,formData:{ [key: string]: string }) => {
             method: 'POST',
             data:dataToSend
         });
+        console.log('Hai');
+        
+        console.log("Response:",response.data);
+        
 
-        const data = response.data; 
+        const data =response.data;
+        console.log("Data checking",data);
+
         return data; 
     } catch (error) {
         console.error("Error during OTP verification:", error);
-        return undefined; 
+        throw error; 
     }
 }
     const userLogin=async(formData:{[key:string]:string})=>{
@@ -89,10 +97,10 @@ const GoogleAuth=async(response:Object)=>{
     return data
 }
 
-const forgotPassword=async(email:string)=>{
+const handleResentOtp=async(email:string)=>{
     console.log("step",email);
         try{
-    const response = await API('/forgotEmail', {
+    const response = await API('/resendOtp', {
         method: 'POST',
         data:{email:email}
     });
@@ -105,6 +113,25 @@ const forgotPassword=async(email:string)=>{
     console.error("Error during User Login:", error);
     return undefined; 
 }
+    }
+
+
+    const forgotPassword=async(email:string)=>{
+        try{
+            const response = await API('/forgotEmail', {
+                method: 'POST',
+                data:{email:email}
+            });
+            console.log("Came back");
+            const data=response.data.message;
+            console.log("hai",data);
+            console.log(response.data.data);
+            return data;
+        }catch(error){
+            console.error("Error during User Login:", error);
+            return undefined; 
+        }
+
     }
 
     const verifyOtpForForgot = async (otpData:string,email:string) => {
@@ -267,4 +294,4 @@ console.log(response?.data.data)
 
 
 
-export { fetchSocialEventDetails,register, verifyOtp,userLogin,GoogleAuth,forgotPassword,verifyOtpForForgot,resetPassword,getEventDataFromDB,handleProfileData,getCategoryDataDetails,handleProfileDetails,generateOtp,verifyOtpForPassword,handleResetPassword};
+export { fetchSocialEventDetails,register, forgotPassword,verifyOtp,userLogin,GoogleAuth,handleResentOtp,verifyOtpForForgot,resetPassword,getEventDataFromDB,handleProfileData,getCategoryDataDetails,handleProfileDetails,generateOtp,verifyOtpForPassword,handleResetPassword};

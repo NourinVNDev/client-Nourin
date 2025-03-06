@@ -1,6 +1,6 @@
-import API from "../../utils/axiosInstance";
-import { getManagerDetails } from "../adminServices/adminUserManager";
 
+import API from "../../utils/axiosInstance";
+import MANAGER_API from "../../utils/managerAxiosInstance";
 const getExistingReviewAndRating = async (eventId: string, userId: string) => {
     try {
         console.log("EventId,userId",eventId,userId)
@@ -77,6 +77,23 @@ const getManagerNames = async (userId: string) => {
     }
 };
 
+
+const getUserNames=async(managerName:string)=>{
+    try {
+
+        const response=await MANAGER_API(`/getUserNames/${managerName}`,{
+            method:"GET"
+        });
+        const data=response.data.data;
+        console.log("user Names Data",data);
+        return data;
+    }catch (error) {
+        console.error("Error fetching user names:", error);
+        return undefined;
+    }
+
+}
+
 const createConversationSchema = async (manager: string, userId: string) => {
     try {
         const formData = { manager, userId };
@@ -130,5 +147,6 @@ export {
     getManagerNames,
     eventBookingDetails,
     createConversationSchema,
-    postUserProfilePicture
+    postUserProfilePicture,
+    getUserNames
 };

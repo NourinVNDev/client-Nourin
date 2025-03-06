@@ -14,8 +14,8 @@ const rootReducer = combineReducers({
 // Persist config
 const persistConfig = {
   key: "root",
-  storage, // Uses local storage
-  whitelist: ["user","manager"], // Persist only the user reducer
+  storage, 
+  // whitelist: ["user","manager"],
 };
 
 // Create persisted reducer
@@ -26,11 +26,12 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
+      immutableCheck: false,
       serializableCheck: false, // Disable serializability check for redux-persist
     }),
 });
 
-// Persistor
+
 export const persistor = persistStore(store);
 
 // Infer types
