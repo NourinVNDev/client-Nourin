@@ -32,10 +32,9 @@ export type PaymentData = {
     endDate: string;
     time: string; // Required property
     noOfPerson: number;
-    Amount: number; // Ensure this matches the casing in your state
+
     destination: string;
-    Included: string[]; // Ensure this is an array of strings
-    notIncluded: string[]; // Ensure this is an array of strings
+   
     tags: string[]; // Ensure this is an array of strings
     // Ensure this is an array of strings or File objects
   };

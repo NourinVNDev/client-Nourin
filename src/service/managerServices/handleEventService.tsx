@@ -2,6 +2,13 @@
 import MANAGER_API from "../../utils/managerAxiosInstance";
 import { EventData } from "../../validations/userValid/TypeValid";
 
+export interface eventSeat {
+  Included: string[];
+  notIncluded: string[];
+  Amount: number;
+  noOfSeats: number;
+  typesOfTickets: string;
+}
 const createEventpost=async(formData:FormData)=>{
   console.log('data from client',formData);
     const response = await MANAGER_API("/createEvent", {
@@ -20,6 +27,24 @@ const createEventpost=async(formData:FormData)=>{
       console.log("pattilla",result.message);
       return result;
 }
+const createEventSeatDetails=async(ticketList:eventSeat[],id:string)=>{
+  console.log('data eventSeat',ticketList);
+    const response = await MANAGER_API(`/createEventSeatDetails/${id}`, {
+        method: "POST",
+ 
+        data: ticketList,
+        withCredentials: true,
+    
+      });
+
+
+      console.log('suucesss');
+      const result = await response.data;
+      console.log("pattilla",result.message);
+      return result;
+}
+
+
 
 const getCategoryEventType=async()=>{
   console.log("fronend");
@@ -104,4 +129,4 @@ const updateEvent = async (eventDetails: FormData) => {
 
 
 
-export {createEventpost,getCategoryEventType,getAllEventData,handlePreviousEvents,updateEvent}
+export {createEventpost,createEventSeatDetails,getCategoryEventType,getAllEventData,handlePreviousEvents,updateEvent}

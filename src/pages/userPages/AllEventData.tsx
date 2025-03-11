@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import useSocket from "../../utils/SocketContext";
 import Header from "../../components/userComponents/Headers";
 import Footer from "../../components/userComponents/Footer";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
-import { FaHeart, FaRegHeart, FaRegCommentDots, FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaSearch } from 'react-icons/fa';
 import SocialEvents from '../../assets/SocialEvents.avif';
 import { useNavigate } from "react-router-dom";
 import { handleLikePost, handlePostDetails, getAllEventDataDetails } from "../../service/userServices/userPost";
@@ -13,7 +12,6 @@ const AllEventData = () => {
   const [categoryName, setCategoryNames] = useState<string[]>([]);
   const userId = localStorage.getItem('userId');
   const [interactions, setInteractions] = useState<{ [key: number]: { liked: boolean, newComment: string, comments: string[] } }>({});
-  const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedPrice,setSelectedPrice]=useState('')
   const [filteredData, setFilteredData] = useState(parsedData);
@@ -158,46 +156,6 @@ const AllEventData = () => {
     };
   }, [parsedData, socket]);
 
-  const toggleCommentBox = (index: number) => {
-    setOpenModalIndex(index);
-  };
-
-  const closeModal = () => {
-    setOpenModalIndex(null);
-  };
-
-  const handleComment = (index: number, postId: string) => {
-    const newComment = interactions[index]?.newComment.trim();
-    if (newComment) {
-      if (!socket) {
-        console.error("Socket is not connected!");
-        return;
-      }
-      socket.emit('post_comment', newComment, userId, postId, (response: { comment: string, userName: string }) => {
-        if (response) {
-          console.log(response.comment);
-          setInteractions((prev) => ({
-            ...prev,
-            [index]: {
-              ...prev[index],
-              comments: [...prev[index].comments, response.comment], // Append comment from response
-              newComment: '',
-            },
-          }));
-        }
-      });
-    }
-  };
-
-  const handleInputChange = (index: number, value: string) => {
-    setInteractions((prev) => ({
-      ...prev,
-      [index]: {
-        ...prev[index],
-        newComment: value,
-      },
-    }));
-  };
 
   useEffect(() => {
     let updatedData = [...parsedData]; // Start with full data
@@ -318,110 +276,72 @@ const AllEventData = () => {
           </div>
 
           <br /><br />
+          <div className="max-w-screen-2xl mx-auto">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-10 w-full">
 
-          <div className="w-full px-4 space-y-6">
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((post: any, index: number) => (
-                <div
-                  key={post._id || index}
-                  className="bg-white w-full p-6 rounded-lg shadow-lg border border-gray-200 flex flex-col space-y-4"
-                >
-                  <div className="flex-1">
-                    <span className="block mb-2 text-gray-700 font-medium hover:text-blue-400">
-                      {post.companyName}
-                      <span className="block text-gray-500 text-sm mb-4">
-                        {post.location?.address || "Unknown"}
-                      </span>
-                    </span>
-                    <div className="relative">
-                      {post.offerDetails?.offerPercentage && (
-                        <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
-                          {post.offerDetails.offerPercentage}% OFF
-                        </div>
-                      )}
-
-                      {/* Image */}
-                      <img
-                        src={post.images}
-                        className="w-full h-auto object-cover rounded-md mb-4"
-                        alt={post.title}
-                        onClick={async () => await handleButtonClick(post._id)}
-                      />
-                    </div>
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                        {post.title}
-                      </h2>
-                      <p className="text-gray-600 text-sm mb-4">{post.content}</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-4">
-                      <button
-                        onClick={() => handleLike(index, post._id)}
-                        className={`flex items-center space-x-2 p-3 rounded-lg transition-all duration-300 ${
-                          interactions[index]?.liked
-                            ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        } shadow-md hover:shadow-lg transform hover:scale-105`}
-                      >
-                        {interactions[index]?.liked ? (
-                          <>
-                            <FaHeart className="text-3xl animate-pulse" />
-                            <h4 className="font-bold">You liked the post</h4>
-                          </>
-                        ) : (
-                          <FaRegHeart className="text-3xl" />
-                        )}
-                      </button>
-                      <div className="flex justify-end">
-                        <button onClick={() => toggleCommentBox(index)} className="flex items-center space-x-2 text-black">
-                          <FaRegCommentDots className="text-3xl" />
-                        </button>
-                      </div>
-                      <Modal isOpen={openModalIndex === index} onClose={closeModal} backdrop="blur" className="rounded-lg shadow-xl border border-gray-200 bg-white max-h-[400px]">
-                        <ModalContent>
-                          <ModalHeader className="text-lg font-semibold text-gray-900 border-b border-gray-300 py-3">Comments</ModalHeader>
-                          <ModalBody className="p-5 space-y-4 max-h-[700px] overflow-y-auto">
-                            {interactions[index]?.comments?.length > 0 ? (
-                              interactions[index].comments.map((comment, i) => (
-                                <div key={i} className="p-2 border-b border-gray-200">
-                                  <p className="text-gray-700">{comment}</p>
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-gray-500 italic">No comments yet.</p>
-                            )}
-                          </ModalBody>
-                          <ModalFooter className="flex flex-col items-start gap-2 border-t border-gray-300 p-4">
-                            <input
-                              value={interactions[index]?.newComment || ''}
-                              onChange={(e) => handleInputChange(index, e.target.value)}
-                              placeholder="Write a comment..."
-                              className="w-full border rounded-lg p-2 bg-white text-black focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                            <div className="text-black flex justify-end w-full gap-4 mt-2">
-                              <button className='bg-purple-700 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded'
-                                onClick={() => handleComment(index, post._id)}>
-                                Add Comment
-                              </button>
-                              <button
-                                className='bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded'
-                                onClick={closeModal}>
-                                Stop
-                              </button>
-                            </div>
-                          </ModalFooter>
-                        </ModalContent>
-                      </Modal>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center text-gray-600">No events found.</div>
+    {filteredData && filteredData.length > 0 ? (
+      filteredData.map((post: any, index: number) => (
+        <div
+          key={post._id || index}
+          className="bg-white w-full rounded-lg shadow-md border border-gray-200 flex flex-col overflow-hidden transition-transform duration-300 hover:shadow-lg hover:scale-105"
+        >
+          {/* Image */}
+          <div className="relative">
+            {post.offerDetails?.offerPercentage && (
+              <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
+                {post.offerDetails.offerPercentage}% OFF
+              </div>
             )}
+            <img
+              src={post.images}
+              className="w-full h-56 object-cover"
+              alt={post.title}
+              onClick={async () => await handleButtonClick(post._id)}
+            />
           </div>
+
+          {/* Content */}
+          <div className="flex-1 p-6 text-center">
+            <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
+            <p className="text-gray-600 text-sm">{post.Amount}</p>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 text-center border-t">
+            <span className="block text-gray-700 font-medium">{post.companyName}</span>
+            <span className="block text-gray-500 text-sm">{post.location?.address || "Unknown"}</span>
+          </div>
+
+          {/* Like Button */}
+          <button
+            onClick={() => handleLike(index, post._id)}
+            className={`flex justify-center items-center space-x-2 p-3 rounded-lg w-full transition-all duration-300 ${
+              interactions[index]?.liked
+                ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            } shadow-md hover:shadow-lg`}
+          >
+            {interactions[index]?.liked ? (
+              <>
+                <FaHeart className="text-2xl animate-pulse" />
+                <span className="font-bold">Liked</span>
+              </>
+            ) : (
+              <FaRegHeart className="text-2xl" />
+            )}
+          </button>
+        </div>
+      ))
+    ) : (
+      <div className="text-center text-gray-600 col-span-full">No events found.</div>
+    )}
+  </div>
+</div>
+
+
+
+
+
         </div>
       </div>
       <Footer />

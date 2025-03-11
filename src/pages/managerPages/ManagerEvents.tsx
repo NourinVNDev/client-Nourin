@@ -26,16 +26,15 @@ const formik = useFormik<eventFormValues>({
     startDate: "",
     endDate: "",
     time: "",
-    tags: [""],
     images: [] as (File | string)[],
     noOfPerson: 0,
     destination: "",
-    Included: [""],
-    notIncluded: [""],
-    Amount: 0
+
   },
+
   validationSchema:eventValidSchema,
   onSubmit: async (values) => {
+    console.log("Hello")
     console.log("Form Submitted", values);
     const formData = new FormData();
     
@@ -48,12 +47,12 @@ const formik = useFormik<eventFormValues>({
     formData.append("startDate", values.startDate);
     formData.append("endDate", values.endDate);
     formData.append("time", values.time);
-    formData.append("tags", values.tags.join(","));
+
     formData.append("destination", values.destination);
     formData.append("noOfPerson", values.noOfPerson.toString());
-    formData.append("amount", values.Amount.toString()); 
-    formData.append("Included", values.Included.join(","));
-    formData.append("notIncluded", values.notIncluded.join(","));
+    // formData.append("amount", values.Amount.toString()); 
+    // formData.append("Included", values.Included.join(","));
+    // formData.append("notIncluded", values.notIncluded.join(","));
 
     if (values.images.length > 0) {
       values.images.forEach((file) => {
@@ -69,9 +68,10 @@ const formik = useFormik<eventFormValues>({
     const postEventData=async ()=>{
           try {
       const result = await createEventpost(formData);
+      console.log("Daata checking",result);
       if (result.message === "Event data saved successfully") {
         toast.success("Event data saved successfully");
-        navigate("/Manager/events");
+        navigate(`/Manager/addNewEvent2/${result.data._id}`);
         formik.resetForm({ values: formik.initialValues });
         setImagePreview([]);
       } else if (result.message === "Duplicate Event Name") {
@@ -153,7 +153,7 @@ return (
               Event Title
             </label>
             <select
-              id="title"
+              id="title"  
               name="title"
               value={formik.values.title}
               onChange={formik.handleChange}
@@ -183,7 +183,6 @@ return (
             name="content"
             value={formik.values.content}
             onChange={formik.handleChange}
-            // onBlur={formik.handleBlur}
             className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.content && formik.errors.content ? 'border-red-500' : ''}`}
           />
           {formik.touched.content && formik.errors.content ? (
@@ -249,25 +248,26 @@ return (
               <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
             ) : null}
           </div>
-
           <div>
-            <label htmlFor="Amount" className="block text-sm font-medium text-gray-400">
-              Amount
-            </label>
-            <input
-              type="number"
-              id="Amount"
-              name="Amount"
-              value={formik.values.Amount}
-              onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.Amount && formik.errors.Amount ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.Amount && formik.errors.Amount ? (
-              <div className="text-red-500 text-sm">{formik.errors.Amount}</div>
-            ) : null}
-          </div>
+          <label htmlFor="destination" className="block text-sm font-medium text-gray-400">
+            Destination
+          </label>
+          <input
+            type="text"
+            id="destination"
+            name="destination"
+            value={formik.values.destination}
+            onChange={formik.handleChange}
+            // onBlur={formik.handleBlur}
+            // required
+            className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.destination && formik.errors.destination ? 'border-red-500' : ''}`}
+          />
+          {formik.touched.destination && formik.errors.destination ? (
+            <div className="text-red-500 text-sm">{formik.errors.destination}</div>
+          ) : null}
+        </div>
+
+    
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -300,92 +300,6 @@ return (
             ) : null}
           </div>
         </div>
-
-    
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label htmlFor="destination" className="block text-sm font-medium text-gray-400">
-            Destination
-          </label>
-          <input
-            type="text"
-            id="destination"
-            name="destination"
-            value={formik.values.destination}
-            onChange={formik.handleChange}
-            // onBlur={formik.handleBlur}
-            // required
-            className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.destination && formik.errors.destination ? 'border-red-500' : ''}`}
-          />
-          {formik.touched.destination && formik.errors.destination ? (
-            <div className="text-red-500 text-sm">{formik.errors.destination}</div>
-          ) : null}
-        </div>
-        <div>
-          <label htmlFor="tags" className="block text-sm font-medium text-gray-400">
-            Tags
-          </label>
-          <input
-            type="text"
-            id="tags"
-            name="tags"
-            value={formik.values.tags.join(", ")}
-            onChange={(e) => {
-              const value = e.target.value.split(",").map(item => item.trim());
-              formik.setFieldValue("tags", value);
-            }}
-            className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.tags && formik.errors.tags ? 'border-red-500' : ''}`}
-            placeholder="comma-separated tags"
-          />
-          {formik.touched.tags && formik.errors.tags ? (
-            <div className="text-red-500 text-sm">{formik.errors.tags}</div>
-          ) : null}
-        </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="included" className="block text-sm font-medium text-gray-400">
-              Included (comma-separated)
-            </label>
-            <input
-              type="text"
-              id="included"
-              name="Included"
-              value={formik.values.Included.join(", ")}
-              onChange={(e) => {
-                const value = e.target.value.split(",").map(item => item.trim()); // Filter out empty strings
-                formik.setFieldValue("Included", value);
-              }}
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.Included && formik.errors.Included ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.Included && formik.errors.Included ? (
-              <div className="text-red-500 text-sm">{formik.errors.Included}</div>
-            ) : null}
-          </div>
-          <div>
-            <label htmlFor="notIncluded" className="block text-sm font-medium text-gray-400">
-              Not Included (comma-separated)
-            </label>
-            <input
-              type="text"
-              id="notIncluded"
-              name="notIncluded"
-              value={formik.values.notIncluded.join(", ")}
-              onChange={(e) => {
-                const value = e.target.value.split(",").map(item => item.trim());
-                formik.setFieldValue("notIncluded", value);
-              }}
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.notIncluded && formik.errors.notIncluded ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.notIncluded && formik.errors.notIncluded ? (
-              <div className="text-red-500 text-sm">{formik.errors.notIncluded}</div>
-            ) : null}
-          </div>
-        </div>
-
-   
-
         <div>
           <label htmlFor="images" className="block text-sm font-medium text-gray-400">
             Upload Images
@@ -417,9 +331,10 @@ return (
         <div className="flex justify-center">
           <button
             type="submit"
+
             className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
           >
-            Create Event
+            Save Event
           </button>
         </div>
       </form>

@@ -1,26 +1,19 @@
 import { BrowserRouter as Router,Route,Routes } from "react-router-dom";
-import Approutes from "./Approutes";
-interface RouteConfig {
-    path: string;
-    element: React.ReactNode;
-  }
+import userRoutes from "./userRoutes";
+import managerRoutes from "./managerRoutes";
+import adminRoutes from "./adminRoutes";
+import verifierRoutes from "./verifierRoutes";
+
 
 const MainRouter:React.FC=()=>{
+    const allRoutes = [...userRoutes, ...managerRoutes, ...adminRoutes,...verifierRoutes];
     return(
         <div>
             <Router>
            <Routes>
-            {Approutes.map((route:RouteConfig)=>{
-                return(
-                    <Route 
-                    key={route.path} 
-                    path={route.path} 
-                    element={route.element}
-                    />
-
-                )
-             
-            })}
+           {allRoutes.map((route) => (
+                    <Route key={route.path} path={route.path} element={route.element} />
+                ))}
            </Routes>
 
             </Router>

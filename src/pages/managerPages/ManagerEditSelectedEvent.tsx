@@ -26,13 +26,10 @@ const ManagerEditSelectedEvents = () => {
       startDate: '',
       endDate: '',
       time: "",
-      tags: [""],
+ 
       images: [] as (File | string)[],
       noOfPerson: 0,
       destination: '',
-      Included: [''],
-      notIncluded: [''],
-      Amount: 0
     },
 
 
@@ -49,12 +46,11 @@ const ManagerEditSelectedEvents = () => {
       formData.append("startDate", values.startDate);
       formData.append("endDate", values.endDate);
       formData.append("time", values.time);
-      formData.append("tags", values.tags.join(","));
       formData.append("destination", values.destination);
       formData.append("noOfPerson", values.noOfPerson.toString());
-      formData.append("amount", values.Amount.toString()); 
-      formData.append("Included", values.Included.join(","));
-      formData.append("notIncluded", values.notIncluded.join(","));
+      // formData.append("amount", values.Amount.toString()); 
+      // formData.append("Included", values.Included.join(","));
+      // formData.append("notIncluded", values.notIncluded.join(","));
   
       if (values.images.length > 0) {
         values.images.forEach((file) => {
@@ -104,10 +100,9 @@ const ManagerEditSelectedEvents = () => {
     endDate: "",
     noOfPerson: 0,
     time: "",
-    Amount: 0,
+ 
     destination: "",
-    Included: [""],
-    notIncluded: [""],
+   
     tags: [""],
     images: [] as (File | string)[],
   });
@@ -313,7 +308,7 @@ const ManagerEditSelectedEvents = () => {
               <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
             ) : null}
               </div>
-              <div>
+              {/* <div>
                 <label htmlFor="amount" className="block text-sm font-medium text-gray-400">Amount</label>
                 <input
                   type="number"
@@ -327,7 +322,7 @@ const ManagerEditSelectedEvents = () => {
                          {formik.touched.Amount && formik.errors.Amount ? (
               <div className="text-red-500 text-sm">{formik.errors.Amount}</div>
             ) : null}
-              </div>
+              </div> */}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                  <div>
@@ -373,22 +368,9 @@ const ManagerEditSelectedEvents = () => {
             <div className="text-red-500 text-sm">{formik.errors.destination}</div>
           ) : null}
               </div>
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-400">Tags (comma-separated)</label>
-                <input
-                  type="text"
-                  id="tags"
-                  name="tags"
-                  value={formik.values.tags.join(", ")}
-                  onChange={handleInputChange}
-                  className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                />
-                   {formik.touched.tags && formik.errors.tags ? (
-            <div className="text-red-500 text-sm">{formik.errors.tags}</div>
-          ) : null}
+         
               </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="Included" className="block text-sm font-medium text-gray-400">Included (comma-separated)</label>
                   <input
@@ -417,7 +399,7 @@ const ManagerEditSelectedEvents = () => {
               <div className="text-red-500 text-sm">{formik.errors.notIncluded}</div>
             ) : null}
                 </div>
-              </div>
+              </div> */}
 
               <div className="mt-4">
                 <strong>Previous Images:</strong>

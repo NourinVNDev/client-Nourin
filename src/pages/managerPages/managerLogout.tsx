@@ -23,6 +23,5 @@ const ManagerLogout=()=>{
 
         </div>
     )
-
 }
 export default ManagerLogout;

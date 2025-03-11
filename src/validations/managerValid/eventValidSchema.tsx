@@ -21,9 +21,9 @@ export const  eventValidSchema = Yup.object({
   noOfPerson: Yup.number().min(1, "Must be at least 1 person").required("Number of persons is required"),
   // noOfDays: Yup.number().min(1, "Must be at least 1 day").required("Number of days is required"),
   destination: Yup.string().required("Destination is required"),
-  Included: Yup.array().of(Yup.string().required()).min(1, "At least one included item is required"),
-  notIncluded: Yup.array().of(Yup.string().required()).min(1, "At least one not included item is required"),
-  Amount: Yup.number().min(1, "Amount must be a positive number").required("Amount is required"),
+  // Included: Yup.array().of(Yup.string().required()).min(1, "At least one included item is required"),
+  // notIncluded: Yup.array().of(Yup.string().required()).min(1, "At least one not included item is required"),
+  // Amount: Yup.number().min(1, "Amount must be a positive number").required("Amount is required"),
 });
 
 
@@ -39,11 +39,9 @@ export interface eventFormValues {
     startDate: string; // Consider using Date type if you want to handle dates directly
     endDate: string;   // Same as above
     time: string;
-    tags: string[];    // Specify the type for tags
     images: (File | string)[]; // Include both File and string types for images
     noOfPerson: number;
     destination: string;
-    Included: string[]; // Specify the type for Included items
-    notIncluded: string[]; // Specify the type for Not Included items
-    Amount: number;
+  
+ 
   }
