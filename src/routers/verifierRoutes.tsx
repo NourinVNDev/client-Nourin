@@ -1,9 +1,16 @@
-import VerifierRegister from "../pages/verifierPages/verifierRegister";
-import VerifierLogin from "../pages/verifierPages/verifierLogin";
+
+import VerifierLogin from "../pages/verifierPages/VerifierLogin";
+import HomePage from "../pages/verifierPages/HomePage";
+import ListAllEvents from "../pages/verifierPages/ListAllEvents";
+import ListingBookedEvent from "../pages/verifierPages/ListingBookedEvent";
 const verifierRoutes=[
-    {path:'/verifier/register',element:<VerifierRegister />},
+
     {path:'/verifier/login',element:<VerifierLogin/>},
-    
+    {path:'/verifier/homePage',element:<HomePage/>},
+    {path:'/verifier/listAllEvents',element:<ListAllEvents/>},
+    {path:'/verifier/bookedEventDetails/:eventId',element:<ListingBookedEvent/>},
+    {},
+
 
 
 ]

@@ -13,7 +13,7 @@ const AllEventData = () => {
   const userId = localStorage.getItem('userId');
   const [interactions, setInteractions] = useState<{ [key: number]: { liked: boolean, newComment: string, comments: string[] } }>({});
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedPrice,setSelectedPrice]=useState('')
+  const [selectedPrice, setSelectedPrice] = useState('')
   const [filteredData, setFilteredData] = useState(parsedData);
   const { socket } = useSocket();
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,7 +34,7 @@ const AllEventData = () => {
 
         // Flatten the Events from all categories
         setParsedData(result.user.categories.flatMap((category: any) => category.Events) || []);
-        const category = result.user.categories.map((event:any)=>event.categoryName); // Access the category object
+        const category = result.user.categories.map((event: any) => event.categoryName); // Access the category object
         console.log("Better ", category);
         setCategoryNames(category);
       } catch (error) {
@@ -159,14 +159,14 @@ const AllEventData = () => {
 
   useEffect(() => {
     let updatedData = [...parsedData]; // Start with full data
-  
+
     // Apply category filter if selected
     if (selectedCategory) {
       updatedData = updatedData.filter((post) =>
         post.title?.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
-  
+
     // Apply search filter if searchQuery exists
     if (searchQuery) {
       updatedData = updatedData.filter((post) =>
@@ -175,34 +175,34 @@ const AllEventData = () => {
           .includes(searchQuery.toLowerCase())
       );
     }
-  
+
     console.log(selectedPrice, "soumya");
-  
+
     // Apply sorting only if selectedPrice is set
     if (selectedPrice === "Price: Low - High") {
       updatedData.sort((a, b) => a.Amount - b.Amount);
     } else if (selectedPrice === "Price: High - Low") {
       updatedData.sort((a, b) => b.Amount - a.Amount);
     }
-  
+
     setFilteredData(updatedData); // Set the final processed data
   }, [parsedData, selectedCategory, selectedPrice, searchQuery]);
-  
+
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(event.target.value); 
+    setSelectedCategory(event.target.value);
   }
 
-  const handlePriceChange=(event:React.ChangeEvent<HTMLSelectElement>)=>{
+  const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPrice(event.target.value);
   }
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
     const filteredEvents = parsedData.filter((post) =>
-        post.location?.address.toLowerCase().includes(query)
-      );
-      setFilteredData(filteredEvents); // Update the filtered data
-    };
+      post.location?.address.toLowerCase().includes(query)
+    );
+    setFilteredData(filteredEvents); // Update the filtered data
+  };
 
   // Return the JSX
   return (
@@ -268,7 +268,7 @@ const AllEventData = () => {
             <div className="flex items-center space-x-3 w-full md:w-auto">
               <span className="font-semibold text-lg">Sort By:</span>
               <select className="border px-4 py-2 rounded-lg bg-white text-black text-lg w-full md:w-auto" onChange={handlePriceChange}
-              value={selectedPrice}>
+                value={selectedPrice}>
                 <option>Price: Low - High</option>
                 <option>Price: High - Low</option>
               </select>
@@ -277,66 +277,66 @@ const AllEventData = () => {
 
           <br /><br />
           <div className="max-w-screen-2xl mx-auto">
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-10 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-10 w-full">
 
-    {filteredData && filteredData.length > 0 ? (
-      filteredData.map((post: any, index: number) => (
-        <div
-          key={post._id || index}
-          className="bg-white w-full rounded-lg shadow-md border border-gray-200 flex flex-col overflow-hidden transition-transform duration-300 hover:shadow-lg hover:scale-105"
-        >
-          {/* Image */}
-          <div className="relative">
-            {post.offerDetails?.offerPercentage && (
-              <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
-                {post.offerDetails.offerPercentage}% OFF
-              </div>
-            )}
-            <img
-              src={post.images}
-              className="w-full h-56 object-cover"
-              alt={post.title}
-              onClick={async () => await handleButtonClick(post._id)}
-            />
+              {filteredData && filteredData.length > 0 ? (
+                filteredData.map((post: any, index: number) => (
+                  <div
+                    key={post._id || index}
+                    className="bg-white w-full rounded-lg shadow-md border border-gray-200 flex flex-col overflow-hidden transition-transform duration-300 hover:shadow-lg hover:scale-105"
+                  >
+                    {/* Image */}
+                    <div className="relative">
+                      {post.typesOfTickets &&
+                        post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+                          <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
+                            {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
+                          </div>
+                        )}
+                      <img
+                        src={post.images}
+                        className="w-full h-56 object-cover"
+                        alt={post.title}
+                        onClick={async () => await handleButtonClick(post._id)}
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 p-6 text-center">
+                      <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
+                      <p className="text-gray-600 text-sm">{post.Amount}</p>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="p-4 text-center border-t">
+                      <span className="block text-gray-700 font-medium">{post.companyName}</span>
+                      <span className="block text-gray-500 text-sm">{post.location?.address || "Unknown"}</span>
+                    </div>
+
+                    {/* Like Button */}
+                    <button
+                      onClick={() => handleLike(index, post._id)}
+                      className={`flex justify-center items-center space-x-2 p-3 rounded-lg w-full transition-all duration-300 ${interactions[index]?.liked
+                          ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        } shadow-md hover:shadow-lg`}
+                    >
+                      {interactions[index]?.liked ? (
+                        <>
+                          <FaHeart className="text-2xl animate-pulse" />
+                          <span className="font-bold">Liked</span>
+                        </>
+                      ) : (
+                        <FaRegHeart className="text-2xl" />
+                      )}
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-600 col-span-full">No events found.</div>
+              )}
+            </div>
           </div>
-
-          {/* Content */}
-          <div className="flex-1 p-6 text-center">
-            <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
-            <p className="text-gray-600 text-sm">{post.Amount}</p>
-          </div>
-
-          {/* Footer */}
-          <div className="p-4 text-center border-t">
-            <span className="block text-gray-700 font-medium">{post.companyName}</span>
-            <span className="block text-gray-500 text-sm">{post.location?.address || "Unknown"}</span>
-          </div>
-
-          {/* Like Button */}
-          <button
-            onClick={() => handleLike(index, post._id)}
-            className={`flex justify-center items-center space-x-2 p-3 rounded-lg w-full transition-all duration-300 ${
-              interactions[index]?.liked
-                ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            } shadow-md hover:shadow-lg`}
-          >
-            {interactions[index]?.liked ? (
-              <>
-                <FaHeart className="text-2xl animate-pulse" />
-                <span className="font-bold">Liked</span>
-              </>
-            ) : (
-              <FaRegHeart className="text-2xl" />
-            )}
-          </button>
-        </div>
-      ))
-    ) : (
-      <div className="text-center text-gray-600 col-span-full">No events found.</div>
-    )}
-  </div>
-</div>
 
 
 

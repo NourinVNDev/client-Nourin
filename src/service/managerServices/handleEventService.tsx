@@ -1,6 +1,6 @@
 
 import MANAGER_API from "../../utils/managerAxiosInstance";
-import { EventData } from "../../validations/userValid/TypeValid";
+
 
 export interface eventSeat {
   Included: string[];

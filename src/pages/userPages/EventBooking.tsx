@@ -18,6 +18,7 @@
       amount: number;
       userId: string;
       eventId: string;
+      bookingId:string;
       image: string;
     }
 
@@ -47,7 +48,8 @@
                   amount: event.totalAmount || 0,
                   userId: event.userId || "",
                   eventId: event.eventId._id || "",
-                  image: event.eventId.images[0] || "" // Safely get image
+                  image: event.eventId.images[0] || "", // Safely get image
+                  bookingId:event.bookingId
                 }));
                 setEventDetails(events); // Set the event details as an array
               }
@@ -58,6 +60,14 @@
         
           fetchEventBooking();
         }, []);
+
+
+
+        useEffect(()=>{
+          console.log("Event Details:",eventDetails);
+          
+
+        },[eventDetails])
       return(
           <div className="min-h-screen flex flex-col">
         <Header />

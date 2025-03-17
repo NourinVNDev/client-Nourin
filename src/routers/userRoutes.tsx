@@ -34,7 +34,7 @@ const userRoutes = [
     { path: '/user/categoryBasedData/:id', element: <PrivateRoute><CategoryBasedData /></PrivateRoute> },
     { path: '/user/resetPassword', element: <PrivateRoute><ResetPasswordALogin /></PrivateRoute> },
     { path: '/singlePostDetails', element: <PrivateRoute><SinglePostDetails /></PrivateRoute> },
-    { path: '/checkEventDetails/:id', element: <PrivateRoute><EventDetails /></PrivateRoute> },
+    { path: '/checkEventDetails/:id/:selectedType', element: <PrivateRoute><EventDetails /></PrivateRoute> },
     { path: '/payment-success', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
     { path: '/payment-cancel/:bookedId', element: <PrivateRoute><PaymentCancel /></PrivateRoute> },
     { path: '/event-history', element: <PrivateRoute><EventHistory /></PrivateRoute> },

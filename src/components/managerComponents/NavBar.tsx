@@ -30,6 +30,9 @@ const NavBar:React.FC=()=>{
       <Link to="/manager/latestRequest" className="block hover:bg-blue-200 rounded p-2 text-black">
         Request
       </Link>
+      <Link to="/manager/verifier" className="block hover:bg-blue-200 rounded p-2 text-black">
+       Verifier
+      </Link>
       <Link to="/manager/chat" className="block hover:bg-blue-200 rounded p-2 text-black">
         Chat
       </Link>

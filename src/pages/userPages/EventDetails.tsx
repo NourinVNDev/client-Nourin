@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Header from "../../components/userComponents/Headers";
 import Footer from "../../components/userComponents/Footer";
 import { getEventData } from "../../service/userServices/userPost";
-import { Star, Users, Calendar } from "lucide-react";
+import { Star, Users, Calendar, Ticket } from "lucide-react";
 import { makeStripePayment } from "../../service/userServices/userPost";
 import { PaymentData } from "../../validations/userValid/TypeValid";
 import { useSelector} from "react-redux";
@@ -31,7 +31,7 @@ const EventDetails = () => {
 
   console.log("User Details from store",user.Address);
   
-  const { id } = useParams();
+  const { id,selectedType } = useParams();
   const [eventData, setEventData] = useState<PaymentData>({
     bookedId:"",
     userId:"",
@@ -73,7 +73,11 @@ useEffect(() => {
       console.log("Results12:", result);
 
       const event = result?.data?.result?.savedEvent || {}; // Extract event data correctly
-
+      const ticket = event?.typesOfTickets?.find(
+        (ticket: any) => ticket.type === selectedType
+      );
+      console.log("Ticket", ticket);
+      
       setEventData((prevData) => ({
         ...prevData,
         userId: user?._id ||prevData.userId,
@@ -89,7 +93,9 @@ useEffect(() => {
         location: event?.location || prevData.location,
         noOfPerson: event?.noOfPerson || prevData.noOfPerson,
         noOfDays: event?.noOfDays || prevData.noOfDays,
-        Amount: event?.offerDetails.offerAmount||event.Amount,
+        Amount: ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
+        bookedId: prevData.bookedId,
+      
 
       }));
     } catch (error) {
@@ -103,6 +109,7 @@ useEffect(() => {
 
 useEffect(() => {
   console.log("Updated eventData:", eventData);
+  console.log("Selected Type")
 }, [eventData]);
 
 

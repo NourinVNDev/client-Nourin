@@ -9,7 +9,6 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../App/store';
 import { setUserDetails } from '../../../Features/userSlice';
 import toast,{Toaster} from 'react-hot-toast';
-import { setLoginAuthentication } from '../../../Features/userSlice';
 
 
 

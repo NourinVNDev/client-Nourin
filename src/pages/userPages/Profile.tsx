@@ -6,7 +6,7 @@ import { handleProfileDetails, handleProfileData } from '../../service/userServi
 import toast, { Toaster } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../App/store';
-import { setUserDetails, updateAddress,updateAddressPhone } from '../../../Features/userSlice';
+import { setUserDetails } from '../../../Features/userSlice';
 import { useFormik } from 'formik';
 import { profileValidSchema } from '../../validations/userValid/profileValidSchema';
 

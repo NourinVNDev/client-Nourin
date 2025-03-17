@@ -1,22 +1,17 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-import { MANAGER_URL } from "./userUrl";
+import { VERIFIER_URL } from "./userUrl";
 // Base Axios instance
-const MANAGER_API = axios.create({ baseURL: MANAGER_URL, withCredentials: true });
+const VERIFIER_API = axios.create({ baseURL: VERIFIER_URL, withCredentials: true });
 
 
 
 
-const getToken = () =>
-
-    document.cookie.split("; ").find(row => row.startsWith("managerToken="))?.split("=")[1];
+const getToken = () =>document.cookie.split("; ").find(row => row.startsWith("verifierToken="))?.split("=")[1];
 
 
-const clearCookies = () => {
-    document.cookie = "managerToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "managerRefreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-};
-MANAGER_API.interceptors.request.use(
+
+VERIFIER_API.interceptors.request.use(
     (config) => {
         const token = getToken();
         console.log(token, "token")
@@ -31,7 +26,7 @@ MANAGER_API.interceptors.request.use(
 );
 
 // Response Interceptor
-MANAGER_API.interceptors.response.use(
+VERIFIER_API.interceptors.response.use(
     (response) => response, // Forward successful responses
     async (error) => {
         const originalRequest = error.config;
@@ -42,7 +37,7 @@ MANAGER_API.interceptors.response.use(
 
             try {
                 // Get a new access token using the refresh token
-                const res = await MANAGER_API.post("/refresh-token");
+                const res = await VERIFIER_API.post("/refresh-token");
 
 
                 // Save the new access token in cookies
@@ -50,7 +45,7 @@ MANAGER_API.interceptors.response.use(
 
                 // Retry the failed request with the new token
                 originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
-                return MANAGER_API(originalRequest);
+                return VERIFIER_API(originalRequest);
             } catch (refreshError) {
                 console.error("Token refresh failed:", refreshError);
                 window.location.href = "/"; // Redirect to login if refresh fails
@@ -62,16 +57,11 @@ MANAGER_API.interceptors.response.use(
                 icon: "warning",
                 confirmButtonText: "OK",
                 allowOutsideClick: false,
-              }).then(() => {
-                clearCookies();
-                localStorage.removeItem('userAuth');
-                window.location.href = '/mLogin';
-                
-            });
+              });
         }
 
         return Promise.reject(error); // Forward other errors
     }
 );
 
-export default MANAGER_API;
+export default VERIFIER_API;
