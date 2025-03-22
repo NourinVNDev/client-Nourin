@@ -29,10 +29,21 @@ const ReviewModal = ({
     setReview(existingReview.review);
   }, [existingReview]);
 
-  const handleReviewRating = () => {
-    console.log("Submitting Review & Rating...");
-    const result = EventReviewAndRating(rating, review, eventId, userId);
-    // Optionally handle the result here
+  const handleReviewRating = async () => {
+    if (!review.trim()) return; // Prevent submission of empty reviews
+
+  
+    try {
+      const result = await EventReviewAndRating(rating, review, eventId, userId);
+      console.log("Result:", result);
+      
+      if (result?.result?.modifiedCount > 0) {
+        onClose(); // Close modal on successful submission
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+    }
+
   };
 
   return (

@@ -22,7 +22,7 @@ const ManagerEditSelectedEvents = () => {
       eventName: "",
       title: "",
       content: "",
-      location: { address: "", city: "" },
+     address:"",
       startDate: '',
       endDate: '',
       time: "",
@@ -42,7 +42,7 @@ const ManagerEditSelectedEvents = () => {
       formData.append("title", values.title);
       formData.append("content", values.content);
       formData.append('companyName',managerCompanyName||'');
-      formData.append("location", JSON.stringify(values.location));
+      formData.append("address", JSON.stringify(values.address));
       formData.append("startDate", values.startDate);
       formData.append("endDate", values.endDate);
       formData.append("time", values.time);
@@ -95,7 +95,7 @@ const ManagerEditSelectedEvents = () => {
     eventName: "",
     title: "",
     content: "",
-    location: { address: "", city: "" },
+   address:"",
     startDate: "",
     endDate: "",
     noOfPerson: 0,
@@ -123,7 +123,7 @@ const ManagerEditSelectedEvents = () => {
           formik.setValues((prevValues) => ({
             ...prevValues,
             ...result.data.result,
-            location: result.data.result.location || { address: "", city: "" },
+            address:result.data.result.address||"",
             Included: result.data.result.Included || [""],
             notIncluded: result.data.result.notIncluded || [""],
             tags: result.data.result.tags || [""],
@@ -149,18 +149,11 @@ const ManagerEditSelectedEvents = () => {
   }, [eventId]);
   
 
-  const formatDateToInput = (isoDate: string) => {
-    if (!isoDate) return ""; // Return empty string if no date
-    const date = new Date(isoDate);
-    return date.toISOString().split("T")[0]; // Get the date part in YYYY-MM-DD format
-  };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === "location.address" || name === "location.city") {
-      const field = name.split(".")[1]; // Extract 'address' or 'city'
-      formik.setFieldValue(`location.${field}`, value);
-    } else if (["Included", "notIncluded", "tags"].includes(name)) {
+  if (["Included", "notIncluded", "tags"].includes(name)) {
       formik.setFieldValue(name, value.split(",").map((item) => item.trim())); // Convert input to array
     } else if (["noOfPerson", "amount"].includes(name)) {
       const parsedValue = Number(value);
@@ -267,30 +260,16 @@ const ManagerEditSelectedEvents = () => {
                     type="text"
                     id="address"
                     name="location.address"
-                    value={formik.values.location.address}
+                    value={formik.values.address}
                     onChange={handleInputChange}
                     required
                     className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   />
-                      {formik.touched.location?.address && formik.errors.location?.address ? (
-              <div className="text-red-500 text-sm">{formik.errors.location.address}</div>
+                      {formik.touched.address && formik.errors.address ? (
+              <div className="text-red-500 text-sm">{formik.errors.address}</div>
             ) : null}
                 </div>
-                <div>
-                  <label htmlFor="city" className="block text-sm font-medium text-gray-400">City</label>
-                  <input
-                    type="text"
-                    id="city"
-                    name="location.city"
-                    value={formik.values.location.city}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                  />
-                          {formik.touched.location?.city && formik.errors.location?.city ? (
-              <div className="text-red-500 text-sm">{formik.errors.location.city}</div>
-            ) : null}
-                </div>
+     
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
@@ -308,21 +287,7 @@ const ManagerEditSelectedEvents = () => {
               <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
             ) : null}
               </div>
-              {/* <div>
-                <label htmlFor="amount" className="block text-sm font-medium text-gray-400">Amount</label>
-                <input
-                  type="number"
-                  id="amount"
-                  name="Amount"
-                  value={formik.values.Amount}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                />
-                         {formik.touched.Amount && formik.errors.Amount ? (
-              <div className="text-red-500 text-sm">{formik.errors.Amount}</div>
-            ) : null}
-              </div> */}
+        
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                  <div>
@@ -370,36 +335,7 @@ const ManagerEditSelectedEvents = () => {
               </div>
          
               </div>
-              {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="Included" className="block text-sm font-medium text-gray-400">Included (comma-separated)</label>
-                  <input
-                    type="text"
-                    id="Included"
-                    name="Included"
-                    value={formik.values.Included.join(", ")}
-                    onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                  />
-                          {formik.touched.Included && formik.errors.Included ? (
-              <div className="text-red-500 text-sm">{formik.errors.Included}</div>
-            ) : null}
-                </div>
-                <div>
-                  <label htmlFor="notIncluded" className="block text-sm font-medium text-gray-400">Not Included (comma-separated)</label>
-                  <input
-                    type="text"
-                    id="notIncluded"
-                    name="notIncluded"
-                    value={formik.values.notIncluded.join(", ")}
-                    onChange={handleInputChange}
-                    className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                  />
-                        {formik.touched.notIncluded && formik.errors.notIncluded ? (
-              <div className="text-red-500 text-sm">{formik.errors.notIncluded}</div>
-            ) : null}
-                </div>
-              </div> */}
+           
 
               <div className="mt-4">
                 <strong>Previous Images:</strong>

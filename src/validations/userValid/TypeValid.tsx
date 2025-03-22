@@ -1,6 +1,7 @@
 export type PaymentData = {
   userId:string,
   bookedId:string
+  bookingId:string
   categoryName:string,
     firstName: string;
     lastName: string;
@@ -16,17 +17,18 @@ export type PaymentData = {
     noOfPerson: number;
     noOfDays: number;
     Amount: number;
-    companyName:string
+    companyName:string;
+    type:string;
+    managerId:string;
+    Included:[string];
+    notIncluded:[string];
   };
   export type EventData = {
     _id:string;
     eventName: string;
     title: string;
     content: string;
-    location: {
-      address: string;
-      city: string;
-    };
+  address:string;
     startDate: string;
     images:(File|string)[]
     endDate: string;
@@ -60,6 +62,25 @@ export type PaymentData = {
     email:string,
     phoneNo:number,
     address:string
+  }
+
+  export interface EventDetails {
+    _id: string;
+    eventName: string;
+    companyName: string;
+    title: string;
+    noOfPerson: number;
+    noOfDays: number;
+    endDate: string;
+    amount: number;
+    userId: string;
+    eventId: string;
+    bookingId: string;
+    image: string;
+    type: string;
+    Included: [string],
+    notIncluded: [string],
+    paymentStatus:string
   }
   
 

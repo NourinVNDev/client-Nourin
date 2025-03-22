@@ -128,9 +128,10 @@ const makeStripePayment=async (eventData:PaymentData)=>{
     }
 }
 
-const saveBillingDetails=async(formData:billingData)=>{
+const saveBillingDetailsOfUser=async(formData:billingData)=>{
+    console.log("FormData",formData)
     try {
-        console.log("FormData",formData)
+        
      
         const response = await API(`/saveBillingDetails`, {
             method: 'POST',
@@ -167,4 +168,4 @@ const updatePaymentStatusService=async(bookedId:string)=>{
 
 
 
-export {getEventDataDetails,getAllEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,saveBillingDetails,updatePaymentStatusService};
+export {getEventDataDetails,getAllEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,saveBillingDetailsOfUser,updatePaymentStatusService};

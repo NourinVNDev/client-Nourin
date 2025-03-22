@@ -106,7 +106,7 @@ const ProfileNavbar = () => {
         <Link to="/user/bookedEvent" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">
           Booked
         </Link>
-        <Link to="/wallets" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">
+        <Link to="/user/wallet" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">
           Wallets
         </Link>
         <Link to="/notifications" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">

@@ -8,13 +8,23 @@ import { createEventpost, getCategoryEventType } from "../../service/managerServ
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useFormik } from "formik";
+
 import { eventValidSchema} from "../../validations/managerValid/eventValidSchema";
 import { eventFormValues } from "../../validations/managerValid/eventValidSchema";
+import PlacesAutocomplete from "../../components/managerComponents/LocationSearch";
+import { LoadScript } from "@react-google-maps/api";
+const libraries: Array<"places"> = ["places"];
+
+ const GOOGLE_API_KEY = "AIzaSyCPaX7uEVQp_z69iGjGmN-kD8M-ENWweOQ";
 const ManagerEvents = () => {
   const navigate = useNavigate();
   const managerCompanyName = localStorage.getItem('ManagerName') ?? " ";
   const [eventType, setEventType] = useState<string[]>([]);
-  const [imagePreview, setImagePreview] = useState<string[]>([]); // Changed to array for multiple images
+  const [imagePreview, setImagePreview] = useState<string[]>([]);
+  const [selectedLocation,setSelectedLocation]=useState("");
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+
+  
 
 const formik = useFormik<eventFormValues>({
   initialValues: {
@@ -22,13 +32,13 @@ const formik = useFormik<eventFormValues>({
     eventName: "",
     title: "",
     content: "",
-    location: { address: "", city: "" },
+    address:"",
     startDate: "",
     endDate: "",
     time: "",
     images: [] as (File | string)[],
     noOfPerson: 0,
-    destination: "",
+    destination: "",  
 
   },
 
@@ -43,7 +53,7 @@ const formik = useFormik<eventFormValues>({
     formData.append("title", values.title);
     formData.append("content", values.content);
     
-    formData.append("location", JSON.stringify(values.location));
+    formData.append("address",values.address);
     formData.append("startDate", values.startDate);
     formData.append("endDate", values.endDate);
     formData.append("time", values.time);
@@ -87,22 +97,32 @@ const formik = useFormik<eventFormValues>({
   },
 });
 
+
 useEffect(() => {
-const fetchCategoryEventType = async () => {
-  try {
-    const result = await getCategoryEventType();
-    if (Array.isArray(result)) {
-      const categoryNames = result.map(item => item.categoryName);
-      setEventType(categoryNames);
-    } else {
-      console.error("Invalid categoryName format");
+  const fetchCategoryEventType = async () => {
+    try {
+      const result = await getCategoryEventType();
+      if (Array.isArray(result)) {
+        const categoryNames = result.map(item => item.categoryName);
+        setEventType(categoryNames);
+        setIsScriptLoaded(true);
+      } else {
+        console.error("Invalid categoryName format");
+      }
+    } catch (error) {
+      console.error("Error fetching category event type:", error);
     }
-  } catch (error) {
-    console.error("Error fetching category event type:", error);
-  }
-};
-fetchCategoryEventType();
+  };
+
+  fetchCategoryEventType();
 }, []);
+
+useEffect(() => {
+  if (isScriptLoaded) {
+    console.log("Script loaded and eventType fetched:", eventType);
+  }
+}, [isScriptLoaded, eventType]);
+
 
 const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 const files = e.target.files;
@@ -116,6 +136,12 @@ if (files) {
   setImagePreview((prevPreviews) => [...prevPreviews, ...previews]);
 }
 };
+
+const handleLocationSelect=(address:string)=>{
+  formik.handleChange(address)
+  setSelectedLocation(address);
+
+}
 
 return (
 <div className="min-h-screen flex flex-col bg-gray-100">
@@ -189,45 +215,18 @@ return (
             <div className="text-red-500 text-sm">{formik.errors.content}</div>
           ) : null}
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-400">
-              Address
-            </label>
-            <input
-              type="text"
-              id="address"
-              name="location.address"
-              value={formik.values.location.address}
-              onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.location?.address && formik.errors.location?.address ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.location?.address && formik.errors.location?.address ? (
-              <div className="text-red-500 text-sm">{formik.errors.location.address}</div>
-            ) : null}
-          </div>
-          <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-400">
-              City
-            </label>
-            <input
-              type="text"
-              id="city"
-              name="location.city"
-              value={formik.values.location.city}
-              onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
-              className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.location?.city && formik.errors.location?.city ? 'border-red-500' : ''}`}
-            />
-            {formik.touched.location?.city && formik.errors.location?.city ? (
-              <div className="text-red-500 text-sm">{formik.errors.location.city}</div>
-            ) : null}
-          </div>
+        {isScriptLoaded && (
+        <LoadScript googleMapsApiKey={GOOGLE_API_KEY} libraries={libraries}>
+        <div className="p-4">
+          <label className="block text-sm font-medium text-gray-400">Address</label>
+          <PlacesAutocomplete onSelectLocation={handleLocationSelect} />
+          {selectedLocation && (
+            <p className="mt-2 text-green-500">Selected: {selectedLocation}</p>
+          )}
         </div>
+      </LoadScript>
+      )}
+   
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
@@ -240,8 +239,7 @@ return (
               name="noOfPerson"
               value={formik.values.noOfPerson}
               onChange={formik.handleChange}
-              // onBlur={formik.handleBlur}
-              // required
+           
               className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.noOfPerson && formik.errors.noOfPerson ? 'border-red-500' : ''}`}
             />
             {formik.touched.noOfPerson && formik.errors.noOfPerson ? (

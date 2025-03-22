@@ -5,10 +5,7 @@ export const  eventValidSchema = Yup.object({
   eventName: Yup.string().required("Event name is required"),
   title: Yup.string().required("Title is required"),
   content: Yup.string().required("Content is required"),
-  location: Yup.object({
-    address: Yup.string().required("Address is required"),
-    city: Yup.string().required("City is required"),
-  }).required("Location is required"),
+  address: Yup.string().required("Address is required"),
   startDate: Yup.date()
   .required("Start date is required")
   .transform((originalValue) => (originalValue ? new Date(originalValue) : null))
@@ -32,10 +29,7 @@ export interface eventFormValues {
     eventName: string;
     title: string;
     content: string;
-    location: {
-      address: string;
-      city: string;
-    };
+    address:string;
     startDate: string; // Consider using Date type if you want to handle dates directly
     endDate: string;   // Same as above
     time: string;

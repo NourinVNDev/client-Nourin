@@ -74,7 +74,7 @@ const UserChat = () => {
           <ProfileNavbar />
         </aside>
         <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-          <ManagerUserList managers={allManagers} onSelectManager={createChatSchema} />
+          <ManagerUserList managers={allManagers} onSelectManager={createChatSchema}   person='Event Manager'/>
           <ChatWindow
             selectedManager={selectedManager}
             setSelectedManager={setSelectedManager}
@@ -82,6 +82,7 @@ const UserChat = () => {
             setAllMessages={setAllMessages}
             senderId={userId as string}
             managerId={managerId}
+          
           />
 
         </div>

@@ -19,6 +19,7 @@ import EventBooking from "../pages/userPages/EventBooking";
 import EntryHome from "../pages/userPages/EntryHome";
 import AllEventData from "../pages/userPages/AllEventData";
 import CheckLoginUser from "../components/userComponents/CheckLogin";
+import UserWallet from "../pages/userPages/UserWallet";
 
 const userRoutes = [
     { path: '/', element: <EntryHome /> },
@@ -35,11 +36,12 @@ const userRoutes = [
     { path: '/user/resetPassword', element: <PrivateRoute><ResetPasswordALogin /></PrivateRoute> },
     { path: '/singlePostDetails', element: <PrivateRoute><SinglePostDetails /></PrivateRoute> },
     { path: '/checkEventDetails/:id/:selectedType', element: <PrivateRoute><EventDetails /></PrivateRoute> },
-    { path: '/payment-success', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
+    { path: '/payment-success/:managerId', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
     { path: '/payment-cancel/:bookedId', element: <PrivateRoute><PaymentCancel /></PrivateRoute> },
     { path: '/event-history', element: <PrivateRoute><EventHistory /></PrivateRoute> },
     { path: '/user/chat', element: <PrivateRoute><UserChat /></PrivateRoute> },
     { path: '/user/bookedEvent', element: <PrivateRoute><EventBooking /></PrivateRoute> },
+    {path:  '/user/wallet', element: <PrivateRoute><UserWallet/></PrivateRoute>}
 ];
 
 export default userRoutes;

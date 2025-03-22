@@ -3,12 +3,12 @@ import { useParams } from "react-router-dom";
 import Header from "../../components/userComponents/Headers";
 import Footer from "../../components/userComponents/Footer";
 import { getEventData } from "../../service/userServices/userPost";
-import { Star, Users, Calendar, Ticket } from "lucide-react";
+import { Star, Users, Calendar } from "lucide-react";
 import { makeStripePayment } from "../../service/userServices/userPost";
 import { PaymentData } from "../../validations/userValid/TypeValid";
 import { useSelector} from "react-redux";
 import { RootState } from "../../../App/store";
-import { saveBillingDetails } from "../../service/userServices/userPost";
+import { saveBillingDetailsOfUser } from "../../service/userServices/userPost";
 import toast,{Toaster} from "react-hot-toast";
 
 const EventDetails = () => {
@@ -47,7 +47,12 @@ const EventDetails = () => {
     location: { address: "", city: "" },
     noOfPerson: 0,
     noOfDays: 0,
-    Amount: 0
+    Amount: 0,
+    type:"",
+    managerId:"",
+    Included:[""],
+    notIncluded:[""],
+    bookingId:""
   });
   const makePayment = async () => {
     console.log("Match");
@@ -95,8 +100,12 @@ useEffect(() => {
         noOfDays: event?.noOfDays || prevData.noOfDays,
         Amount: ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
         bookedId: prevData.bookedId,
-      
-
+        bookingId:prevData.bookingId,  //ith 8 digit generate booked Id
+        type:selectedType||"",
+        managerId:event?.Manager||prevData.managerId,
+        Included: event?.typesOfTickets.find((ticket: any) => ticket.type === selectedType)?.Included || [],
+        notIncluded: event?.typesOfTickets.find((ticket: any) => ticket.type === selectedType)?.notIncluded || [],
+        
       }));
     } catch (error) {
       console.error("Error fetching event data:", error);
@@ -150,16 +159,18 @@ const SaveBillingDetails = async (e: React.FormEvent) => {
     phoneNo:eventData.phoneNo,
     address:eventData.address
   }
+  console.log("HElloo");
 
-  const result=await saveBillingDetails(formData);
-  console.log("Onnce",result.data);
+  const result=await saveBillingDetailsOfUser(formData);
+  console.log("Onnce",result);
   if (result.success) {
-    console.log("Billing details saved successfully:", result.data);
+    console.log("Billing details saved successfully:", result.data.data.id);
     toast.success('Saved Billing Details');
     setEventData((prevData) => ({
       ...prevData,
       ...result.data.billingDetails, // Corrected field access
       bookedId: result.data?.data.id, // Ensure bookedId is updated
+      bookingId:result.data?.data.bookingId
     }));
   } else {
     console.error("Failed to save billing details:", result.message);

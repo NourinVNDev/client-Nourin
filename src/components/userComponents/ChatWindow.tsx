@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@nextui-org/react";
 import useSocket from "../../utils/SocketContext";
 import MessageBubble from "../userComponents/MessageBubble";
@@ -24,19 +24,22 @@ const ChatWindow = ({
 }: ChatWindowProps) => {
   const user = useSelector((state: RootState) => state.user._id);
   const manager = useSelector((state: RootState) => state.manager._id);
-  const userId = user || manager
+  const userId = user || manager;
 
   const { socket } = useSocket();
   const [message, setMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll to bottom when messages update
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [allMessages]);
 
   // Listen for incoming messages
   useEffect(() => {
     if (!socket) return;
-    console.log("Happy");
-
 
     const messageListener = ({ senderId, message, timestamp }: { senderId: string; message: string; timestamp: string }) => {
-      console.log(message,"message data")
       setAllMessages((prevMessages) => [...prevMessages, { message, timestamp, senderId }]);
     };
 
@@ -47,43 +50,12 @@ const ChatWindow = ({
   }, [socket]);
 
   // Send a new message
-  // const postNewMessage = async (message: string) => {
-  //   if (!socket || senderId || !managerId || !message.trim()) return;
-
-  //   const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  //   const newMessage = { message, timestamp: currentTime };
-  // console.log("Message",message);  
-  //   let socketMessage;
-  //   if (userId === senderId) {
-  //     const sender=userId;
-  //     const receiver=managerId;
-
-  //     socketMessage = { message, sender, receiver };
-  //   } else {
-  //     const sender=senderId;
-  //     const receiver=managerId;
-  //     socketMessage = { message, sender, receiver };
-  //   }
-
-  //   socket.emit("post-new-message", socketMessage, (response: any) => {
-  //     console.log("Message sent acknowledgment:", response);
-  //   });
-
-  //   setAllMessages((prevMessages) => [...prevMessages, newMessage]);
-  //   setMessage(""); // Clear input after sending
-  // };
-
   const postNewMessage = async (message: string) => {
-    console.log("Sad");
-
     if (!socket || !managerId || !message.trim()) return;
 
     const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const newMessage = { message, timestamp: currentTime, senderId };
 
-    console.log("Message", message);
-    console.log('senderid', senderId)
-    console.log('reciever id in post message', managerId)
     const socketMessage = { message, sender: senderId, receiver: managerId };
 
     socket.emit("post-new-message", socketMessage, (response: any) => {
@@ -93,7 +65,6 @@ const ChatWindow = ({
     setAllMessages((prevMessages) => [...prevMessages, newMessage]);
     setMessage("");
   };
-
 
   return (
     <div className={`w-2/3 min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
@@ -105,8 +76,8 @@ const ChatWindow = ({
             <Button onClick={() => setSelectedManager(null)}>Close</Button>
           </div>
 
-          {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 bg-gray-100 rounded-b-lg">
+          {/* Messages Container with Scrolling */}
+          <div className="flex-1 overflow-y-auto max-h-[600px] p-4 bg-gray-100 rounded-b-lg">
             {allMessages.length > 0 ? (
               allMessages.map((msgObj, index) => (
                 <div
@@ -124,6 +95,7 @@ const ChatWindow = ({
             ) : (
               <p className="text-gray-500">Start the conversation...</p>
             )}
+            <div ref={messagesEndRef} /> {/* Auto-scroll reference */}
           </div>
 
           {/* Input Section */}
@@ -136,12 +108,9 @@ const ChatWindow = ({
               onKeyDown={(e) => {
                 if (e.key === "Enter" && message.trim()) {
                   postNewMessage(message);
-                  setMessage(""); // Clear input after sending
                 }
               }}
             />
-
-
           </div>
         </div>
       ) : (

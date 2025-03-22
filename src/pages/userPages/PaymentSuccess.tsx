@@ -1,12 +1,25 @@
 import { useNavigate} from 'react-router-dom';
 import Header from '../../components/userComponents/Headers';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import useSocket from '../../utils/SocketContext';
 
 const PaymentSuccess = () => {
-  const naavigate = useNavigate(); // For navigating to the home page
+  const naavigate = useNavigate(); 
+  const managerId=useParams().managerId;
+  const {socket}=useSocket();
+
+
 
   const handleGoHome = () => {
     naavigate('/home'); // Redirect to the home page
   };
+
+  useEffect(()=>{
+    console.log("HAI",managerId);
+
+
+  },[]);
 
   return (
     <div>

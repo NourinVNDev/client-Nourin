@@ -77,8 +77,8 @@ const EventHistory = () => {
         console.log("API Response:", result);
 
         setIsReviewRating({
-            review: result.message === "No matching data found" ? "" : result.data.review,
-            rating: result.message === "No matching data found" ? 0 : result.data.rating
+            review: result.message === "No matching data found" ? "" : result.data.data.review,
+            rating: result.message === "No matching data found" ? 0 : result.data.data.rating
         });
 
         setModalOpen(true);
@@ -171,7 +171,7 @@ const EventHistory = () => {
                 </Card>
               ))
             ) : (
-              <p>No events found</p>
+              <div className="text-center text-gray-600 col-span-full">No event History found.</div>
             )}
           </div>
         </main>

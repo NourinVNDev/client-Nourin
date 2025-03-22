@@ -16,6 +16,7 @@ import TodaysRequest from "../pages/managerPages/TodaysRequest";
 import TotalBooking from "../pages/managerPages/TotalBooking";
 import ManagerChat from "../pages/managerPages/ManagerChat";
 import ManagerEvents2 from "../pages/managerPages/ManagerEvents2";
+import ListVerifier from '../pages/managerPages/ListVerifier';
 
 const managerRoutes = [
     { path: '/mLogin', element: <MLogin /> },
@@ -33,6 +34,7 @@ const managerRoutes = [
     { path: '/editEventDetails/:id', element: <ManagerPrivateRoute><ManagerEditSelectedEvents /></ManagerPrivateRoute> },
     { path: '/manager/latestRequest', element: <ManagerPrivateRoute><TodaysRequest /></ManagerPrivateRoute> },
     { path: '/manager/futureBooking', element: <ManagerPrivateRoute><TotalBooking /></ManagerPrivateRoute> },
+    {path:'/manager/verifier',element:<ManagerPrivateRoute><ListVerifier/></ManagerPrivateRoute>},
     { path: '/manager/chat', element: <ManagerPrivateRoute><ManagerChat /></ManagerPrivateRoute> },
     { path: '/managerLogout', element: <ManagerLogout /> },
 ];
