@@ -98,10 +98,30 @@ const updateOffer=async(formData:OfferData)=>{
 
 }
 
+const fetchManagerWallet=async(managerId:string)=>{
+  console.log("ManagerID",managerId);
+  
+  try {
+     
+    const response = await MANAGER_API(`/fetchManagerWallet/${managerId}`, {
+        method: 'GET',
+
+    });
+
+    const data = response.data;
+console.log("Data from Manager Wallet",data);
+    return data; 
+} catch (error) {
+    console.error("Error during cancelling event booking:", error);
+    return undefined; 
+}
+
+}
 
 
 
 
 
 
-export {getAllOffers,addEventOffer,getSpecificOffer,updateOffer,fetchSearchData};
+
+export {getAllOffers,addEventOffer,getSpecificOffer,updateOffer,fetchSearchData,fetchManagerWallet};

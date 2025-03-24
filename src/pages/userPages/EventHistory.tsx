@@ -97,6 +97,7 @@ const EventHistory = () => {
         </aside>
 
         <main className="flex-1 p-4 lg:p-8 bg-gray-50">
+          
           <div className="max-w-5xl mx-auto">
             <h1 className="text-2xl font-bold mb-6 text-gray-800">Event History</h1>
 

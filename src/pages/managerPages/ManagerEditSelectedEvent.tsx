@@ -10,11 +10,17 @@ import DatePicker from "react-datepicker";
 import { EventData } from "../../validations/userValid/TypeValid";
 import { eventFormValues, eventValidSchema } from "../../validations/managerValid/eventValidSchema";
 import { useFormik } from "formik";
-
+import MapboxAutocomplete from "../../components/managerComponents/LocationSearch";
+interface LocationState {
+  lat: number;
+  lng: number;
+  place: string;
+}
 const ManagerEditSelectedEvents = () => {
   const navigate = useNavigate();
   const { id: eventId } = useParams<{ id: string }>();
   const managerCompanyName = localStorage.getItem('ManagerName') ?? " ";
+    const [location, setLocation] = useState<LocationState | null>(null);
 
   const formik = useFormik<eventFormValues>({
     initialValues: {
@@ -178,6 +184,12 @@ const ManagerEditSelectedEvents = () => {
       
     }
   };
+  const handleLocationSelect = (lat: number, lng: number, place: string): void => {
+   
+    formik.setFieldValue("address", place);
+    setLocation({ lat, lng, place });
+    console.log("Selected:", { lat, lng, place });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -256,20 +268,13 @@ const ManagerEditSelectedEvents = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-400">Address</label>
-                  <input
-                    type="text"
-                    id="address"
-                    name="location.address"
-                    value={formik.values.address}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                  />
+                  <MapboxAutocomplete onSelectLocation={handleLocationSelect} />
+              
                       {formik.touched.address && formik.errors.address ? (
               <div className="text-red-500 text-sm">{formik.errors.address}</div>
             ) : null}
                 </div>
-     
+      
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>

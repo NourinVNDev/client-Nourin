@@ -1,93 +1,158 @@
-import React, { useState } from "react";
-import { Autocomplete } from "@react-google-maps/api";
+import React, { useEffect, useRef, useState } from 'react';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
-interface PlacesAutocompleteProps {
-  onSelectLocation: (address: string) => void;
+interface MapboxAutocompleteProps {
+  onSelectLocation: (lat: number, lng: number, place: string) => void;
 }
 
-const PlacesAutocomplete: React.FC<PlacesAutocompleteProps> = ({ onSelectLocation }) => {
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-  const [value, setValue] = useState<string>("");
+const MapboxAutocomplete: React.FC<MapboxAutocompleteProps> = ({ onSelectLocation }) => {
+  const geocoderContainerRef = useRef<HTMLDivElement>(null);
+  const geocoderRef = useRef<MapboxGeocoder | null>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAP_TOKEN;
 
-  // Handle loading of Google Maps Autocomplete
-  const onLoad = (autocompleteInstance: google.maps.places.Autocomplete) => {
-    setAutocomplete(autocompleteInstance);
-  };
+  useEffect(() => {
+    if (!geocoderContainerRef.current) return;
 
-  // Handle place selection
-  const onPlaceChanged = () => {
-    if (autocomplete) {
-      const place = autocomplete.getPlace();
-      if (place && place.formatted_address) {
-        setValue(place.formatted_address);
-        onSelectLocation(place.formatted_address);
+    if (!MAPBOX_ACCESS_TOKEN || MAPBOX_ACCESS_TOKEN === 'YOUR_MAPBOX_ACCESS_TOKEN') {
+      console.error('Mapbox access token is missing or invalid');
+      return;
+    }
+
+    // Create the geocoder instance
+    const geocoder = new MapboxGeocoder({
+      accessToken: MAPBOX_ACCESS_TOKEN,
+      types: 'address,place',
+      placeholder: 'Search for a location...',
+      marker: false,
+    });
+
+    // Store the reference to use later
+    geocoderRef.current = geocoder;
+    
+    // Add it to the container
+    geocoder.addTo(geocoderContainerRef.current);
+
+    // Listen for results
+    geocoder.on('result', (e) => {
+      if (e.result && e.result.geometry && e.result.geometry.coordinates) {
+        const [lng, lat] = e.result.geometry.coordinates;
+        const placeName = e.result.place_name || '';
+        setSearchValue(placeName);
+        onSelectLocation(lat, lng, placeName);
+      }
+    });
+
+    // Apply custom styling to the Mapbox Geocoder input
+    const applyCustomStyles = () => {
+      const geocoderInput = geocoderContainerRef.current?.querySelector('.mapboxgl-ctrl-geocoder--input');
+      if (geocoderInput) {
+        (geocoderInput as HTMLElement).style.height = '50px';
+        (geocoderInput as HTMLElement).style.fontSize = '16px';
+      }
+    };
+
+    // Apply styles after a short delay to ensure elements are rendered
+    setTimeout(applyCustomStyles, 100);
+
+    return () => {
+      if (geocoderRef.current) {
+        geocoderRef.current.onRemove();
+        geocoderRef.current = null;
+      }
+    };
+  }, [MAPBOX_ACCESS_TOKEN, onSelectLocation]);
+
+  // Effect to update the input value when searchValue changes
+  useEffect(() => {
+    if (searchValue && geocoderRef.current) {
+      // Get the input element
+      const inputElement = geocoderContainerRef.current?.querySelector('.mapboxgl-ctrl-geocoder--input') as HTMLInputElement;
+      
+      if (inputElement) {
+        // Set the input value
+        inputElement.value = searchValue;
+        
+        // If you want to trigger the geocoder's internal state update (optional)
+        if (geocoderRef.current.setInput) {
+          try {
+            geocoderRef.current.setInput(searchValue);
+          } catch (e) {
+            // Some versions of Mapbox might not have this method or implement it differently
+            console.log("Could not use setInput method, falling back to direct value setting");
+          }
+        }
       }
     }
-  };
+  }, [searchValue]);
+
+  // Add custom CSS to override Mapbox Geocoder default styles
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .mapboxgl-ctrl-geocoder {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        border-radius: 0.5rem !important;
+        font-family: inherit !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--input {
+        height: 3rem !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--input:focus {
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--icon {
+        top: 12px !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--icon-search {
+        top: 12px !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--button {
+        background-color: transparent !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--suggestion-title {
+        font-weight: 600 !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--suggestion-address {
+        color: #6B7280 !important;
+      }
+      
+      .mapboxgl-ctrl-geocoder--suggestion:hover {
+        background-color: #F3F4F6 !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
-    <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Enter address"
-        className="w-full p-2 border border-gray-300 rounded text-gray-800 bg-white focus:ring focus:ring-blue-400"
+    <div className="mb-4">
+      <div 
+        ref={geocoderContainerRef}
+        className="w-1/2 relative focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all duration-300"
       />
-    </Autocomplete>
+      <div className="mt-1 text-xs text-gray-500">
+        Type to search for a location
+      </div>
+    </div>
   );
 };
 
-export default PlacesAutocomplete;
-
-
-
-
-// // LocationSearch.tsx
-// import { Autocomplete } from "@react-google-maps/api";
-// import { useState } from "react";
-
-// interface LocationSearchProps {
-//   onSelectLocation: (address: string) => void;
-// }
-
-// const LocationSearch = ({ onSelectLocation }: LocationSearchProps) => {
-//   const [address, setAddress] = useState<string>("");
-//   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-
-//   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
-//     setAutocomplete(autocomplete);
-//   };
-
-//   const onPlaceChanged = () => {
-//     if (autocomplete) {
-//       const place = autocomplete.getPlace();
-//       if (place && place.formatted_address) {
-//         setAddress(place.formatted_address);
-//         onSelectLocation(place.formatted_address);
-//       }
-//     }
-//   };
-
-//   return (
-//     <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-//       <input
-//         type="text"
-//         value={address}
-//         onChange={(e) => setAddress(e.target.value)}
-//         placeholder="Enter location"
-//         style={{
-//           width: "100%",
-//           padding: "10px",
-//           fontSize: "16px",
-//           border: "1px solid #ccc",
-//           borderRadius: "4px",
-//           background:"white",
-//           color:"grey"
-//         }}
-//       />
-//     </Autocomplete>
-//   );
-// };
-
-// export default LocationSearch;
+export default MapboxAutocomplete;

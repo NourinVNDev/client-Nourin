@@ -1,7 +1,7 @@
 import Header from "../../components/adminComponents/Header";
 import NavBar from "../../components/adminComponents/NavBar";
 import Footer from "../../components/adminComponents/Footer";
-import { addNewCategoryDetails } from "../../service/adminServices/adminCategory";
+import { addNewCategoryDetails } from "../../service/adminServices/adminCategoryAndWallet";
 import  { useState } from "react";
 import toast ,{Toaster} from "react-hot-toast";
 import { useNavigate } from "react-router-dom";

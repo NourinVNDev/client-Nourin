@@ -7,6 +7,7 @@ import AdminAddCategory from "../pages/adminPages/AdminAddCategory";
 import AdminLogout from "../pages/adminPages/AdminLogout";
 import AdminPrivateRoute from "../components/adminComponents/AdminPrivateRoute";
 import AdminEditCategory from "../pages/adminPages/AdminEditCategory";
+import AdminWallet from "../pages/adminPages/AdminWallet";
 
 const adminRoutes = [
     { path: '/adminlogin', element: <Adminlogin /> },
@@ -14,6 +15,7 @@ const adminRoutes = [
     { path: '/admin/users', element: <AdminPrivateRoute><AdminUser /></AdminPrivateRoute> },
     { path: '/admin/managers', element: <AdminPrivateRoute><AdminManager /></AdminPrivateRoute> },
     { path: '/admin/category', element: <AdminPrivateRoute><AdminCategory /></AdminPrivateRoute> },
+    {path:  '/admin/wallet',element:<AdminPrivateRoute><AdminWallet/></AdminPrivateRoute>},
     { path: '/admin/editCategory/:id', element: <AdminPrivateRoute><AdminEditCategory /></AdminPrivateRoute> },
     { path: '/admin/addEvents', element: <AdminPrivateRoute><AdminAddCategory /></AdminPrivateRoute> },
     { path: '/adminLogout', element: <AdminLogout /> },

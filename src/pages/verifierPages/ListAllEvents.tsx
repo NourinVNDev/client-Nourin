@@ -7,11 +7,25 @@ import toast, { Toaster } from "react-hot-toast";
 import Footer from "../../components/verifierComponents/Footer";
 import { useNavigate } from "react-router-dom";
 
+interface EventData {
+    _id: string;
+    eventName: string;
+    companyName: string;
+    location?: {
+        city?: string;
+        address?: string;
+        coordinates?: [number, number];
+    };
+    startDate: string;
+    endDate: string;
+    typesOfTickets: any[];
+    images?: string[];
+}
 
 const ListAllEvents = () => {
     const companyName = useSelector((state: RootState) => state.verifier.companyName);
-    const [events, setEvents] = useState<any[]>([]);
-    const navigate=useNavigate();
+    const [events, setEvents] = useState<EventData[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAllEvents = async () => {
@@ -21,17 +35,22 @@ const ListAllEvents = () => {
                     toast.error(result.message);
                 } else {
                     console.log(result.data);
-                    setEvents(result.data);
+                    // Filter events with end dates greater than today's date
+                    const today = new Date();
+                    const upcomingEvents = result.data.filter((event: EventData) => {
+                        const endDate = new Date(event.endDate);
+                        return endDate > today;
+                    });
+                    setEvents(upcomingEvents);
                 }
             }
         };
-
+    
         fetchAllEvents();
     }, [companyName]);
 
-    const handleParticularEvent=(eventId:string)=>{
+    const handleParticularEvent = (eventId: string) => {
         navigate(`/verifier/bookedEventDetails/${eventId}`)
-        
     }
 
     return (
@@ -61,7 +80,7 @@ const ListAllEvents = () => {
                                 <p className="text-gray-600"><strong>Tickets:</strong> {event.typesOfTickets.length} types</p>
 
                                 <div className="mt-4">
-                                    <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" onClick={()=>{handleParticularEvent(event._id)}}>
+                                    <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" onClick={() => {handleParticularEvent(event._id)}}>
                                         View Details
                                     </button>
                                 </div>

@@ -116,7 +116,7 @@ const ManagerProfile = () => {
             {/* User Details Form */}
             <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
               <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">
-                User Details
+                Manager Details
               </h2>
               <form onSubmit={handleFormSubmit}>
                 {/* Firm Name */}

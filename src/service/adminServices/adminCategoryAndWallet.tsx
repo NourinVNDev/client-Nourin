@@ -96,6 +96,25 @@ const  fetchSelectedCategory=async(categoryId:string)=>{
            }
     
 }
-export  {getCategoryDetails,addNewCategoryDetails,updateCategoryBlockStatus,fetchSelectedCategory,editSelectedCategory};
+
+const fetchAdminWallet=async()=>{
+    try {
+     
+        const response = await ADMIN_API(`/admin/fetchAdminWallet`, {
+            method: 'GET',
+    
+        });
+    
+        const data = response.data.result;
+    console.log("Data from Admin Wallet",data);
+        return data; 
+    } catch (error) {
+        console.error("Error during cancelling event booking:", error);
+        return undefined; 
+    }
+
+
+}
+export  {getCategoryDetails,addNewCategoryDetails,updateCategoryBlockStatus,fetchSelectedCategory,editSelectedCategory,fetchAdminWallet};
 
 

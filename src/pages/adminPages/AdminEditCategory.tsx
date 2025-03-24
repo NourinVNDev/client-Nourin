@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchSelectedCategory, editSelectedCategory } from "../../service/adminServices/adminCategory";
+import { fetchSelectedCategory, editSelectedCategory } from "../../service/adminServices/adminCategoryAndWallet";
 import Header from "../../components/adminComponents/Header";
 import NavBar from "../../components/adminComponents/NavBar";
 import Footer from "../../components/adminComponents/Footer";

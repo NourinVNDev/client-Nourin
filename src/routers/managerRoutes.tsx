@@ -17,9 +17,11 @@ import TotalBooking from "../pages/managerPages/TotalBooking";
 import ManagerChat from "../pages/managerPages/ManagerChat";
 import ManagerEvents2 from "../pages/managerPages/ManagerEvents2";
 import ListVerifier from '../pages/managerPages/ListVerifier';
+import ManagerWallet from '../pages/managerPages/ManagerWallet';
+import CheckLoginManager from '../components/managerComponents/CheckLoginManager';
 
 const managerRoutes = [
-    { path: '/mLogin', element: <MLogin /> },
+    { path: '/mLogin', element: <CheckLoginManager><MLogin /></CheckLoginManager> },
     { path: '/mRegister', element: <ManagerRegister /> },
     { path: '/Manager/dashboard', element: <ManagerPrivateRoute><DashBoard /></ManagerPrivateRoute> },
     { path: '/forgot-passwordM', element: <ForgotPasswordM /> },
@@ -36,6 +38,7 @@ const managerRoutes = [
     { path: '/manager/futureBooking', element: <ManagerPrivateRoute><TotalBooking /></ManagerPrivateRoute> },
     {path:'/manager/verifier',element:<ManagerPrivateRoute><ListVerifier/></ManagerPrivateRoute>},
     { path: '/manager/chat', element: <ManagerPrivateRoute><ManagerChat /></ManagerPrivateRoute> },
+    {path:'/manager/wallet',element:<ManagerPrivateRoute><ManagerWallet/></ManagerPrivateRoute>},
     { path: '/managerLogout', element: <ManagerLogout /> },
 ];
 

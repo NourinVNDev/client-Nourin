@@ -72,7 +72,12 @@ const SinglePostDetails = () => {
       setDateRange([new Date(), new Date()]); // Reset to default
     }
   };
+  const generalTicket = parsedData?.data?.result?.savedEvent?.typesOfTickets?.find(
+    (ticket: any) => ticket.type === "general"
+  );
 
+  const amount = generalTicket?.Amount || "Not Available";
+  const offerAmount = generalTicket?.offerDetails?.offerAmount || "Not Available";
 
 
   return (
@@ -135,39 +140,23 @@ const SinglePostDetails = () => {
                           {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
                         </span>
 
-                        {/* Ticket Price & Offer */}
+
+
+                        return (
                         <span className="text-lg text-violet-700 font-semibold">
-                          {parsedData?.data?.result?.savedEvent?.typesOfTickets?.find((ticket: any) => ticket.type === 'general')?.offerDetails ? (
+                          {generalTicket?.offerDetails?.offerAmount ? (
                             <>
                               <span>
-                                General Ticket Price: <br /> ₹
-                                {
-                                  parsedData?.data?.result?.savedEvent?.typesOfTickets?.find(
-                                    (ticket: any) => ticket.type === "general"
-                                  )?.Amount || "Not Available"
-                                }
+                                General Ticket Price: <br /> ₹{amount}
                               </span>
-                              <span>
-                                {" "}
-                                → ₹
-                                {
-                                  parsedData?.data?.result?.savedEvent?.typesOfTickets?.find(
-                                    (ticket: any) => ticket.type === "general"
-                                  )?.offerDetails?.offerAmount || "Not Available"
-                                }
-                              </span>
+                              <span> → ₹{offerAmount}</span>
                             </>
                           ) : (
-                            <span>
-                              ₹
-                              {
-                                parsedData?.data?.result?.savedEvent?.typesOfTickets?.find(
-                                  (ticket: any) => ticket.type === "general"
-                                )?.Amount || "0"
-                              }
-                            </span>
+                            <span>₹{amount !== "Not Available" ? amount : "0"}</span>
                           )}
                         </span>
+                        );
+
 
                         {/* Company Name */}
                         <span className="text-lg text-green-600 font-semibold">
@@ -251,10 +240,10 @@ const SinglePostDetails = () => {
                             onClick={() => setSelectedTicket(ticket)}
                             disabled={ticket.noOfSeats <= 0}
                             className={`p-4 border rounded-lg transition-all duration-300 ${selectedTicket?.type === ticket.type
-                                ? "bg-violet-700 text-white shadow-lg"
-                                : ticket.noOfSeats <= 0
-                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                  : "bg-white text-gray-800 hover:bg-violet-100"
+                              ? "bg-violet-700 text-white shadow-lg"
+                              : ticket.noOfSeats <= 0
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-white text-gray-800 hover:bg-violet-100"
                               }`}
                           >
                             <span className="text-lg font-semibold">{ticket.type}</span>

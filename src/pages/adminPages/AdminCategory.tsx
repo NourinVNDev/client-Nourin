@@ -1,10 +1,10 @@
 import { useEffect,useState } from "react";
-import { getCategoryDetails } from "../../service/adminServices/adminCategory";
+import { getCategoryDetails } from "../../service/adminServices/adminCategoryAndWallet";
 import Header from "../../components/adminComponents/Header";
 import NavBar from "../../components/adminComponents/NavBar";
 import Footer from "../../components/adminComponents/Footer";
 import { Navigate, useNavigate } from "react-router-dom";
-import {updateCategoryBlockStatus} from '../../service/adminServices/adminCategory';
+import {updateCategoryBlockStatus} from '../../service/adminServices/adminCategoryAndWallet';
 interface Category{
     categoryName:string,
     Description:string

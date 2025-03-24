@@ -23,8 +23,8 @@ const NavBar:React.FC=()=>{
       {/* <Link to="/request" className="block hover:bg-blue-200 rounded p-2 text-black">
         Request
       </Link> */}
-      <Link to="/chat" className="block hover:bg-blue-200 rounded p-2 text-black">
-        Chat
+      <Link to="/admin/wallet" className="block hover:bg-blue-200 rounded p-2 text-black">
+        Wallet
       </Link>
     </ul>
     <Link to='/adminLogout'>

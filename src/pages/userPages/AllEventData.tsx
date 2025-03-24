@@ -6,6 +6,7 @@ import { FaHeart, FaRegHeart, FaSearch } from 'react-icons/fa';
 import SocialEvents from '../../assets/SocialEvents.avif';
 import { useNavigate } from "react-router-dom";
 import { handleLikePost, handlePostDetails, getAllEventDataDetails } from "../../service/userServices/userPost";
+import SearchBar from "../../components/userComponents/SearchBar";
 
 const AllEventData = () => {
   const [parsedData, setParsedData] = useState<any[]>([]);
@@ -18,11 +19,75 @@ const AllEventData = () => {
   const { socket } = useSocket();
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
 
   type Like = {
     user: string;
     _id: string;
     createdAt: string;
+  };
+
+  const handleSearchChange = (coords: [number, number], placeName: string) => {
+    setSearchQuery(placeName);
+    setCoordinates(coords); 
+    console.log("Query:", placeName);
+    console.log("Coordinates:", coords);
+
+  };
+  useEffect(() => {
+    let updatedData = [...parsedData];
+    console.log("UpdatedData", updatedData);
+
+
+
+    if (coordinates && coordinates.length === 2) {
+
+      const [lat, lng] = coordinates;
+      updatedData = updatedData.filter((post) => {
+        if (!post.location || !post.location.coordinates) return false;
+
+        const [longitude, latitude] = post.location.coordinates;
+        console.log("Latitude db", latitude, longitude);
+        const distance = haversineDistance(lat, lng, latitude, longitude);
+        console.log("Distance check:", post.title, distance);
+        return distance <= 10;
+      });
+    }
+
+    if (selectedCategory) {
+      updatedData = updatedData.filter((post) =>
+        post.title?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+
+    if (selectedPrice === "Price: Low - High") {
+      updatedData.sort((a, b) => a.Amount - b.Amount);
+    } else if (selectedPrice === "Price: High - Low") {
+      updatedData.sort((a, b) => b.Amount - a.Amount);
+    }
+
+    console.log("Final filtered data:", updatedData);
+    setFilteredData(updatedData);
+    console.log("Fill:", filteredData);
+
+  }, [parsedData, selectedCategory, selectedPrice, searchQuery, coordinates]);
+
+  const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const R = 6371;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   };
 
   useEffect(() => {
@@ -104,7 +169,7 @@ const AllEventData = () => {
       const response = await handleLikePost(index, postId, userId);
       console.log('API Response:', response);
 
-      if (response.message !== 'User  likes successfully') {
+      if (response.message !== 'User likes successfully') {
         // Revert UI if API call fails
         console.error('Failed to like post, reverting UI');
         setInteractions((prev) => ({
@@ -167,14 +232,7 @@ const AllEventData = () => {
       );
     }
 
-    // Apply search filter if searchQuery exists
-    if (searchQuery) {
-      updatedData = updatedData.filter((post) =>
-        post.location?.address
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase())
-      );
-    }
+
 
     console.log(selectedPrice, "soumya");
 
@@ -186,7 +244,7 @@ const AllEventData = () => {
     }
 
     setFilteredData(updatedData); // Set the final processed data
-  }, [parsedData, selectedCategory, selectedPrice, searchQuery]);
+  }, [ selectedCategory, selectedPrice]);
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedCategory(event.target.value);
@@ -195,25 +253,19 @@ const AllEventData = () => {
   const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPrice(event.target.value);
   }
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    const filteredEvents = parsedData.filter((post) =>
-      post.location?.address.toLowerCase().includes(query)
-    );
-    setFilteredData(filteredEvents); // Update the filtered data
-  };
 
-  // Return the JSX
+
+
+  
   return (
     <div className="min-h-screen bg-blue-50">
       <Header />
       <div className="bg-[#fdeedc] min-h-screen p-8 flex flex-col items-center">
-        {/* Main Content */}
+      
         <h1 className="text-black text-6xl font-bold mb-4 self-start">Events:</h1>
 
         <div className="flex flex-col items-center md:flex-row md:justify-end w-full">
-          {/* Image - Right Aligned, Bigger & More Beautiful */}
+        
           <img
             src={SocialEvents}
             alt="Events"
@@ -228,16 +280,9 @@ const AllEventData = () => {
       <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full min-h-screen pt-10 pb-10 flex justify-center">
         <div className="w-full max-w-4xl flex flex-col items-center">
           <div className="relative flex items-center bg-white rounded-full shadow-lg w-full max-w-lg mt-6">
-            <input
-              type="text"
-              placeholder="Search location here..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full p-4 pr-12 bg-white rounded-full outline-none text-lg text-black"
+            <SearchBar onSelectLocation={(coordinates, placeName) => handleSearchChange(coordinates, placeName)}
+              initialValue={searchQuery}
             />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
-              <FaSearch size={24} />
-            </button>
           </div>
 
           {/* Filters - Centered Below Search Bar */}
@@ -310,21 +355,21 @@ const AllEventData = () => {
                     {/* Footer */}
                     <div className="p-4 text-center border-t">
                       <span className="block text-gray-700 font-medium">{post.companyName}</span>
-                      <span className="block text-gray-500 text-sm">{post.location?.address || "Unknown"}</span>
+                      <span className="block text-gray-500 text-sm">{post.address || "Unknown"}</span>
                     </div>
 
                     {/* Like Button */}
                     <button
                       onClick={() => handleLike(index, post._id)}
                       className={`flex justify-center items-center space-x-2 p-3 rounded-lg w-full transition-all duration-300 ${interactions[index]?.liked
-                          ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                         } shadow-md hover:shadow-lg`}
                     >
                       {interactions[index]?.liked ? (
                         <>
                           <FaHeart className="text-2xl animate-pulse" />
-                          <span className="font-bold">Liked</span>
+                          <span className="font-bold">Interested</span>
                         </>
                       ) : (
                         <FaRegHeart className="text-2xl" />

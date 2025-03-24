@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { fetchUserWallet } from "../../service/userServices/userOfferAndWallet";
 
-type userWallet = {
+type UserWallet = {
     balance: number;
     transactionHistory: {
         transaction: string;
@@ -14,25 +14,37 @@ type userWallet = {
     }[];
 };
 
-const UserWallet = () => {
+const UserWallet: React.FC = () => {
     const userId = useSelector((state: RootState) => state.user._id);
-    const [userWalletData, setUserWalletData] = useState<userWallet | null>(null);
+    const [userWalletData, setUserWalletData] = useState<UserWallet | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const getUserWallet = async () => {
             if (userId) {
-                const result = await fetchUserWallet(userId);
-                if (result.success) {
-                    setUserWalletData({
-                        balance: result.data.balance,
-                        transactionHistory: result.data.transactionHistory.map(
-                            (tx: { transaction: string; amount: number }) => ({
-                                transaction: tx.transaction,
-                                amount: tx.amount,
-                            })
-                        ),
-                    });
+                try {
+                    const result = await fetchUserWallet(userId);
+                    if (result.success) {
+                        setUserWalletData({
+                            balance: result.data.balance,
+                            transactionHistory: result.data.transactionHistory.map(
+                                (tx: { transaction: string; amount: number }) => ({
+                                    transaction: tx.transaction,
+                                    amount: tx.amount,
+                                })
+                            ),
+                        });
+                    } else {
+                        setError("Failed to fetch wallet data.");
+                    }
+                } catch (err) {
+                    setError("An error occurred while fetching wallet data.");
+                } finally {
+                    setLoading(false);
                 }
+            } else {
+                setLoading(false);
             }
         };
 
@@ -46,17 +58,22 @@ const UserWallet = () => {
                 <aside className="hidden md:block w-64 bg-gray-900 text-white min-h-[calc(100vh-4rem)] shadow-lg p-4">
                     <ProfileNavbar />
                 </aside>
-                <main className="flex-1 p-6">
-                    {userWalletData ? (
+                <main className="flex-1 p-6 lg:p-8 bg-gray-50">
+                    {loading ? (
+                        <div className="flex justify-center items-center min-h-[60vh]">
+                            <p className="text-lg text-gray-500 animate-pulse">Loading wallet data...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="flex justify-center items-center min-h-[60vh]">
+                            <p className="text-lg text-red-500">{error}</p>
+                        </div>
+                    ) : userWalletData ? (
                         <div className="max-w-3xl mx-auto">
-                            {/* Wallet Balance Card */}
-                            <div className="bg-white shadow-md rounded-xl p-6 mb-6 text-center">
+                            <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
                                 <h2 className="text-2xl font-bold text-gray-800">Wallet Balance</h2>
                                 <p className="text-3xl font-semibold text-blue-600 mt-2">₹{userWalletData.balance}</p>
                             </div>
-
-                            {/* Transaction History */}
-                            <div className="bg-white shadow-md rounded-xl p-6">
+                            <div className="bg-white shadow-lg rounded-lg p-6">
                                 <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
                                     Transaction History
                                 </h3>
@@ -79,7 +96,7 @@ const UserWallet = () => {
                         </div>
                     ) : (
                         <div className="flex justify-center items-center min-h-[60vh]">
-                            <p className="text-lg text-gray-500 animate-pulse">Loading wallet data...</p>
+                            <p className="text-lg text-gray-500">No wallet data available.</p>
                         </div>
                     )}
                 </main>

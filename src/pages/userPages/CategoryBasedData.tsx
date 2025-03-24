@@ -5,8 +5,10 @@ import Header from '../../components/userComponents/Headers';
 import { getEventDataDetails, handleLikePost, handlePostDetails } from '../../service/userServices/userPost';
 import Footer from '../../components/userComponents/Footer';
 import useSocket from '../../utils/SocketContext';
-import { FaSearch } from "react-icons/fa";
+
 import SocialEvents from '../../assets/SocialEvents.avif'
+import SearchBar from '../../components/userComponents/SearchBar';
+
 type Like = {
   user: string;
   _id: string;
@@ -24,14 +26,74 @@ const CategoryBasedData = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
   const [filteredData, setFilteredData] = useState(parsedData); // Store filtered events
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    const filteredEvents = parsedData.filter((post) =>
-      post.location?.address.toLowerCase().includes(query)
-    );
-    setFilteredData(filteredEvents); // Update the filtered data
+
+
+
+
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+
+
+  const handleSearchChange = (coords: [number, number], placeName: string) => {
+    setSearchQuery(placeName);
+    setCoordinates(coords); 
+    console.log("Query:", placeName);
+    console.log("Coordinates:", coords);
+
   };
+
+
+  useEffect(() => {
+    let updatedData = [...parsedData];
+    console.log("UpdatedData", updatedData);
+
+
+
+    if (coordinates && coordinates.length === 2) {
+
+      const [lat, lng] = coordinates;
+      updatedData = updatedData.filter((post) => {
+        if (!post.location || !post.location.coordinates) return false;
+
+        const [longitude, latitude] = post.location.coordinates;
+        console.log("Latitude db", latitude, longitude);
+        const distance = haversineDistance(lat, lng, latitude, longitude);
+        console.log("Distance check:", post.title, distance);
+        return distance <= 10;
+      });
+    }
+
+
+
+
+    if (selectedPrice === "Price: Low - High") {
+      updatedData.sort((a, b) => a.Amount - b.Amount);
+    } else if (selectedPrice === "Price: High - Low") {
+      updatedData.sort((a, b) => b.Amount - a.Amount);
+    }
+
+    console.log("Final filtered data:", updatedData);
+    setFilteredData(updatedData);
+    console.log("Fill:", filteredData);
+
+  }, [parsedData, selectedCategory, selectedPrice, searchQuery, coordinates]);
+
+  const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const R = 6371;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+
 
   useEffect(() => {
 
@@ -42,7 +104,7 @@ const CategoryBasedData = () => {
     try {
       const result = await handlePostDetails(postId);
       if (result?.message === 'Retrive Post Data successfully') {
-        // navigate(`/singlePostDetails?data=${encodeURIComponent(JSON.stringify(result))}`);
+
         navigate('/singlePostDetails', { state: { data: result } });
 
       } else {
@@ -67,7 +129,7 @@ const CategoryBasedData = () => {
 
 
 
-        const category = result.user.category; // Access the category object
+        const category = result.user.category;
         console.log("Better", category);
 
         setCategoryNames([category.categoryName]);
@@ -87,24 +149,24 @@ const CategoryBasedData = () => {
       return acc;
     }, {} as typeof interactions);
 
-    console.log('Initial Interactions:', initialInteractions); // Debugging log
+    console.log('Initial Interactions:', initialInteractions);
     setInteractions(initialInteractions);
   }, [parsedData, userId]);
 
   const handleLike = async (index: number, postId: string) => {
     console.log("Mad");
 
-    // Check if interactions[index] exists
+
     if (!interactions[index]) {
       console.error(`No interaction found for index: ${index}`);
-      return; // Exit if there's no interaction for this index
+      return;
     }
 
     const newLikedStatus = !interactions[index]?.liked;
     console.log("Setting", newLikedStatus);
 
 
-    // Optimistically update UI
+
     setInteractions((prev) => {
       const updatedInteractions = {
         ...prev,
@@ -113,7 +175,7 @@ const CategoryBasedData = () => {
           liked: newLikedStatus,
         },
       };
-      console.log('Updated Interactions:', updatedInteractions); // Log updated state
+      console.log('Updated Interactions:', updatedInteractions);
       return updatedInteractions;
     });
 
@@ -126,24 +188,24 @@ const CategoryBasedData = () => {
       console.log('API Response:', response);
 
       if (response.message !== 'User likes successfully') {
-        // Revert UI if API call fails
+
         console.error('Failed to like post, reverting UI');
         setInteractions((prev) => ({
           ...prev,
           [index]: {
             ...prev[index],
-            liked: !newLikedStatus, // Revert to the previous liked status
+            liked: !newLikedStatus,
           },
         }));
       }
     } catch (error) {
       console.error('Error liking post:', error);
-      // Revert UI in case of error
+
       setInteractions((prev) => ({
         ...prev,
         [index]: {
           ...prev[index],
-          liked: !newLikedStatus, // Revert to the previous liked status
+          liked: !newLikedStatus,
         },
       }));
     }
@@ -153,15 +215,15 @@ const CategoryBasedData = () => {
       console.log("checking", postId, comment);
 
       setInteractions((prev) => {
-        const newData = { ...prev }; // Clone state object
+        const newData = { ...prev };
         const postIndex = parsedData.findIndex((post) => post._id === postId);
 
-        if (postIndex === -1) return prev; // If post is not found, return original state
+        if (postIndex === -1) return prev;
 
-        // Ensure comments exist before updating
+
         if (!newData[postIndex]?.comments) newData[postIndex].comments = [];
 
-        // Add new comment without losing previous data
+
         newData[postIndex] = {
           ...newData[postIndex],
           comments: [comment, ...newData[postIndex].comments],
@@ -182,40 +244,27 @@ const CategoryBasedData = () => {
 
 
   useEffect(() => {
-    let updatedData = [...parsedData]; // Start with full data
+    let updatedData = [...parsedData];
 
-    // Apply category filter if selected
-    if (selectedCategory) {
-      updatedData = updatedData.filter((post) =>
-        post.title?.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
 
-    // Apply search filter if searchQuery exists
-    if (searchQuery) {
-      updatedData = updatedData.filter((post) =>
-        post.location?.address
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase())
-      );
-    }
+
+
+
 
     console.log(selectedPrice, "soumya");
 
-    // Apply sorting only if selectedPrice is set
+
     if (selectedPrice === "Price: Low - High") {
       updatedData.sort((a, b) => a.Amount - b.Amount);
     } else if (selectedPrice === "Price: High - Low") {
       updatedData.sort((a, b) => b.Amount - a.Amount);
     }
 
-    setFilteredData(updatedData); // Set the final processed data
-  }, [parsedData, selectedCategory, selectedPrice, searchQuery]);
+    setFilteredData(updatedData);
+  }, [selectedPrice]);
 
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(event.target.value); // Update the selected category state
-  };
+
 
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -229,11 +278,11 @@ const CategoryBasedData = () => {
     <div className="min-h-screen bg-blue-50">
       <Header />
       <div className="bg-[#fdeedc] min-h-screen p-8 flex flex-col items-center">
-        {/* Main Content */}
+
         <h1 className="text-black text-6xl font-bold mb-4 self-start">Events:</h1>
 
         <div className="flex flex-col items-center md:flex-row md:justify-end w-full">
-          {/* Image - Right Aligned, Bigger & More Beautiful */}
+
           <img
             src={SocialEvents}
             alt="Events"
@@ -251,40 +300,16 @@ const CategoryBasedData = () => {
       <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full min-h-screen pt-10 pb-10 flex justify-center">
         <div className="w-full max-w-4xl flex flex-col items-center">
           <div className="relative flex items-center bg-white rounded-full shadow-lg w-full max-w-lg mt-6">
-            <input
-              type="text"
-              placeholder="Search location here..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full p-4 pr-12 bg-white rounded-full outline-none text-lg text-black"
+
+            <SearchBar onSelectLocation={(coordinates, placeName) => handleSearchChange(coordinates, placeName)}
+              initialValue={searchQuery}
             />
-            <button className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
-              <FaSearch size={24} />
-            </button>
           </div>
 
-          {/* Filters - Centered Below Search Bar */}
+
           <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
-            {/* Select Event Dropdown */}
-            <div className="flex items-center space-x-3 w-full md:w-auto">
-              <span className="font-semibold text-lg">Select Event:</span>
-              <select
-                className="border px-4 py-2 rounded-lg text-lg w-full bg-white text-black md:w-auto"
-                onChange={handleCategoryChange} // Add onChange handler
-                value={selectedCategory}
-              >
-                <option value="">Select Category</option> {/* Ensure a default option */}
-                {categoryName && categoryName.length > 0 ? (
-                  categoryName.map((cat: any, index: number) => (
-                    <option key={index} value={cat}>
-                      {cat}
-                    </option>
-                  ))
-                ) : (
-                  <option disabled>No categories available</option>
-                )}
-              </select>
-            </div>
+
+       
 
 
             {/* Sort Dropdown */}
@@ -329,27 +354,27 @@ const CategoryBasedData = () => {
                     {/* Content */}
                     <div className="flex-1 p-6 text-center">
                       <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
-                      <p className="text-gray-600 text-sm">{post.Amount}</p>
+
                     </div>
 
                     {/* Footer */}
                     <div className="p-4 text-center border-t">
                       <span className="block text-gray-700 font-medium">{post.companyName}</span>
-                      <span className="block text-gray-500 text-sm">{post.location?.address || "Unknown"}</span>
+                      <span className="block text-gray-500 text-sm">{post.address || "Unknown"}</span>
                     </div>
 
                     {/* Like Button */}
                     <button
                       onClick={() => handleLike(index, post._id)}
                       className={`flex justify-center items-center space-x-2 p-3 rounded-lg w-full transition-all duration-300 ${interactions[index]?.liked
-                          ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                         } shadow-md hover:shadow-lg`}
                     >
                       {interactions[index]?.liked ? (
                         <>
                           <FaHeart className="text-2xl animate-pulse" />
-                          <span className="font-bold">Liked</span>
+                          <span className="font-bold">Interested</span>
                         </>
                       ) : (
                         <FaRegHeart className="text-2xl" />
