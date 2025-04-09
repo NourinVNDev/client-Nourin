@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import '../TailwindSetup.css';
 import { ManagerResetPassword1 } from "../../service/managerServices/mRegister";
+import { Toaster } from "react-hot-toast";
 
 
 const ManagerResetPassword:React.FC=()=>{
@@ -41,12 +42,18 @@ const ManagerResetPassword:React.FC=()=>{
     };
     
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="text-black rounded-xl w-full sm:w-4/5 lg:w-3/4 p-8 shadow-lg">
-                {/* Title */}
-                <h2 className="text-3xl font-semibold mb-6">Reset Your Password</h2>
+        <div className="min-h-screen w-screen bg-blue-50  flex items-center justify-center"> {/* Added flex, items-center, and justify-center */}
+
+        <Toaster position="top-center" reverseOrder={false} toastOptions={{
+            duration: 3000, // Default duration for toasts
+        }} />
     
-                {/* Form */}
+        <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full max-w-md p-8 rounded-lg shadow-lg"> {/* Added max-w-md, padding, and shadow */}
+            <h2 className="text-2xl font-bold text-purple-700 mb-6 text-center">Reset Your Password</h2>
+    
+                
+    
+           
                 <form className="w-full" onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label htmlFor="password" className="block text-gray-700">Password</label>

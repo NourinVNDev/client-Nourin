@@ -40,7 +40,7 @@ const ManagerRegister=async(formData:{[key:string]:string})=>{
             return data; 
         } catch (error) {
             console.error("Error during OTP verification:", error);
-            return undefined; 
+            throw error 
         }
         
     }
@@ -55,7 +55,7 @@ const ManagerRegister=async(formData:{[key:string]:string})=>{
         },
         data:formData
     });
-    const data=response.data.data;
+    const data=response.data;
     console.log("hai",data);
     return data;
 }catch(error){
@@ -102,7 +102,7 @@ const ManagerRegister=async(formData:{[key:string]:string})=>{
                 data:dataToSend
             });
     
-            const data = response.data.message; 
+            const data = response.data; 
             console.log(data)
             return {data,email}; 
         } catch (error) {

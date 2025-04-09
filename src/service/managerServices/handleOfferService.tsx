@@ -1,7 +1,7 @@
 import MANAGER_API from "../../utils/managerAxiosInstance";
 import { OfferData } from "../../validations/userValid/TypeValid";
-const getAllOffers=async()=>{
-    const response = await MANAGER_API("/getOffers",{
+const getAllOffers=async(managerId:string)=>{
+    const response = await MANAGER_API(`/getOffers/${managerId}`,{
         method: "GET",
         
         withCredentials: true,

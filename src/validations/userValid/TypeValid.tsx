@@ -6,14 +6,10 @@ export type PaymentData = {
     firstName: string;
     lastName: string;
     email: string;
-    phoneNo: number;
+    phoneNo: string;
     address: string;
     images: string [];
     eventName: string;
-    location: {
-      address: string;
-      city: string;
-    };
     noOfPerson: number;
     noOfDays: number;
     Amount: number;
@@ -22,6 +18,10 @@ export type PaymentData = {
     managerId:string;
     Included:[string];
     notIncluded:[string];
+    actualAmount:number;
+    bookedMembers:string[];
+    location:string;
+   
   };
   export type EventData = {
     _id:string;
@@ -60,8 +60,9 @@ export type PaymentData = {
     firstName:string,
     lastName:string,
     email:string,
-    phoneNo:number,
-    address:string
+    phoneNo:string,
+    address:string,
+    ticketType:string
   }
 
   export interface EventDetails {
@@ -72,6 +73,7 @@ export type PaymentData = {
     noOfPerson: number;
     noOfDays: number;
     endDate: string;
+    startDate:string;
     amount: number;
     userId: string;
     eventId: string;
@@ -80,7 +82,8 @@ export type PaymentData = {
     type: string;
     Included: [string],
     notIncluded: [string],
-    paymentStatus:string
+    paymentStatus:string,
+    bookedUser:[user:string,isParticipated:boolean]
   }
   
 

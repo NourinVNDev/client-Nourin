@@ -53,7 +53,7 @@ MANAGER_API.interceptors.response.use(
                 return MANAGER_API(originalRequest);
             } catch (refreshError) {
                 console.error("Token refresh failed:", refreshError);
-                window.location.href = "/"; // Redirect to login if refresh fails
+                window.location.href = "/mLogin"; // Redirect to login if refresh fails
             }
         }else if(error.response?.status===403){
             Swal.fire({

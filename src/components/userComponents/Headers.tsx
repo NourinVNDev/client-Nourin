@@ -2,9 +2,8 @@ import { Link } from "react-router-dom";
 import person from '../../assets/person.png';
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { setUserDetails } from "../../../Features/userSlice"; // Import Redux action
 import { RootState } from "../../../App/store";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 

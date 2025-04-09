@@ -55,21 +55,29 @@ export interface FormData {
     return errors;
 };
 
-
-export interface BookingData{
-    eventId:string,
-    userId:string,
-    paymentStatus:string,
-    categoryId:string,
-    bookingDate:string,
-    totalAmount:number,
-    billingDetails:{
-        firstName:string,
-        lastName:string,
-        email:string,
-        phoneNo:string,
-        address:string
-    },
-    NoOfPerson:string,
-
+export interface BookingData {
+    _id: string;
+    userId: string;
+    paymentStatus: string;
+    categoryId: string;
+    bookingDate: string;
+    totalAmount: number;
+    billingDetails: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        phoneNo: string;
+        address: string;
+    };
+    eventId: {
+        _id: string;
+        eventName: string;
+    };
+    NoOfPerson: number; // Changed from string to number
+    bookingId: string;
+    ticketDetails: {
+        Included: string[];
+        notIncluded: string[];
+        type: string;
+    };
 }

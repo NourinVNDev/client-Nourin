@@ -54,15 +54,15 @@ const ManagerEvents: React.FC = () => {
       endDate: "",
       time: "",
       images: [] as (File | string)[],
-      noOfPerson: 0,
-      destination: "",  
+
+      destination: "",
     },
 
     validationSchema: eventValidSchema,
     onSubmit: async (values) => {
       console.log("Form Submitted", values);
       const formData = new FormData();
-      
+
       formData.append("eventName", values.eventName);
       formData.append("companyName", managerCompanyName || "");
       formData.append("title", values.title);
@@ -72,7 +72,7 @@ const ManagerEvents: React.FC = () => {
       formData.append("endDate", values.endDate);
       formData.append("time", values.time);
       formData.append("destination", values.destination);
-      formData.append("noOfPerson", values.noOfPerson.toString());
+
 
       if (values.images.length > 0) {
         values.images.forEach((file) => {
@@ -129,10 +129,10 @@ const ManagerEvents: React.FC = () => {
     const files = e.target.files;
     if (files) {
       const fileArray = Array.from(files);
-      const newImages = fileArray.filter(file => 
+      const newImages = fileArray.filter(file =>
         !imagePreview.includes(URL.createObjectURL(file))
       );
-      
+
       formik.setFieldValue("images", [...formik.values.images, ...newImages]);
       const previews = newImages.map(file => URL.createObjectURL(file));
       setImagePreview((prevPreviews) => [...prevPreviews, ...previews]);
@@ -140,13 +140,14 @@ const ManagerEvents: React.FC = () => {
   };
 
   const handleLocationSelect = (lat: number, lng: number, place: string): void => {
-   
+
     formik.setFieldValue("address", place);
     setLocation({ lat, lng, place });
     console.log("Selected:", { lat, lng, place });
+    formik.setFieldValue('address', place)
   };
 
-  return (  
+  return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <Toaster position="top-center" reverseOrder={false} toastOptions={{
@@ -183,7 +184,7 @@ const ManagerEvents: React.FC = () => {
                   Event Title
                 </label>
                 <select
-                  id="title"  
+                  id="title"
                   name="title"
                   value={formik.values.title}
                   onChange={formik.handleChange}
@@ -219,53 +220,51 @@ const ManagerEvents: React.FC = () => {
                 <div className="text-red-500 text-sm">{formik.errors.content}</div>
               ) : null}
             </div>
-            
+
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-400">
                 Address
               </label>
-              <MapboxAutocomplete onSelectLocation={handleLocationSelect} />
-          
-              {formik.touched.address && formik.errors.address ? (
-                <div className="text-red-500 text-sm">{formik.errors.address}</div>
-              ) : null}
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="noOfPerson" className="block text-sm font-medium text-gray-400">
-                  Number of People
-                </label>
-                <input
-                  type="number"
-                  id="noOfPerson"
-                  name="noOfPerson"
-                  value={formik.values.noOfPerson}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.noOfPerson && formik.errors.noOfPerson ? 'border-red-500' : ''}`}
-                />
-                {formik.touched.noOfPerson && formik.errors.noOfPerson ? (
-                  <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
-                ) : null}
-              </div>
-              <div>
-                <label htmlFor="destination" className="block text-sm font-medium text-gray-400">
-                  Destination
-                </label>
+              <MapboxAutocomplete onSelectLocation={handleLocationSelect} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <input
                   type="text"
-                  id="destination"
-                  name="destination"
-                  value={formik.values.destination}
+                  name="address"
+                  value={formik.values.address}
                   onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.destination && formik.errors.destination ? 'border-red-500' : ''}`}
+                  placeholder="Address"
+                  readOnly
+                  className="border p-2 bg-white text-black mt-2 w-1/2"
                 />
-                {formik.touched.destination && formik.errors.destination ? (
-                  <div className="text-red-500 text-sm">{formik.errors.destination}</div>
+
+                {formik.touched.address && formik.errors.address ? (
+                  <div className="text-red-500 text-sm">{formik.errors.address}</div>
                 ) : null}
+
+
+                <div>
+                  <label htmlFor="destination" className="block text-sm font-medium text-gray-400">
+                    Destination
+                  </label>
+                  <input
+                    type="text"
+                    id="destination"
+                    name="destination"
+                    value={formik.values.destination}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={`w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black ${formik.touched.destination && formik.errors.destination ? 'border-red-500' : ''}`}
+                  />
+                  {formik.touched.destination && formik.errors.destination ? (
+                    <div className="text-red-500 text-sm">{formik.errors.destination}</div>
+                  ) : null}
+                </div>
               </div>
+
+
+
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -273,7 +272,7 @@ const ManagerEvents: React.FC = () => {
                 <label htmlFor="startDate" className="block text-sm font-medium text-gray-400">
                   Start Date
                 </label>
-                <DatePicker 
+                <DatePicker
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   selected={formik.values.startDate ? new Date(formik.values.startDate) : null}
                   onChange={(date: Date | null) => formik.setFieldValue('startDate', date)}
@@ -287,7 +286,7 @@ const ManagerEvents: React.FC = () => {
                 <label htmlFor="endDate" className="block text-sm font-medium text-gray-400">
                   End Date
                 </label>
-                <DatePicker 
+                <DatePicker
                   className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
                   selected={formik.values.endDate ? new Date(formik.values.endDate) : null}
                   onChange={(date: Date | null) => formik.setFieldValue('endDate', date)}
@@ -315,7 +314,7 @@ const ManagerEvents: React.FC = () => {
                 ) : null}
               </div>
             </div>
-            
+
             <div>
               <label htmlFor="images" className="block text-sm font-medium text-gray-400">
                 Upload Images

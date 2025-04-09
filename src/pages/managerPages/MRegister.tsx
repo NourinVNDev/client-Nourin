@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
-// import './Register.css';
 import '../TailwindSetup.css';
 import connectionImage from '../../../src/assets/new.avif';
 import { useNavigate } from "react-router-dom";
 import { ManagerRegister, mVerifyOtp } from '../../service/managerServices/mRegister';
 import { forgotPasswordForManager } from '../../service/managerServices/mRegister';
 import { registerValidationFormanager } from "../../validations/managerValid/RegisterValid";
-import toast ,{Toaster} from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+import axios from 'axios';
 
 const MRegister: React.FC = () => {
-
     const navigate = useNavigate();
     const [isOtp, setIsOtp] = useState(false);
     const [formData, setFormData] = useState({
@@ -21,14 +20,17 @@ const MRegister: React.FC = () => {
         phoneNo: "",
     });
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-    const [timer, setTimer] = useState(30); // Timer for 30 seconds
+    const [timer, setTimer] = useState(30);
     const [resendVisible, setResendVisible] = useState(false);
-    const [errors, setErrors] = useState<string[]>([]); // To store error messages
+    const [errors, setErrors] = useState<string[]>([]);
+    const [otpError, setOTPError] = useState<string>('');
 
     useEffect(() => {
         let countdown: number | null = null;
         if (isOtp) {
-            setTimer(30);
+            console.log("Bang");
+            
+            
             setResendVisible(false);
             countdown = window.setInterval(() => {
                 setTimer((prevTimer) => {
@@ -41,21 +43,27 @@ const MRegister: React.FC = () => {
                 });
             }, 1000);
         }
-
         return () => {
             if (countdown) clearInterval(countdown);
         };
-    }, [isOtp]);
+    }, [isOtp,timer]);
 
     const handleResendOtp = async () => {
         try {
             setOtp(['', '', '', '', '', '']);
+            setOTPError('');
+            setTimer(30);
+
+          
             await forgotPasswordForManager(formData.email);
+            toast.success("OTP has been resent to your email.");
         } catch (error) {
             console.error("Failed to resend OTP:", error);
             alert("Error resending OTP. Please try again.");
         }
     };
+
+   
 
     const handleData = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
@@ -64,32 +72,32 @@ const MRegister: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-    
-        const validationErrors = registerValidationFormanager(formData); // Get validation errors
+        const validationErrors = registerValidationFormanager(formData);
+        console.log("Validation Errors:", validationErrors);
 
-        if (validationErrors.length > 0) {
-            setErrors(validationErrors); 
-        }else{
-        setErrors([]);    
-        try {
-            await ManagerRegister(formData); // Assuming ManagerRegister is an API call function
-            setIsOtp(true); // Proceed to OTP step
-        } catch (error) {
-            console.error("Error registering user:", error);
-            alert("Registration failed. Please try again."); // Handle errors from the API
+        if (validationErrors.length === 0) {
+            try {
+                const result = await ManagerRegister(formData);
+                console.log("Registration Result:", result);
+                setIsOtp(true);
+                setTimer(30);
+                
+            } catch (error) {
+                console.error("Error registering user:", error);
+                toast.error("Registration failed. Please try again.");
+            }
+        } else {
+            setErrors(validationErrors);
         }
-    }
     };
 
     const handleChangeOne = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const value = e.target.value;
-
         if (/^[0-9]*$/.test(value) && value.length <= 1) {
             const newOtp = [...otp];
             newOtp[index] = value;
             setIsOtp(true);
             setOtp(newOtp);
-
             if (value) {
                 const nextInput = document.getElementById(`otp-input-${index + 1}`);
                 if (nextInput) {
@@ -99,28 +107,38 @@ const MRegister: React.FC = () => {
         }
     };
 
-    const handleVerify =async() => {
-        const otpValue = otp.join("");
-       const result= await mVerifyOtp(otpValue, formData);
-       console.log("Message",result);
-       if(result==='Otp is Matched'){
-        toast.success("Otp is Matched");
-       }else{
-        toast.error("Otp is not Matched");
-       }
-
-        navigate("/mLogin");
+    const handleVerify = async () => {
+        try {
+            const otpValue = otp.join("");
+            console.log("Verifying OTP:", otpValue);
+            const result = await mVerifyOtp(otpValue, formData);
+            console.log("Verification Result:", result);
+            if (result.message === 'Otp is Matched') {
+                toast.success("Otp is Matched");
+                navigate("/mLogin");
+            }
+        } catch (error) {
+            console.log("Caught error:", error);
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.message || "OTP verification failed";
+                console.log(message, "OTP ERROR");
+                setOTPError("Invalid OTP. Try Again");
+                toast.error(message);
+            } else {
+                console.error("Unexpected error:", error);
+                toast.error("An unexpected error occurred");
+            }
+        }
     };
-
     return (
+        
         <div className="bg-white w-screen min-h-screen flex">
              <Toaster position="top-center" reverseOrder={false}   toastOptions={{
     duration: 3000, // Default duration for toasts
   }} />
-            {/* Conditional Rendering */}
             {!isOtp ? (
                 <>
-                    {/* Left Section: Form */}
+               
                     <div className="bg-gray-100 w-full md:w-4/5 flex justify-center items-center p-6">
                         <div className="text-black rounded-xl w-full sm:w-4/5 lg:w-3/4 p-8 shadow-lg">
                             {/* Title */}
@@ -277,14 +295,15 @@ const MRegister: React.FC = () => {
                     </div>
                 </>
             ) : (
-                <div className="bg-white w-screen min-h-screen flex">
-                    {/* OTP Confirmation Section */}
-                    <div className="bg-gray-100 w-full flex justify-center items-center p-6">
-                        <div className="bg-gray-800 text-white rounded-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-6 shadow-lg">
-                            <h2 className="text-2xl font-semibold mb-4">OTP Sent!</h2>
-                            <p className="mb-4">An OTP has been sent to your email. Please check your inbox.</p>
-
-                            <div className="flex justify-center space-x-2 mb-4">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-screen min-h-screen flex justify-center items-center p-6">
+              <div className="bg-white rounded-2xl shadow-2xl w-full sm:w-96 p-8">
+                  <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">OTP Verification</h2>
+                  <p className="text-center text-gray-600 mb-4">We've sent a 6-digit OTP to your email.</p>
+          
+                  {otpError && (
+                      <p className="text-center text-red-500 text-sm mb-2">{otpError}</p>
+                  )}
+                              <div className="flex justify-center gap-2 mb-4">
                                 {/* OTP Input Boxes */}
                                 {otp.map((value, index) => (
                                     <input
@@ -298,25 +317,31 @@ const MRegister: React.FC = () => {
                                     />
                                 ))}
                             </div>
-                            <div className="text-center">
-                                <button
-                                    onClick={handleVerify}
-                                    className="w-full py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900"
-                                >
-                                    Verify OTP
-                                </button>
-                                {resendVisible && (
-                                    <button
-                                        onClick={handleResendOtp}
-                                        className="text-blue-600 hover:text-blue-800 mt-4"
-                                    >
-                                        Resend OTP
-                                    </button>
-                                )}
-                            </div>
+                            {timer > 0 ? (
+                    <>
+                      <p className="text-center text-gray-600 mt-4">
+                          Resend OTP in <span className="font-semibold">{timer}</span> seconds
+                      </p>
+                           <button
+                           onClick={handleVerify}
+                           className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 transition duration-200"
+                       >
+                           Verify OTP
+                       </button>
+                       </>
+                  ) : (
+                      resendVisible && (
+                          <button
+                              onClick={handleResendOtp}
+                              className="w-full mt-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition duration-200"
+                          >
+                              Resend OTP
+                          </button>
+                      )
+                  )}
                         </div>
                     </div>
-                </div>
+           
             )}
         </div>
     );

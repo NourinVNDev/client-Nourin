@@ -12,10 +12,10 @@ const getEventDataDetails=async (postId:string)=>{
 
         const data = response.data.data;
    console.log("Data form unique",data);
-        return data; // Return the OTP or any other relevant data
+        return data; 
     } catch (error) {
         console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined;
     }
 }
 
@@ -29,10 +29,10 @@ const getAllEventDataDetails=async ()=>{
 
         const data = response.data.data;
    console.log("Data form unique",data);
-        return data; // Return the OTP or any other relevant data
+        return data;
     } catch (error) {
         console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined;
     }
 }
 
@@ -47,10 +47,10 @@ const handleLikePost=async (index:number,postId:string,userId:string)=>{
 
         const data = response.data;
    console.log("Data form client",data);
-        return data; // Return the OTP or any other relevant data
+        return data;
     } catch (error) {
         console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined;
     }
 }
 
@@ -65,10 +65,10 @@ const handlePostDetails=async (postId:string)=>{
 
         const data = response.data;
    console.log("Data form client",data);
-        return data; // Return the OTP or any other relevant data
+        return data;
     } catch (error) {
         console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined; 
     }
 }
 
@@ -82,51 +82,63 @@ const getEventData=async (id:string)=>{
 
         const data = response.data;
    console.log("Data form client",data);
-        return data; // Return the OTP or any other relevant data
+        return data;
     } catch (error) {
         console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined;
     }
 }
-const makeStripePayment=async (eventData:PaymentData)=>{
-    console.log("Hello from Payment",eventData);
-    
+const makeStripePayment = async (eventData: PaymentData) => {
+    console.log("Hello from Payment", eventData);
+
     try {
-        const CLIENT_SECRET ="pk_test_51QjGncHTmAq9EwyH7hFljKers4qMvfKCMLy5Rww0cjJDMXRpDIO7acQ2lRmgklw84ichb4Pbk906AFmpprdu7C7G00yjPaeCF8";
-        console.log(CLIENT_SECRET);
-        if(!CLIENT_SECRET){
-            throw new Error('No client ID from .env')
-
-             }
-             console.log("Client Id",CLIENT_SECRET);
-             const stripe=await loadStripe(CLIENT_SECRET);
-             const userEventData={
-                products:eventData
-}
-
      
-        const response = await API(`/post/create-checkout-session`, {
-            method: 'POST',
-            data:userEventData
-    
-        });
+        const PUBLISHABLE_KEY = "pk_test_51QjGncHTmAq9EwyH7hFljKers4qMvfKCMLy5Rww0cjJDMXRpDIO7acQ2lRmgklw84ichb4Pbk906AFmpprdu7C7G00yjPaeCF8";
+        console.log(PUBLISHABLE_KEY);
 
-       const session=await response.data;
-       console.log("Session from client",session.sessionId.id);
-       const result=stripe?.redirectToCheckout({
-        sessionId:session.sessionId?.id
-       })
-       if((await result)?.error){
-        console.log((await result)?.error);    
-       }
-       return result;
+        if (!PUBLISHABLE_KEY) {
+            throw new Error("No publishable key provided.");
+        }
 
-      
-    }catch (error) {
-        console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        console.log("Client Id", PUBLISHABLE_KEY);
+        const stripe = await loadStripe(PUBLISHABLE_KEY);
+
+        if (!stripe) {
+            throw new Error("Stripe failed to initialize.");
+        }
+
+        const userEventData = { products: eventData };
+
+        const response = await API.post("/post/create-checkout-session", userEventData);
+        console.log("Response",response);
+        
+        if (!response.data || !response.data.success) {
+            return { success: false, message: response.data?.message || "Failed to create checkout session" };
+        }
+
+        const sessionId = response.data.sessionId;
+        if (!sessionId) {
+            console.error("Invalid session ID from server");
+            return { success: false, message: "Seat Sold Out"};
+        }
+
+        const result = await stripe.redirectToCheckout({ sessionId });
+
+        if (result?.error) {
+            console.error("Stripe Checkout Error:", result.error.message);
+            return { success: false, message: result.error.message };
+        }
+
+        return { success: true, message: "Redirecting to payment" };
+
+    } catch (error) {
+        console.error("Error during payment:", error);
+        return { success: false, message: error || "Something went wrong" };
     }
-}
+};
+
+
+
 
 const saveBillingDetailsOfUser=async(formData:billingData)=>{
     console.log("FormData",formData)

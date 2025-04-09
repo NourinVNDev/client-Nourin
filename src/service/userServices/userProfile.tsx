@@ -36,9 +36,9 @@ const EventReviewAndRating = async (rating: number, review: string,eventId:strin
     }
 };
 
-const eventHistoryDetails = async () => {
+const eventHistoryDetails = async (userId:string) => {
     try {
-        const response = await API("/getEventHistory", { method: "GET" });
+        const response = await API(`/getEventHistory/${userId}`, { method: "GET" });
 
         const data = response.data.data;
         console.log("Event History Data:", data);
@@ -49,9 +49,9 @@ const eventHistoryDetails = async () => {
     }
 };
 
-const eventBookingDetails = async () => {
+const eventBookingDetails = async (userId:string) => {
     try {
-        const response = await API("/getBookedEvent", { method: "GET" });
+        const response = await API(`/getBookedEvent/${userId}`, { method: "GET" });
 
         const data = response.data.data;
         console.log("Booked Events Data:", data);

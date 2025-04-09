@@ -7,11 +7,12 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setVerifierDetails } from "../../../Features/verifierSlice";
-import { AppDispatch } from "../../../App/store";
+
 const VerifierLogin = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [email, setEmail] = useState("");
-    const [companyName, setCompanyName] = useState("");
+    const dispatch=useDispatch()
+    
     const [otp, setOtp] = useState<string[]>(new Array(6).fill("")); // Fixed OTP state
     const [showOtpInput, setShowOtpInput] = useState(false);
     const navigate = useNavigate();
@@ -19,12 +20,12 @@ const VerifierLogin = () => {
     const otpInputs = useRef<Array<HTMLInputElement | null>>(
         new Array(6).fill(null)
     );
-    const dispatch = useDispatch<AppDispatch>();
     const handleToCheckManager = async () => {
         try {
             const result = await checkManagerHaveEvent(email);
             if (result.success) {
                 toast.success("OTP sent successfully!");
+               
                 setShowOtpInput(true);
                 setErrorMessage(null);
                 setTimer(30);
@@ -34,8 +35,8 @@ const VerifierLogin = () => {
                 setErrorMessage(error.response?.data.message);
                 toast.error("You are not hosting any events");
             } else {
-                toast.error("Unexpected error occurred");
-                setErrorMessage("You are not hosting any events");
+               
+                setErrorMessage("This email is not permitted by manager");
             }
         }
     };
@@ -84,13 +85,16 @@ const VerifierLogin = () => {
     // Handle OTP verification
     const handleOtpVerification = async () => {
         const enteredOtp = otp.join(""); // Combine digits
-        const result = await verifyOtp(enteredOtp);
+        const result = await verifyOtp(enteredOtp,email);
         console.log("yes", result);
         if (result.success) {
-            console.log("CompanyName:",companyName);
-            dispatch(setVerifierDetails({ companyName }))
-
-            navigate("/verifier/homePage");
+            localStorage.setItem('verifierAuth','true');
+            const formData={
+                email:email,
+                companyName:''
+            }
+            dispatch(setVerifierDetails(formData));
+            navigate(`/verifier/listAllEvents/${email}`);
         } else {
 
             setErrorMessage(result.message);
@@ -107,18 +111,7 @@ const VerifierLogin = () => {
                     <h2 className="text-3xl font-semibold mb-6">Login to Verifier Account</h2>
 
                     <div className="mb-4 flex items-center gap-4 bg-gray-100 p-4 rounded-lg shadow-md">
-                        <label htmlFor="companyName" className="text-gray-700 font-medium">
-                            Company Name:
-                        </label>
-                        <input
-                            id="companyName"
-                            type="text"  // ✅ Fix: use 'text' instead of 'companyName'
-                            className="p-2 border border-gray-300 rounded-lg bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600 w-72"
-                            placeholder="Enter your company name"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            required
-                        />
+                     
                         <br />
                         <label htmlFor="email" className="text-gray-700 font-medium">
                             Email:
@@ -133,11 +126,11 @@ const VerifierLogin = () => {
                             required
                         />
                         <button
-                            type="button" // ✅ Fix: Use "button" instead of "submit" to prevent unwanted form submission
+                            type="button"
                             onClick={handleToCheckManager}
                             className="py-2 px-6 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-all duration-200"
                         >
-                            Enter
+                            Submit
                         </button>
                     </div>
 

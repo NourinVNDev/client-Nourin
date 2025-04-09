@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../components/managerComponents/Header";
 import NavBar from "../../components/managerComponents/NavBar";
 import Footer from "../../components/managerComponents/Footer";
@@ -10,9 +10,12 @@ import { OfferFormValues, offerValidSchema } from "../../validations/managerVali
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import datepicker styles
 import { getCategoryEventType } from "../../service/managerServices/handleEventService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../App/store";
 const ManagerAddOffer = () => {
   const navigate = useNavigate();
-  const [eventType,setEventType]=useState<string[]>([])
+  const [eventType,setEventType]=useState<string[]>([]);
+  const managerId=useSelector((state:RootState)=>state.manager._id);
 
   const formik = useFormik<OfferFormValues>({
     initialValues: {
@@ -27,7 +30,8 @@ const ManagerAddOffer = () => {
     onSubmit: async (values) => {
       const formattedValues = {
         ...values,
-        discount_value: String(values.discount_value), // Convert number to string if required
+        discount_value: String(values.discount_value),
+        ...(managerId && { managerId: managerId })
       };
 
       console.log("Form Data Submitted:", formattedValues);

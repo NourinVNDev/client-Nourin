@@ -11,6 +11,7 @@ import { EventData } from "../../validations/userValid/TypeValid";
 import { eventFormValues, eventValidSchema } from "../../validations/managerValid/eventValidSchema";
 import { useFormik } from "formik";
 import MapboxAutocomplete from "../../components/managerComponents/LocationSearch";
+import { Link } from "react-router-dom";
 interface LocationState {
   lat: number;
   lng: number;
@@ -20,7 +21,7 @@ const ManagerEditSelectedEvents = () => {
   const navigate = useNavigate();
   const { id: eventId } = useParams<{ id: string }>();
   const managerCompanyName = localStorage.getItem('ManagerName') ?? " ";
-    const [location, setLocation] = useState<LocationState | null>(null);
+    const [location, setLocation] = useState('');
 
   const formik = useFormik<eventFormValues>({
     initialValues: {
@@ -34,13 +35,15 @@ const ManagerEditSelectedEvents = () => {
       time: "",
  
       images: [] as (File | string)[],
-      noOfPerson: 0,
+    
       destination: '',
     },
 
 
   validationSchema:eventValidSchema,
     onSubmit:  (values) => {
+      console.log("Location",location);
+      
       console.log("Form Submitted", values);
       const formData = new FormData();
       formData.append("id", values._id)
@@ -48,16 +51,20 @@ const ManagerEditSelectedEvents = () => {
       formData.append("title", values.title);
       formData.append("content", values.content);
       formData.append('companyName',managerCompanyName||'');
-      formData.append("address", JSON.stringify(values.address));
+      if(location){
+        formData.append("address", location);
+      }
+    
       formData.append("startDate", values.startDate);
       formData.append("endDate", values.endDate);
       formData.append("time", values.time);
       formData.append("destination", values.destination);
-      formData.append("noOfPerson", values.noOfPerson.toString());
+      // formData.append("noOfPerson", values.noOfPerson.toString());
       // formData.append("amount", values.Amount.toString()); 
       // formData.append("Included", values.Included.join(","));
       // formData.append("notIncluded", values.notIncluded.join(","));
-  
+   
+      
       if (values.images.length > 0) {
         values.images.forEach((file) => {
           if (file instanceof File) {
@@ -92,7 +99,13 @@ const ManagerEditSelectedEvents = () => {
 
   useEffect(() => {
     console.log("Formik Errors:", formik.errors);
-  }, [formik.errors]);
+    if(location){
+      console.log("Loc",location);
+      
+    }
+  }, [formik.errors,location]);
+  
+
   
 
   const [categoryName, setCategoryName] = useState<string[]>([]);
@@ -130,11 +143,10 @@ const ManagerEditSelectedEvents = () => {
             ...prevValues,
             ...result.data.result,
             address:result.data.result.address||"",
-            Included: result.data.result.Included || [""],
-            notIncluded: result.data.result.notIncluded || [""],
-            tags: result.data.result.tags || [""],
+         
             images: result.data.result.images || [],
           }));
+          setLocation(result.data.result.address);
         } else {
           console.error("Invalid data structure:", result);
         }
@@ -187,7 +199,8 @@ const ManagerEditSelectedEvents = () => {
   const handleLocationSelect = (lat: number, lng: number, place: string): void => {
    
     formik.setFieldValue("address", place);
-    setLocation({ lat, lng, place });
+    setLocation(place);
+
     console.log("Selected:", { lat, lng, place });
   };
 
@@ -207,7 +220,12 @@ const ManagerEditSelectedEvents = () => {
 
         <main className="flex-1 p-6">
           <h2 className="text-3xl font-bold mb-6 text-gray-800">Edit Event</h2>
-
+          <div className=" flex justify-end">
+          <Link to={`/Manager/update2Page/${formik.values._id}`}>
+        <button  className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition">Update Tickets</button>
+        </Link>
+        </div>
+        <br />
           {loading ? (
             <p>Loading...</p> // Show loading state
           ) : eventDetails ? (
@@ -269,30 +287,20 @@ const ManagerEditSelectedEvents = () => {
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-400">Address</label>
                   <MapboxAutocomplete onSelectLocation={handleLocationSelect} />
-              
+                  <input
+                type="text"
+                name="address"
+                value={formik.values.address}
+                onChange={formik.handleChange}
+                placeholder="Address"
+                readOnly
+                className="border p-2 bg-white text-black mt-2 w-1/2" 
+              />
                       {formik.touched.address && formik.errors.address ? (
               <div className="text-red-500 text-sm">{formik.errors.address}</div>
             ) : null}
                 </div>
       
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="noOfPerson" className="block text-sm font-medium text-gray-400">Number of People</label>
-                <input
-                  type="number"
-                  id="noOfPerson"
-                  name="noOfPerson"
-                  value={formik.values.noOfPerson}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                />
-                        {formik.touched.noOfPerson && formik.errors.noOfPerson ? (
-              <div className="text-red-500 text-sm">{formik.errors.noOfPerson}</div>
-            ) : null}
-              </div>
-        
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                  <div>

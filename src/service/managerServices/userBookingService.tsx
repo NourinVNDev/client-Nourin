@@ -1,10 +1,10 @@
 import MANAGER_API from "../../utils/managerAxiosInstance";
 
 
-const fetchTodaysBooking=async()=>{
+const fetchTodaysBooking=async(managerId:string)=>{
     try {
            
-        const response = await MANAGER_API('/fetchTodayBooking', {
+        const response = await MANAGER_API(`/fetchTodayBooking/${managerId}`, {
             method: 'GET',
        
         
@@ -16,10 +16,10 @@ const fetchTodaysBooking=async()=>{
         
     }
 }
-const fetchTotalBooking=async()=>{
+const fetchTotalBooking=async(managerId:string)=>{
     try {
            
-        const response = await MANAGER_API('/fetchTotalBooking', {
+        const response = await MANAGER_API(`/fetchTotalBooking/${managerId}`, {
             method: 'GET',
        
         

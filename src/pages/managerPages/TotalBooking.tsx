@@ -1,20 +1,27 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { BookingData } from "../../validations/managerValid/RegisterValid";
 import { fetchTotalBooking } from "../../service/managerServices/userBookingService";
 import Header from "../../components/managerComponents/Header";
 import Footer from "../../components/managerComponents/Footer";
 import NavBar from "../../components/managerComponents/NavBar";
 import { Calendar, Users } from "lucide-react";
-const TotalBooking=()=>{
-        const [bookings, setBookings] = useState<BookingData[]>([]);
+import { useSelector } from "react-redux";
+import { RootState } from "../../../App/store";
+const TotalBooking = () => {
+    const [bookings, setBookings] = useState<BookingData[]>([]);
+    const managerId = useSelector((state: RootState) => state.manager._id);
     useEffect(() => {
         const fetchTotalBookingDetails = async () => {
-            const result = await fetchTotalBooking();
-            
-            if (result.message === "Bookings retrieved successfully") {
-                setBookings(result.data);
-                console.log("Safe", result.data);
+            if (managerId) {
+                const result = await fetchTotalBooking(managerId);
+
+                if (result.message === "Manager's bookings retrieved successfully") {
+                    setBookings(result.data);
+                    console.log("Safe", result.data);
+                }
+
             }
+
         };
 
         fetchTotalBookingDetails();
@@ -42,11 +49,19 @@ const TotalBooking=()=>{
                                             </div>
                                             <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full">
                                                 <Calendar className="w-4 h-4" />
-                                                <span>{new Date(booking.bookingDate).toLocaleDateString()}</span>
+                                                <span>
+                                                    {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
+                                                        day: '2-digit',
+                                                        month: '2-digit',
+                                                        year: 'numeric'
+                                                    })}
+                                                </span>
                                             </div>
                                         </div>
                                         <p className="text-gray-600 mt-2">Email: {booking.billingDetails.email}</p>
                                         <p className="text-gray-600">Phone: {booking.billingDetails.phoneNo}</p>
+                                        <p className="text-gray-600">Event Name: {booking.eventId.eventName}</p>
+                                        <p className="text-gray-600">Event Name: {booking.paymentStatus==='Confirmed'?<span className="text-green-500">Confirmed</span>:<span className="text-red-500">Cancelled</span>}</p>
                                         <div className="flex justify-between items-center mt-4">
                                             <span className="text-lg font-bold text-green-600">₹{booking.totalAmount}</span>
                                         </div>
@@ -66,4 +81,4 @@ const TotalBooking=()=>{
     );
 
 }
-export  default TotalBooking;
+export default TotalBooking;

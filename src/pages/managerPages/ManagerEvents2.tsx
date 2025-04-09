@@ -7,12 +7,21 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 import { createEventSeatDetails } from "../../service/managerServices/handleEventService";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { validateSeatDetails } from "../../validations/managerValid/validateSeatDetails";
+
 export interface EventFormValues {
     Included: string[];
     notIncluded: string[];
     Amount: number;
     noOfSeats: number;
     typesOfTickets: string;
+}
+interface TicketErrors {
+    typesOfTickets?: string;
+    noOfSeats?: string;
+    Amount?: string;
+    Included?: string;
+    notIncluded?: string;
 }
 
 const ManagerEvents2: React.FC = () => {
@@ -26,8 +35,7 @@ const ManagerEvents2: React.FC = () => {
     });
     const { eventId } = useParams();
     const navigate=useNavigate();
-
-
+    const [error, setError] = useState<TicketErrors>({});
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -54,8 +62,15 @@ const ManagerEvents2: React.FC = () => {
         setFormValues({ Included: [""], notIncluded: [""], Amount: 0, noOfSeats: 0, typesOfTickets: "" });
     };
 
-    const handleAddTicket = () => {
+    const handleAddTicket = async() => {
         console.log("Adding ticket with values:", formValues);
+        const validationErrors = await validateSeatDetails(formValues);
+
+    if (Object.keys(validationErrors).length > 0) {
+        setError(validationErrors);  // No need to wrap in another object
+        return;
+    }
+
         setTicketsList([...ticketsList, formValues]);
         setFormValues({ Included: [""], notIncluded: [""], Amount: 0, noOfSeats: 0, typesOfTickets: "" });
     };
@@ -100,20 +115,19 @@ const ManagerEvents2: React.FC = () => {
 
                     <form onSubmit={handleFormSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400">Types of Ticket</label>
-                                <select
-                                    name="typesOfTickets"
-                                    value={formValues.typesOfTickets}
-                                    onChange={handleInputChange}
-                                    className="w-full mt-1 p-2 bg-white text-black border rounded focus:outline-blue-400"
-                                >
-                                    <option value="">Select Type</option>
-                                    <option value="general">GENERAL</option>
-                                    <option value="vip">VIP</option>
-                                    <option value="premium">PREMIUM</option>
-                                </select>
-                            </div>
+                        <div>
+    <label className="block text-sm font-medium text-gray-400">Types of Ticket</label>
+    <input
+        type="text"
+        name="typesOfTickets"
+        value={formValues.typesOfTickets}
+        onChange={handleInputChange}
+        className="w-full mt-1 p-2 border bg-white text-black rounded focus:outline-blue-400"
+    />
+    {error.typesOfTickets && <p className="text-red-500 text-sm">{error.typesOfTickets}</p>}
+</div>
+
+
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -126,6 +140,7 @@ const ManagerEvents2: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-full mt-1 p-2 border bg-white text-black rounded focus:outline-blue-400"
                                 />
+                                {error.Included && <p className="text-red-500 text-sm">{error.Included}</p>}
                             </div>
 
                             <div>
@@ -137,6 +152,7 @@ const ManagerEvents2: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-full mt-1 p-2 bg-white text-black border rounded focus:outline-blue-400"
                                 />
+                                {error.notIncluded && <p className="text-red-500 text-sm">{error.notIncluded}</p>}
                             </div>
                         </div>
 
@@ -150,6 +166,7 @@ const ManagerEvents2: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-full mt-1 p-2 bg-white text-black border rounded focus:outline-blue-400"
                                 />
+                                {error.Amount && <p className="text-red-500 text-sm">{error.Amount}</p>}
                             </div>
 
                             <div>
@@ -161,6 +178,7 @@ const ManagerEvents2: React.FC = () => {
                                     onChange={handleInputChange}
                                     className="w-full mt-1 p-2 bg-white text-black border rounded focus:outline-blue-400"
                                 />
+                                {error.noOfSeats && <p className="text-red-500 text-sm">{error.noOfSeats}</p>}
                             </div>
                         </div>
 

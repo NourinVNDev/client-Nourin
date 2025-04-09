@@ -12,6 +12,8 @@ interface ChatWindowProps {
   setAllMessages: React.Dispatch<React.SetStateAction<{ message: string; timestamp: string, senderId: string }[]>>;
   senderId: string;
   managerId: string;
+  selectedEvent?: string;
+
 }
 
 const ChatWindow = ({
@@ -21,6 +23,9 @@ const ChatWindow = ({
   setAllMessages,
   senderId,
   managerId,
+  selectedEvent
+
+
 }: ChatWindowProps) => {
   const user = useSelector((state: RootState) => state.user._id);
   const manager = useSelector((state: RootState) => state.manager._id);
@@ -68,13 +73,28 @@ const ChatWindow = ({
 
   return (
     <div className={`w-2/3 min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
-      {selectedManager ? (
+      {selectedEvent || selectedManager ? (
         <div className="flex flex-col h-full">
           {/* Chat Header */}
-          <div className="flex items-center justify-between p-3 bg-purple-500 text-white rounded-t-lg">
-            <h2 className="text-lg font-bold">{selectedManager}</h2>
-            <Button onClick={() => setSelectedManager(null)}>Close</Button>
+          {selectedEvent && selectedManager?(
+             <div className="p-4 bg-purple-500 text-white flex justify-between items-start">
+             <div>
+               <h2 className="text-lg font-bold">{selectedEvent}</h2>
+               <h4 className="font-semibold">{selectedManager}</h4>
+             </div>
+             <Button onPress={() => setSelectedManager(null)}>Close</Button>
+           </div>
+
+          ):(
+            <div className="p-4 bg-purple-500 text-white flex justify-between items-start">
+            <div>
+              <h2 className="text-lg font-bold">{selectedManager}</h2>
+            </div>
+            <Button onPress={() => setSelectedManager(null)}>Close</Button>
           </div>
+          )}
+         
+
 
           {/* Messages Container with Scrolling */}
           <div className="flex-1 overflow-y-auto max-h-[600px] p-4 bg-gray-100 rounded-b-lg">

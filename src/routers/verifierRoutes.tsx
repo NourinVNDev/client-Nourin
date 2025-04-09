@@ -1,15 +1,18 @@
 
 import VerifierLogin from "../pages/verifierPages/VerifierLogin";
-import HomePage from "../pages/verifierPages/HomePage";
+
 import ListAllEvents from "../pages/verifierPages/ListAllEvents";
 import ListingBookedEvent from "../pages/verifierPages/ListingBookedEvent";
+import CheckLoginVerifier from "../components/verifierComponents/CheckLoginVerifier";
+import VerifierLogout from "../pages/verifierPages/VerifierLogout";
+import VerifierPrivateRoute from "../components/verifierComponents/VerifierPrivateRoute";
 const verifierRoutes=[
 
-    {path:'/verifier/login',element:<VerifierLogin/>},
-    {path:'/verifier/homePage',element:<HomePage/>},
-    {path:'/verifier/listAllEvents',element:<ListAllEvents/>},
-    {path:'/verifier/bookedEventDetails/:eventId',element:<ListingBookedEvent/>},
-    {},
+    {path:'/verifier/login',element:<CheckLoginVerifier><VerifierLogin/></CheckLoginVerifier>},
+    {path:'/verifier/listAllEvents/:email',element:<VerifierPrivateRoute><ListAllEvents/></VerifierPrivateRoute>},
+    {path:'/verifier/bookedEventDetails/:eventId',element:<VerifierPrivateRoute><ListingBookedEvent/></VerifierPrivateRoute>},
+    {path:'/verifier/logOut',element:<VerifierLogout/>}
+    
 
 
 

@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/verifierComponents/Header";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../App/store";
 import { fetchAllCompanyEvents } from "../../service/verifierServices/verifierLogin";
 import toast, { Toaster } from "react-hot-toast";
 import Footer from "../../components/verifierComponents/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface EventData {
     _id: string;
     eventName: string;
     companyName: string;
-    location?: {
-        city?: string;
-        address?: string;
-        coordinates?: [number, number];
-    };
+  address:string;
     startDate: string;
     endDate: string;
     typesOfTickets: any[];
@@ -23,31 +17,33 @@ interface EventData {
 }
 
 const ListAllEvents = () => {
-    const companyName = useSelector((state: RootState) => state.verifier.companyName);
+
     const [events, setEvents] = useState<EventData[]>([]);
     const navigate = useNavigate();
-
+    const {email}=useParams<{email:string}>()
     useEffect(() => {
         const fetchAllEvents = async () => {
-            if (companyName) {
-                const result = await fetchAllCompanyEvents(companyName);
+            if ( email) {
+                const result = await fetchAllCompanyEvents(email);
                 if (result.message === "No Events hosted in this company") {
                     toast.error(result.message);
                 } else {
-                    console.log(result.data);
-                    // Filter events with end dates greater than today's date
+                    console.log("cannn",result.data);
+            
                     const today = new Date();
                     const upcomingEvents = result.data.filter((event: EventData) => {
-                        const endDate = new Date(event.endDate);
-                        return endDate > today;
+                        const startDate = new Date(event.startDate);
+                        return startDate > today;
                     });
+                    console.log("Upcomming Events",upcomingEvents);
+                    
                     setEvents(upcomingEvents);
                 }
             }
         };
     
         fetchAllEvents();
-    }, [companyName]);
+    }, [email]);
 
     const handleParticularEvent = (eventId: string) => {
         navigate(`/verifier/bookedEventDetails/${eventId}`)
@@ -74,7 +70,7 @@ const ListAllEvents = () => {
                                 )}
                                 <h3 className="text-xl font-semibold text-gray-900">{event.eventName}</h3>
                                 <p className="text-gray-600"><strong>Company:</strong> {event.companyName}</p>
-                                <p className="text-gray-600"><strong>Location:</strong> {event.location?.city}, {event.location?.address}</p>
+                                <p className="text-gray-600"><strong>Location:</strong> {event.address}</p>
                                 <p className="text-gray-600"><strong>Start Date:</strong> {new Date(event.startDate).toDateString()}</p>
                                 <p className="text-gray-600"><strong>End Date:</strong> {new Date(event.endDate).toDateString()}</p>
                                 <p className="text-gray-600"><strong>Tickets:</strong> {event.typesOfTickets.length} types</p>

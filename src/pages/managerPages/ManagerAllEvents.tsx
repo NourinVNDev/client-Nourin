@@ -6,6 +6,8 @@ import Footer from "../../components/managerComponents/Footer";
 import NavBar from "../../components/managerComponents/NavBar";
 
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../App/store";
 interface Location {
   address: string;
   city: string;
@@ -39,7 +41,8 @@ interface EventData {
   createdAt: string;
   updatedAt: string;
   eventName: string
-  destination: string
+  destination: string,
+  typesOfTickets: [{ type: string, noOfSeats: number, Amount: number }]
 }
 
 const ManagerAllEvents = () => {
@@ -47,49 +50,65 @@ const ManagerAllEvents = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 5;
   const navigate = useNavigate();
-
+  const managerId = useSelector((state: RootState) => state.manager._id);
+  const [searchTerm,setSearchTerm]=useState('');
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with leading zero if needed
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed) and pad
-    const year = date.getFullYear(); // Get full year
-    return `${day}-${month}-${year}`; // Return formatted date
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   useEffect(() => {
     const fetchAllEvents = async () => {
       try {
-        const response: EventData[] = await getAllEventData();
-        setEvents(response);
-
-
+        if (managerId) {
+          const response: EventData[] = await getAllEventData(managerId);
+          setEvents(response);
+        }
       } catch (error) {
         console.error("Error fetching events:", error);
       }
     };
 
     fetchAllEvents();
-  }, []);
+  }, [managerId]);
 
+  // Sort events
+  const sortedEvents = [...events].sort((a, b) => {
+    const dateA = new Date(a.startDate);
+    const dateB = new Date(b.startDate);
+    return dateB.getTime() - dateA.getTime();
+  });
 
-  const totalPages = Math.ceil(events.length / eventsPerPage);
+  // Filter events based on search term
+  const filteredEvents = sortedEvents.filter((event) =>
+    event.eventName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
   const startIndex = (currentPage - 1) * eventsPerPage;
-  const currentEvents = events.slice(startIndex, startIndex + eventsPerPage);
+  const currentEvents = filteredEvents.slice(startIndex, startIndex + eventsPerPage);
 
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
   };
-  const handleEventEdit = async (id: string) => {
-    console.log("EventId", id);
+
+  const handleEventEdit = (id: string) => {
     navigate(`/editEventDetails/${id}`);
+  };
 
+  const handleSearchEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
 
-
-
-  }
+  
+  
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 text-black">
       <Header />
@@ -106,102 +125,144 @@ const ManagerAllEvents = () => {
                 </button>
               </Link>
             </div>
-            <div className="overflow-x-auto bg-white shadow-md rounded">
-              <table className="min-w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    {["EventName", "Images", "Title", "Location", "Date", "Actions"].map((header) => (
-                      <th
-                        key={header}
-                        className="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-600"
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentEvents.map((event, index) => (
-                    <tr
-                      key={index}
-                      className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+            <div className="max-w-md mx-auto">
+            <div className="relative flex items-center w-full h-12 bg-white rounded-lg focus-within:shadow-lg overflow-hidden">
+              <div className="grid place-items-center h-full w-12 text-gray-300">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <input
+                className="peer h-full w-full outline-none text-sm  bg-white text-gray-700 pr-2"
+                type="text"
+                id="search"
+                onChange={handleSearchEvent}
+                placeholder="Search by Event Name..."
+              />
+            </div>
+            </div>
+            <br /><br />  
+            {currentEvents && currentEvents.length > 0 ? (
+              <>
+                <div className="overflow-x-auto bg-white shadow-md rounded">
+                  <table className="min-w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        {["EventName", "Images", "Title", "Location", "Date", "Seat Information", "Actions"].map((header) => (
+                          <th
+                            key={header}
+                            className="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-600"
+                          >
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentEvents.map((event, index) => (
+                        <tr
+                          key={index}
+                          className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                        >
+                          <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
+                          <td className="border border-gray-300 px-4 py-3">
+                            {event.images && event.images.length > 0 ? (
+                              <div className="flex flex-wrap gap-2">
+                                {event.images.map((image, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={image}
+                                    alt={`Event image ${idx + 1}`}
+                                    className="w-16 h-16 object-cover rounded border border-gray-200"
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              "No images"
+                            )}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-3">{event.title}</td>
+                          <td className="border border-gray-300 px-4 py-3">{event.destination}</td>
+                          <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
+                          <td className="border  px-4 py-3">
+                            <div className="flex flex-col space-y-2">
+                              {event.typesOfTickets.map((ticket, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between "
+                                >
+                                  <span className="font-semibold text-indigo-700">{ticket.type}</span>
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
+                                    <span className="text-gray-500 text-sm">
+                                      ({ticket.noOfSeats} seats available)
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                          <td>
+                            <div className=" px-4">
+                            <button
+                              onClick={() => handleEventEdit(event._id)}
+                              className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
+                            >
+                              Edit
+                            </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+            
+                <div className="flex justify-center items-center mt-4 space-x-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => handlePageChange(i + 1)}
+                      className={`px-4 py-2 rounded-lg ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-300 hover:bg-blue-300"
                         }`}
                     >
-                      <td className="border border-gray-300 px-4 py-3">
-                        {event.eventName}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-3">
-                        {event.images && event.images.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {event.images.map((image, idx) => (
-                              <img
-                                key={idx}
-                                src={image}
-                                alt={`Event image ${idx + 1}`}
-                                className="w-16 h-16 object-cover rounded border border-gray-200"
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          "No images"
-                        )}
-                      </td>
-
-
-                      <td className="border border-gray-300 px-4 py-3">
-                        {event.title}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-3">
-                        {event.destination}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-3">
-                        {formatDate(event.startDate)}
-                      </td>
-
-                      <td>
-                        <button onClick={() => { handleEventEdit(event._id) }} className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600">
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
+                      {i + 1}
+                    </button>
                   ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex justify-center items-center mt-4 space-x-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg ${currentPage === 1
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
-                  }`}
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => handlePageChange(i + 1)}
-                  className={`px-4 py-2 rounded-lg ${currentPage === i + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-300 hover:bg-blue-300"
-                    }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-lg ${currentPage === totalPages
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-blue-500 text-white hover:bg-blue-600"
-                  }`}
-              >
-                Next
-              </button>
-            </div>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-center text-gray-500">No event found for this account.</p>
+            )}
+
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ const AdminWallet = () => {
             status: string;
             eventName: string;
             createdAt: string;
+            companyName:string
         }>,
     });
 
@@ -45,7 +46,8 @@ const AdminWallet = () => {
                             type: tx.type,
                             status: tx.status,
                             eventName: tx.eventName,
-                            createdAt: new Date(tx.createdAt).toLocaleDateString() // Formatting date
+                            createdAt: new Date(tx.createdAt).toLocaleDateString() ,
+                            companyName:tx.companyName
                         })),
                     });
                 } else {
@@ -83,9 +85,7 @@ const AdminWallet = () => {
 
                     {loading ? (
                         <p className="text-center text-lg text-gray-700">Loading wallet details...</p>
-                    ) : error ? (
-                        <p className="text-center text-red-600 font-semibold">{error}</p>
-                    ) : (
+                    )  :  adminWallet ?(
                         <div className="bg-white shadow-lg rounded-xl p-6">
                            <div className="flex justify-between mb-6">
                                     <h3 className="text-xl font-semibold text-gray-800">Wallet Balance</h3>
@@ -102,6 +102,7 @@ const AdminWallet = () => {
                                                 <th className="py-3 px-4">Booked ID</th>
                                                 <th className="py-3 px-4">Date</th>
                                                 <th className="py-3 px-4">Event Name</th>
+                                                <th className="py-3 px-4">Company Name</th>
                                                 <th className="py-3 px-4">Total Amount (₹)</th>
                                                 <th className="py-3 px-4">Manager Amount (₹)</th>
                                                 <th className="py-3 px-4">Type</th>
@@ -119,6 +120,7 @@ const AdminWallet = () => {
                                                     <td className="py-3 px-4">{tx.bookedId}</td>
                                                     <td className="py-3 px-4">{tx.createdAt}</td>
                                                     <td className="py-3 px-4">{tx.eventName}</td>
+                                                    <td className="py-3 px-4">{tx.companyName}</td>
                                                     <td className="py-3 px-4 font-semibold text-green-600">₹{tx.totalAmount.toFixed(2)}</td>
                                                     <td className="py-3 px-4 font-semibold text-blue-600">₹{tx.managerAmount.toFixed(2)}</td>
                                                     <td
@@ -165,6 +167,10 @@ const AdminWallet = () => {
                                 </button>
                             </div>
                         </div>
+                    ):(
+                        <div className="flex justify-center items-center min-h-[60vh]">
+                        <p className="text-lg text-gray-500">No Money in the Wallet.</p>
+                    </div>  
                     )}
                 </div>
             </div>

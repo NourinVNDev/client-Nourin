@@ -8,6 +8,8 @@ import Header from "../../components/userComponents/Headers";
 import Footer from "../../components/userComponents/Footer";
 import ProfileNavbar from "../../components/userComponents/ProfileNavbar";
 import { getExistingReviewAndRating } from '../../service/userServices/userProfile';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../App/store';
 // Define an interface for the event object
 interface EventDetails {
   eventName: string;
@@ -30,27 +32,31 @@ const EventHistory = () => {
   });
 
   const [eventDetails, setEventDetails] = useState<EventDetails[]>([]);
-
+  const userId=useSelector((state:RootState)=>state.user._id);
   useEffect(() => {
     const fetchEventHistory = async () => {
       try {
-        const result = await eventHistoryDetails();
-        if (result.success && result.data.length > 0) {
-          console.log("Black",result.data);
-          const events = result.data.map((event: any) => ({
-            eventName: event.eventId.eventName || "",
-            companyName: event.eventId.companyName || "",
-            title: event.eventId.title || "",
-            noOfPerson: event.NoOfPerson || 0,
-            noOfDays: event.eventId.noOfDays || 0,
-            endDate: format(new Date(event.eventId.endDate), 'dd-MM-yyyy'),
-            amount: event.totalAmount || 0,
-            userId: event.userId || "",
-            eventId: event.eventId._id || "",
-            image: event.eventId.images[0] || ""
-          }));
-          setEventDetails(events);
+        if(userId){
+          const result = await eventHistoryDetails(userId);
+          if (result.success && result.data.length > 0) {
+            console.log("Black",result.data);
+            const events = result.data.map((event: any) => ({
+              eventName: event.eventId.eventName || "",
+              companyName: event.eventId.companyName || "",
+              title: event.eventId.title || "",
+              noOfPerson: event.NoOfPerson || 0,
+              noOfDays: event.eventId.noOfDays || 0,
+              endDate: format(new Date(event.eventId.endDate), 'dd-MM-yyyy'),
+              amount: event.totalAmount || 0,
+              userId: event.userId || "",
+              eventId: event.eventId._id || "",
+              image: event.eventId.images[0] || ""
+            }));
+            setEventDetails(events);
+          }
+
         }
+     
       } catch (error) {
         console.error("Error fetching event history:", error);
       }

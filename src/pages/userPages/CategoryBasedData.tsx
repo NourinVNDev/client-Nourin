@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaBuilding, FaMapMarkerAlt } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../../components/userComponents/Headers';
 import { getEventDataDetails, handleLikePost, handlePostDetails } from '../../service/userServices/userPost';
@@ -35,7 +35,7 @@ const CategoryBasedData = () => {
 
   const handleSearchChange = (coords: [number, number], placeName: string) => {
     setSearchQuery(placeName);
-    setCoordinates(coords); 
+    setCoordinates(coords);
     console.log("Query:", placeName);
     console.log("Coordinates:", coords);
 
@@ -95,13 +95,14 @@ const CategoryBasedData = () => {
 
 
 
-  useEffect(() => {
 
-    console.log("Filtered Data:", filteredData);
 
-  }, [filteredData]);
   const handleButtonClick = async (postId: string) => {
+    console.log("Same");
+
     try {
+      console.log("Yes");
+
       const result = await handlePostDetails(postId);
       if (result?.message === 'Retrive Post Data successfully') {
 
@@ -298,7 +299,7 @@ const CategoryBasedData = () => {
 
       {/* Search & Filters Section */}
       <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full min-h-screen pt-10 pb-10 flex justify-center">
-        <div className="w-full max-w-4xl flex flex-col items-center">
+        <div className="w-full max-w-7xl flex flex-col items-center">
           <div className="relative flex items-center bg-white rounded-full shadow-lg w-full max-w-lg mt-6">
 
             <SearchBar onSelectLocation={(coordinates, placeName) => handleSearchChange(coordinates, placeName)}
@@ -309,7 +310,7 @@ const CategoryBasedData = () => {
 
           <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
 
-       
+
 
 
             {/* Sort Dropdown */}
@@ -324,69 +325,96 @@ const CategoryBasedData = () => {
           </div>
 
           <br /><br />
-          <div className="max-w-screen-2xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-10 w-full">
 
-              {filteredData && filteredData.length > 0 ? (
-                filteredData.map((post: any, index: number) => (
-                  <div
-                    key={post._id || index}
-                    className="bg-white w-full rounded-lg shadow-md border border-gray-200 flex flex-col overflow-hidden transition-transform duration-300 hover:shadow-lg hover:scale-105"
-                  >
-                    {/* Image */}
-                    <div className="relative">
-                      {post.typesOfTickets &&
-                        post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
-                          <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-md">
-                            {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
-                          </div>
-                        )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
+            {filteredData && filteredData.length > 0 ? (
+              filteredData.map((post: any, index: number) => (
+                <div
+                  key={post._id || index}
+                  className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 w-full max-w-[400px] mx-auto"
+                >
+                  
+                  <div className="relative group bg-white rounded-lg shadow-md">
+  {/* Discount Badge */}
+  {post.typesOfTickets && post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+    <div className="absolute top-4 right-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+      {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
+    </div>
+  )}
+
+  <div className="relative overflow-hidden rounded-lg">
+    <img
+      src={post.images || "fallback.jpg"}
+      className="w-full h-72 object-cover cursor-pointer"
+      alt={post.title}
+      onClick={() => handleButtonClick(post._id)}
+    />
+    <div className="absolute inset-0 bg-purple-300 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"></div>
+  </div>
+</div>
 
 
-                      <img
-                        src={post.images}
-                        className="w-full h-56 object-cover"
-                        alt={post.title}
-                        onClick={async () => await handleButtonClick(post._id)}
-                      />
-                    </div>
 
-                    {/* Content */}
-                    <div className="flex-1 p-6 text-center">
-                      <h2 className="text-xl font-bold text-gray-800">{post.title}</h2>
+                  {/* Event Details */}
+                  <div className="p-6 space-y-4">
+                    <h2 className="text-2xl font-bold text-gray-800 truncate">{post.eventName}</h2>
 
-                    </div>
-
-                    {/* Footer */}
-                    <div className="p-4 text-center border-t">
-                      <span className="block text-gray-700 font-medium">{post.companyName}</span>
-                      <span className="block text-gray-500 text-sm">{post.address || "Unknown"}</span>
-                    </div>
-
-                    {/* Like Button */}
-                    <button
-                      onClick={() => handleLike(index, post._id)}
-                      className={`flex justify-center items-center space-x-2 p-3 rounded-lg w-full transition-all duration-300 ${interactions[index]?.liked
-                        ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        } shadow-md hover:shadow-lg`}
-                    >
-                      {interactions[index]?.liked ? (
-                        <>
-                          <FaHeart className="text-2xl animate-pulse" />
-                          <span className="font-bold">Interested</span>
-                        </>
-                      ) : (
-                        <FaRegHeart className="text-2xl" />
+                    {/* Price Display */}
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xl font-bold text-green-600">₹{post.typesOfTickets[0].Amount}</span>
+                        <span className="text-sm text-gray-500">per ticket</span>
+                      </div>
+                      {post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+                        <span className="text-sm text-emerald-600 font-medium">
+                          Save {post.typesOfTickets[0].offerDetails.offerPercentage}%
+                        </span>
                       )}
-                    </button>
+                    </div>
+
+                    <div className="flex items-center space-x-3 text-gray-600">
+                      <FaBuilding className="text-blue-500 flex-shrink-0" />
+                      <span className="text-sm truncate">{post.companyName}</span>
+                    </div>
+
+                    <div className="flex items-center space-x-3 text-gray-600">
+                      <FaMapMarkerAlt className="text-red-500 flex-shrink-0" />
+                      <span className="text-sm truncate">{post.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '') || "Unknown Location"}</span>
+                    </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-600 col-span-full">No events found.</div>
-              )}
-            </div>
+                  <button
+                    onClick={() => handleLike(index, post._id)}
+                    className={`w-full py-4 flex items-center justify-center space-x-3 font-bold transition-all duration-300 rounded-lg shadow-md 
+    ${interactions[index]?.liked
+                        ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-105 shadow-lg"
+                        : "bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200 hover:shadow-md"
+                      }`}
+                  >
+                    {interactions[index]?.liked ? (
+                      <>
+                        <FaHeart className="text-2xl animate-bounce" />
+                        <span>Interested</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaRegHeart className="text-2xl" />
+                        <span>Mark Interest</span>
+                      </>
+                    )}
+                  </button>
+
+
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-600 col-span-full py-12">
+                <div className="text-7xl mb-4 opacity-30">🎫</div>
+                <h3 className="text-2xl font-semibold mb-2">No Events Found</h3>
+                <p className="text-gray-500">Try adjusting your search or filters</p>
+              </div>
+            )}
           </div>
+
 
 
 

@@ -2,8 +2,8 @@ import VERIFIER_API from "../../utils/verifierAxiosInstance";
 import { VerifierData } from "../../validations/verifierValid/verifierTypeValid";
 const checkManagerHaveEvent=async (email:string)=>{
     try {
-        console.log("Manager Email",email)
-        const response = await VERIFIER_API(`/checkManagerHaveEvent/${email}`, {
+        console.log("Verifier Email",email)
+        const response = await VERIFIER_API(`/checkVerifierHaveAccount/${email}`, {
             method: "GET",
         });
 
@@ -35,10 +35,10 @@ const sendResendOtp=async(email:string)=>{
 
 
 }
-const  verifyOtp=async(otp:string)=>{
+const  verifyOtp=async(otp:string,email:string)=>{
     try {
         console.log('Entered OTP:',otp);
-        const response = await VERIFIER_API(`/verifyOtp/${otp}`, {
+        const response = await VERIFIER_API(`/verifyOtp/${otp}/${email}`, {
             method: "GET",
         });
 
@@ -62,7 +62,7 @@ const handleVerifierData = async (
 
         const formData = {
             ...formInput,
-            companyName: companyName || "", // Ensure it's a string or empty if null
+            companyName: companyName || "",
         };
 
         console.log("FormData", formData);
@@ -81,10 +81,10 @@ const handleVerifierData = async (
     }
 };
 
-const fetchAllCompanyEvents=async(companyName:string)=>{
+const fetchAllCompanyEvents=async(email:string)=>{
     try {
-        console.log('Your CompanyName',companyName);
-        const response = await VERIFIER_API(`/fetchEvents/${companyName}`, {
+        console.log('Your Email',email);
+        const response = await VERIFIER_API(`/fetchEvents/${email}`, {
             method: "GET",
         });
 
@@ -116,7 +116,7 @@ const fetchAllBooking=async(eventId:string)=>{
 const markUserEntry=async(bookingId:string)=>{
     try {
         console.log('BookingID',bookingId);
-        const response = await VERIFIER_API(`/markUserEntry/${bookingId}`, {
+        const response = await VERIFIER_API(`markUserEntry/${bookingId}`, {
             method: "GET",
         });
 

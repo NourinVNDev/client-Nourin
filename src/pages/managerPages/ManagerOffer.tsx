@@ -4,6 +4,8 @@ import Header from "../../components/managerComponents/Header";
 import NavBar from "../../components/managerComponents/NavBar";
 import Footer from "../../components/managerComponents/Footer";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../App/store";
 
 type Offer = {
   discount_on: string;
@@ -25,6 +27,7 @@ const ManagerOffers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const offersPerPage = 5;
   const navigate = useNavigate();
+  const managerId=useSelector((state:RootState)=>state.manager._id);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredOffers.length / offersPerPage);
@@ -41,14 +44,18 @@ const ManagerOffers = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const response = await getAllOffers();
-        if (response.data && Array.isArray(response.data)) {
-          console.log("Main Data", response.data);
-          setOffers(response.data);
-          setFilteredOffers(response.data);
-        } else {
-          setError("Unexpected response format.");
+        if(managerId){
+          const response = await getAllOffers(managerId);
+          if (response.data && Array.isArray(response.data)) {
+            console.log("Main Data", response.data);
+            setOffers(response.data);
+            setFilteredOffers(response.data);
+          } else {
+            setError("Unexpected response format.");
+          }
+
         }
+  
       } catch (err) {
         console.error("Failed to fetch offers:", err);
         setError("Failed to load offers. Please try again later.");
@@ -60,7 +67,7 @@ const ManagerOffers = () => {
     fetchOffers();
   }, []);
 
-  // Filtering logic
+  
   useEffect(() => {
     let results = offers;
 
@@ -107,7 +114,7 @@ const ManagerOffers = () => {
           <br />
           <br />
           <div className="max-w-md mx-auto">
-            {/* Search Input */}
+            
             <div className="relative flex items-center w-full h-12 bg-white rounded-lg focus-within:shadow-lg overflow-hidden">
               <div className="grid place-items-center h-full w-12 text-gray-300">
                 <svg
@@ -134,7 +141,7 @@ const ManagerOffers = () => {
               />
             </div>
 
-            {/* Discount Dropdown */}
+         
             <select
               name="discount_on"
               id="discount_on"
@@ -152,7 +159,7 @@ const ManagerOffers = () => {
             </select>
           </div>
 
-          {/* Offer Module Heading */}
+         
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-semibold">Offer Module</h2>
             <Link to="/Manager/addOffer">

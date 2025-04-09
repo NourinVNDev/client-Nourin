@@ -16,7 +16,6 @@ const CheckLoginManager: React.FC<PrivateRouteProps> = ({ children }) => {
         return <Navigate to='/Manager/dashboard' />;
     }
 
-    // Return children if not logged in
     return <>{children}</>;
 };
 

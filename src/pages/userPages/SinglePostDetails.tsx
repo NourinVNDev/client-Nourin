@@ -6,7 +6,7 @@ import Footer from "../../components/userComponents/Footer";
 import Calendar, { CalendarProps } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { Link } from "react-router-dom";
-import { H1Icon } from "@heroicons/react/24/solid";
+
 
 // import { CheckOfferAvailable } from "../../service/userServices/userOffer";
 // import { OfferData } from "../../validations/userValid/TypeValid";
@@ -33,14 +33,14 @@ const SinglePostDetails = () => {
   console.log('Amount:', generalTicketAmount);
   const [selectedTicket, setSelectedTicket] = useState<selectTicket>();
 
-  const seatOrder = ["GENERAL", "VIP", "PREMIUM"];
+  // const seatOrder = ["GENERAL", "VIP", "PREMIUM"];
 
   const tickets = (parsedData?.data?.result?.savedEvent?.typesOfTickets || [])
     .map((ticket: any) => ({
       ...ticket,
-      type: ticket.type.toUpperCase(), // Convert to uppercase
+      type: ticket.type.toUpperCase(),
     }))
-    .sort((a: any, b: any) => seatOrder.indexOf(a.type) - seatOrder.indexOf(b.type));
+  //   .sort((a: any, b: any) => seatOrder.indexOf(a.type) - seatOrder.indexOf(b.type));
 
 
 
@@ -61,44 +61,36 @@ const SinglePostDetails = () => {
     const [start, end] = dateRange;
     return date >= start && date <= end;
   };
-  // type CalendarOnChange = (value: Date | [Date, Date] | null) => void;
+
 
   const handleDateChange: CalendarProps['onChange'] = (value) => {
     if (Array.isArray(value)) {
-      setDateRange(value as [Date, Date]); // Ensure both dates are valid
+      setDateRange(value as [Date, Date]);
     } else if (value instanceof Date) {
-      setDateRange([value, value]); // Single date selection
+      setDateRange([value, value]);
     } else {
-      setDateRange([new Date(), new Date()]); // Reset to default
+      setDateRange([new Date(), new Date()]);
     }
   };
-  const generalTicket = parsedData?.data?.result?.savedEvent?.typesOfTickets?.find(
-    (ticket: any) => ticket.type === "general"
-  );
+  const generalTicket = parsedData?.data?.result?.savedEvent?.typesOfTickets[0]
 
   const amount = generalTicket?.Amount || "Not Available";
   const offerAmount = generalTicket?.offerDetails?.offerAmount || "Not Available";
 
 
   return (
-    <div className="w-screen min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 relative">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 relative overflow-x-hidden">
       <Header />
-
-      {/* Hero Image */}
       <img
         src={SocialEvents1}
         alt="Social Events"
         className="w-full h-[400px] object-cover"
       />
 
-      <div className="min-h-screen flex-grow bg-gray-100 flex justify-center">
-        {/* Main Wrapper */}
+      <div className="min-h-screen flex-grow bg-gray-100 flex justify-center px-4">
         <div className="w-full max-w-5xl">
-          <div className="-mt-16 relative bg-white rounded-t-lg shadow-lg p-6 flex">
-            {/* Main Content */}
-            <div className="w-3/4 pr-6">
-              {/* Tabs */}
+          <div className="-mt-16 relative bg-white rounded-t-lg shadow-lg p-6 flex flex-col md:flex-row">
+            <div className="w-full md:w-3/4 md:pr-6">
               <div className="flex justify-around border-b border-gray-300 pb-2 mb-4">
                 <button
                   className={`text-lg font-semibold px-4 py-2 rounded ${activeTab === "information"
@@ -129,69 +121,44 @@ const SinglePostDetails = () => {
                 </button>
               </div>
 
-              {/* Tab Content */}
+
               <div className="mt-4">
                 {activeTab === "information" && (
-                  <div className="p-6 bg-gray-100 rounded-lg shadow-md">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        {/* Event Name */}
-                        <span className="text-lg font-bold text-gray-800">
-                          {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
-                        </span>
-
-
-
-                        return (
-                        <span className="text-lg text-violet-700 font-semibold">
-                          {generalTicket?.offerDetails?.offerAmount ? (
-                            <>
-                              <span>
-                                General Ticket Price: <br /> ₹{amount}
-                              </span>
-                              <span> → ₹{offerAmount}</span>
-                            </>
-                          ) : (
-                            <span>₹{amount !== "Not Available" ? amount : "0"}</span>
-                          )}
-                        </span>
-                        );
-
-
-                        {/* Company Name */}
-                        <span className="text-lg text-green-600 font-semibold">
-                          {parsedData?.data?.result?.savedEvent?.companyName || "Company Name"}
-                        </span>
+                  <div className="p-6 bg-white rounded-lg shadow-lg border border-gray-200">
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-center border-b pb-4">
+                        <div className="flex flex-col">
+                          <span className="text-2xl font-bold text-gray-800">
+                            {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
+                          </span>
+                          <span className="text-lg text-green-600 font-semibold">
+                            {parsedData?.data?.result?.savedEvent?.companyName || "Company Name"}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Event Description */}
                       <div>
-                        <p className="text-gray-700">
+                        <p className="text-gray-700 text-base">
                           {parsedData?.data?.result?.savedEvent?.content ||
                             "Details about the event description go here."}
                         </p>
                       </div>
 
-                      <br />
+                      <div className="space-y-4">
 
-                      {/* Destination */}
-                      <div>
-                        <div className="flex justify-between items-center">
-                          <h2 className="text-violet-700">Destination:</h2>
-                          <p className="text-gray-700">
-                            {parsedData?.data?.result?.savedEvent?.location?.address &&
-                              parsedData?.data?.result?.savedEvent?.location?.city
-                              ? `${parsedData.data.result.savedEvent.location.address}, ${parsedData.data.result.savedEvent.location.city}`
+                        <div className="flex  items-center">
+                          <h2 className="text-violet-700 font-semibold">Destination:</h2>
+                          <p className="text-yellow-700 pl-2 ">
+                            {parsedData?.data?.result?.savedEvent?.address
+                              ? `${parsedData.data.result.savedEvent.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '')}`
                               : "Address"}
                           </p>
                         </div>
 
-                        <br />
-
                         {/* Start Date */}
-                        <div className="flex justify-between items-center">
-                          <h2 className="text-violet-700">Start Date:</h2>
-                          <p className="text-gray-700">
+                        <div className="flex items-center">
+                          <h2 className="text-violet-700 font-semibold">Start Date:</h2>
+                          <p className="text-yellow-700 p;-2">
                             {parsedData?.data?.result?.savedEvent?.startDate
                               ? new Date(parsedData.data?.result?.savedEvent?.startDate).toLocaleDateString(
                                 "en-US",
@@ -205,12 +172,10 @@ const SinglePostDetails = () => {
                           </p>
                         </div>
 
-                        <br />
-
                         {/* End Date */}
-                        <div className="flex justify-between items-center">
-                          <h2 className="text-violet-700">End Date:</h2>
-                          <p className="text-gray-700">
+                        <div className="flex  items-center">
+                          <h2 className="text-violet-700 font-semibold">End Date:</h2>
+                          <p className="text-yellow-700 pl-2">
                             {parsedData?.data?.result?.savedEvent?.endDate
                               ? new Date(parsedData.data?.result?.savedEvent?.endDate).toLocaleDateString(
                                 "en-US",
@@ -239,19 +204,20 @@ const SinglePostDetails = () => {
                             key={ticket.type.toUpperCase()}
                             onClick={() => setSelectedTicket(ticket)}
                             disabled={ticket.noOfSeats <= 0}
-                            className={`p-4 border rounded-lg transition-all duration-300 ${selectedTicket?.type === ticket.type
-                              ? "bg-violet-700 text-white shadow-lg"
-                              : ticket.noOfSeats <= 0
-                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                : "bg-white text-gray-800 hover:bg-violet-100"
+                            className={`w-full min-w-[150px] p-4 border rounded-lg transition-all duration-300 
+      ${selectedTicket?.type === ticket.type
+                                ? "bg-violet-700 text-white shadow-lg"
+                                : ticket.noOfSeats <= 0
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-white text-gray-800 hover:bg-violet-100"
                               }`}
                           >
                             <span className="text-lg font-semibold">{ticket.type}</span>
                             <div className="text-md font-medium">₹{ticket.Amount}</div>
                             {ticket.noOfSeats <= 0 && <div className="text-red-500 text-sm">Seat Unavailable</div>}
                           </button>
-
                         ))}
+
                       </div>
                     ) : (
                       <p className="text-gray-600">No Type of seat available.</p>
@@ -369,16 +335,13 @@ const SinglePostDetails = () => {
 
               </div>
             </div>
-
-            {/* Calendar Section */}
-
-            <div className="w-2/4 rounded-lg shadow-md p-4 mx-auto">
-              <div className=" bg-gray-200">
+            <div className="w-full md:w-2/4 rounded-lg shadow-md p-4 mt-4 md:mt-0">
+              <div className="bg-gray-200">
                 <br />
                 <h1 className="text-xl font-bold mb-2 text-black text-center">
                   Book This Event
                 </h1>
-                <p className="text-gray-600 text-center mb-2 text-sm leading-relaxed">
+                <p className="text-gray-600 text-center mb-2 text-sm leading-relaxed px-4">
                   Duis aute irure dolor in reprehenderit in voluptate velit esse
                   cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat.
                 </p>
@@ -386,15 +349,15 @@ const SinglePostDetails = () => {
                 <div className="flex justify-center items-center">
                   <input
                     type="date"
-                    value={dateRange[0]?.toISOString().split("T")[0] || ""}
-                    onChange={(e) => handleDateChange}
+                    value={dateRange[0] ? dateRange[0].toLocaleDateString('en-CA') : ""
+                    }
+                    onChange={() => handleDateChange}
                     className="px-4 py-2 border rounded-lg text-gray-700 bg-white w-3/5 focus:outline-none focus:ring-2 focus:ring-purple-700 text-center"
                   />
                 </div>
-
-
                 <br /><br />
               </div>
+
               <div className="p-6 bg-white rounded-lg shadow-md">
                 <Calendar
                   onChange={handleDateChange}
@@ -402,15 +365,20 @@ const SinglePostDetails = () => {
                   selectRange={true}
                   className="w-full border border-gray-300 rounded-lg"
                   tileClassName={({ date }) =>
-                    isHighlightedDate(date) ? "relative bg-purple-200 rounded-lg" : undefined
+                    isHighlightedDate(date) ? "relative" : undefined
                   }
-                  tileContent={({ date }) =>
-                    isHighlightedDate(date) ? (
-                      <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>
-                    ) : null
-                  }
+                  tileContent={({ date }) => {
+                   
+                    if (isHighlightedDate(date)) {
+                      return (
+                        <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>
+                      );
+                    }
+                    // For non-highlighted dates, just return the date number
+                    // return <span className="text-black">{date.getDate()}</span>;
+                  }}
                   navigationLabel={({ date }) => (
-                    <div className="flex justify-between items-center p-4 bg-gray-100 rounded-t-lg">
+                    <div className="flex justify-between items-center p-4 bg-gray-100 rounded-t-lg shadow-md">
                       <span className="text-lg font-bold text-gray-700">
                         {date.toLocaleString("default", { month: "long", year: "numeric" })}
                       </span>
@@ -426,18 +394,26 @@ const SinglePostDetails = () => {
                       &rarr;
                     </span>
                   }
-                // Add additional props for better styling if needed
                 />
               </div>
+
               <br />
               <div className="bg-gray-200 p-6 rounded-lg shadow-md items-center flex justify-center">
-                <Link to={`/checkEventDetails/${parsedData.data?.result.savedEvent._id}/${selectedTicket?.type.toLowerCase()}`}>
-
-                  <button className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 transition items-center">
-                    Book The Slots
-                  </button></Link>
+                {selectedTicket ? (
+                  <Link to={`/checkEventDetails/${parsedData.data?.result.savedEvent._id}/${selectedTicket.type.toLowerCase()}`}>
+                    <button className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 transition items-center">
+                      Book The Slots
+                    </button>
+                  </Link>
+                ) : (
+                  <button
+                    disabled
+                    className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                  >
+                    Select a Ticket First
+                  </button>
+                )}
               </div>
-
             </div>
           </div>
         </div>

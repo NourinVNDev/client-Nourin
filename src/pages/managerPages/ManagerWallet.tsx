@@ -11,13 +11,15 @@ const ManagerWallet = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [managerWalletData, setManagerWalletData] = useState({
-        balance: 0, // Default balance
+        balance: 0,
+  
         transactionHistory: [] as Array<{
             id: string;
             amount: number;
             eventName: string;
             status: string;
             type: string;
+            noOfPerson:number;
         }>,
     });
 
@@ -33,14 +35,18 @@ const ManagerWallet = () => {
                     console.log("Result of Wallet:", result.data);
                     if (result.success) {
                         setManagerWalletData({
+                        
+                            
                             balance: result.data.balance,
+                         
                             transactionHistory: result.data.transactions.map(
-                                (tx: { bookedId: string; managerAmount: number; eventName: string; status: string; type: string }) => ({
+                                (tx: { bookedId: string; managerAmount: number; eventName: string; status: string; type: string ,noOfPerson:number}) => ({
                                     id: tx.bookedId,
                                     amount: tx.managerAmount,
                                     eventName: tx.eventName,
                                     status: tx.status,
                                     type: tx.type,
+                                    noOfPerson:tx.noOfPerson
                                 })
                             ),
                         });
@@ -76,6 +82,10 @@ const ManagerWallet = () => {
         }
     };
 
+
+    console.log("Manager Wallet",managerWalletData);
+    
+
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
             <Header />
@@ -83,18 +93,16 @@ const ManagerWallet = () => {
                 <NavBar />
                 <div className="flex-1 p-6">
                     <h2 className="text-3xl font-bold mb-6 text-center text-black">Manager Wallet</h2>
-
+    
                     {loading ? (
                         <p className="text-center text-lg text-gray-700">Loading wallet details...</p>
-                    ) : error ? (
-                        <p className="text-center text-red-600 font-semibold">{error}</p>
-                    ) : (
+                    ) : managerWalletData?(
                         <div className="bg-white shadow-md rounded-lg p-6">
                             <div className="flex justify-between mb-6">
                                 <h3 className="text-xl font-semibold text-gray-800">Wallet Balance</h3>
-                                <span className="text-xl font-bold text-green-600">₹{managerWalletData.balance.toFixed()}</span>
+                                <span className="text-xl font-bold text-green-600">₹{managerWalletData.balance.toFixed(2)}</span>
                             </div>
-
+    
                             <h3 className="text-lg font-semibold text-gray-800 mb-4">Transaction History</h3>
                             {managerWalletData.transactionHistory.length > 0 ? (
                                 <div className="overflow-x-auto">
@@ -102,6 +110,7 @@ const ManagerWallet = () => {
                                         <thead className="bg-gray-200 text-gray-700">
                                             <tr>
                                                 <th className="py-2 px-4 border-b">Event Name</th>
+                                                <th className="py-2 px-4 border-b">NoOfPerson</th>
                                                 <th className="py-2 px-4 border-b">Amount (₹)</th>
                                                 <th className="py-2 px-4 border-b">Type</th>
                                                 <th className="py-2 px-4 border-b">Status</th>
@@ -111,6 +120,7 @@ const ManagerWallet = () => {
                                             {currentTransactions.map((tx) => (
                                                 <tr key={tx.id} className="text-gray-700 text-center border-b">
                                                     <td className="py-2 px-4">{tx.eventName}</td>
+                                                    <td className="py-2 px-4">{tx.noOfPerson} person</td>
                                                     <td className="py-2 px-4 font-semibold">₹{tx.amount.toFixed(2)}</td>
                                                     <td className={`py-2 px-4 ${tx.type === "credit" ? "text-green-500" : "text-red-500"}`}>
                                                         {tx.type}
@@ -122,7 +132,7 @@ const ManagerWallet = () => {
                                             ))}
                                         </tbody>
                                     </table>
-
+    
                                     {/* Pagination Controls */}
                                     <div className="flex justify-center mt-4">
                                         <button
@@ -145,9 +155,15 @@ const ManagerWallet = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <p className="text-gray-600 text-center mt-4">No transactions available.</p>
+                                <div className="flex justify-center items-center min-h-[60vh]">
+                                    <p className="text-lg text-gray-500">No transactions found.</p>
+                                </div>
                             )}
                         </div>
+                    ):(
+                        <div className="flex justify-center items-center min-h-[60vh]">
+                        <p className="text-lg text-gray-500">No Money in the Wallet.</p>
+                    </div> 
                     )}
                 </div>
             </div>

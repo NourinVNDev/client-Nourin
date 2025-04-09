@@ -19,12 +19,17 @@ import ManagerEvents2 from "../pages/managerPages/ManagerEvents2";
 import ListVerifier from '../pages/managerPages/ListVerifier';
 import ManagerWallet from '../pages/managerPages/ManagerWallet';
 import CheckLoginManager from '../components/managerComponents/CheckLoginManager';
+import AddNewVerifier from '../pages/managerPages/AddNewVerifier';
+import Manager2Page from '../pages/managerPages/Manager2page';
+import ManagerEditVerifier from '../pages/managerPages/ManagerEditVerifier';
+import ManagerResetPassword from '../pages/managerPages/ManagerResetPassword';
 
 const managerRoutes = [
     { path: '/mLogin', element: <CheckLoginManager><MLogin /></CheckLoginManager> },
     { path: '/mRegister', element: <ManagerRegister /> },
     { path: '/Manager/dashboard', element: <ManagerPrivateRoute><DashBoard /></ManagerPrivateRoute> },
     { path: '/forgot-passwordM', element: <ForgotPasswordM /> },
+    {path:'/manager/Reset-password/:email',element:<ManagerResetPassword/>},
     { path: '/managerOtpPage/:email', element: <ManagerOtpPage /> },
     { path: '/Manager/profile/:companyName', element: <ManagerPrivateRoute><ManagerProfile /></ManagerPrivateRoute> },
     { path: '/Manager/events', element: <ManagerPrivateRoute><ManagerAllEvents /></ManagerPrivateRoute> },
@@ -39,6 +44,9 @@ const managerRoutes = [
     {path:'/manager/verifier',element:<ManagerPrivateRoute><ListVerifier/></ManagerPrivateRoute>},
     { path: '/manager/chat', element: <ManagerPrivateRoute><ManagerChat /></ManagerPrivateRoute> },
     {path:'/manager/wallet',element:<ManagerPrivateRoute><ManagerWallet/></ManagerPrivateRoute>},
+    {path:'/Manager/addNewVerifier',element:<ManagerPrivateRoute><AddNewVerifier/></ManagerPrivateRoute>},
+    {path:'/Manager/update2Page/:id',element:<ManagerPrivateRoute><Manager2Page/></ManagerPrivateRoute>},
+    {path:'/Manager/editVerifier/:verifierId',element:<ManagerPrivateRoute><ManagerEditVerifier/></ManagerPrivateRoute>},
     { path: '/managerLogout', element: <ManagerLogout /> },
 ];
 

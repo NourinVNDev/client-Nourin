@@ -1,7 +1,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { USER_URL } from "./userUrl";
-// Base Axios instance
+
 const API = axios.create({ baseURL: USER_URL, withCredentials: true });
 
 
@@ -15,7 +15,7 @@ const clearCookies = () => {
     document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 };
    
-// Request Interceptor
+
 API.interceptors.request.use(
     (config) => {
         const token = getToken();

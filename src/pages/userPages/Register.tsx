@@ -22,7 +22,7 @@ const Register: React.FC = () => {
     });
     const [otp, setOtp] = useState(['', '', '', '', '', '']); 
 
-    const [timer, setTimer] = useState(30); // Timer for 30 seconds
+    const [timer, setTimer] = useState(30); 
     const [resendVisible, setResendVisible] = useState(false);
    
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -32,7 +32,7 @@ const Register: React.FC = () => {
       useEffect(() => {
     let countdown: number | null = null;
     if (isOtp) {
-      setTimer(30);
+    
       setResendVisible(false);
       countdown = window.setInterval(() => {
         setTimer((prevTimer) => {
@@ -49,7 +49,7 @@ const Register: React.FC = () => {
     return () => {
       if (countdown) clearInterval(countdown);
     };
-  }, [isOtp]);
+  }, [isOtp,timer]);
 
 
   const TimerCount=async()=>{
@@ -74,13 +74,18 @@ const Register: React.FC = () => {
     };
 
   }
+
     
     const handleResendOtp = async () => {
         try {
-            TimerCount();
+
+          
             setOtp(['', '', '', '', '', '']);
+            setOTPError('');
+            setTimer(30);
 
             await handleResentOtp(formData.email);
+
           
         } catch (error) {
             console.error("Failed to resend OTP:", error);
@@ -109,7 +114,7 @@ const Register: React.FC = () => {
         if (success) {
             console.log('Form Submitted Successfully');
             try {
-                // Registration logic
+              
                 const result=await register(formData); // Await the register function
 
                 console.log("Result Details:",result);
@@ -136,14 +141,14 @@ const Register: React.FC = () => {
     const handleChangeOne = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const value = e.target.value;
 
-        // Allow only one digit
+     
         if (/^[0-9]*$/.test(value) && value.length <= 1) {
             const newOtp = [...otp];
             newOtp[index] = value;
             setIsOtp(true);
             setOtp(newOtp);
 
-            // Automatically focus on the next input if a digit is entered
+            
             if (value) {
                 const nextInput = document.getElementById(`otp-input-${index + 1}`);
                 if (nextInput) {
@@ -156,14 +161,15 @@ const Register: React.FC = () => {
 
       try {
         
-        const otpValue = otp.join(''); // Combine the OTP values into a single string
+        const otpValue = otp.join(''); 
         console.log("Verifying OTP:", otpValue);
-        // You can add your verification logic here
+
         const result=await verifyOtp(otpValue,formData);
         if(result.success){
           navigate('/login');
         }
         console.log("Result of  verifyOtp",result);
+
       } catch (error) {
         if(error instanceof axios.AxiosError){
           console.log(error.response?.data.message,"OTP ERROR")
@@ -200,7 +206,7 @@ const Register: React.FC = () => {
                             value={formData.firstName}
                             onChange={handleData}
                           />
-                          {errors.firstName && <p className="text-red-500">{errors.firstName}</p>} {/* Error message for firstName */}
+                          {errors.firstName && <p className="text-red-500">{errors.firstName}</p>} 
                         </div>
 
                         <div className="mb-4">
@@ -300,51 +306,56 @@ const Register: React.FC = () => {
                     </div>
                 </>
             ) : (
-                <div className="bg-white w-screen min-h-screen flex">
-                    {/* OTP Confirmation Section */}
-                    <div className="bg-white-100 w-full flex justify-center items-center p-6">
-                        <div className="bg-white-800 text-white rounded-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-6 shadow-lg">
-                            <h2 className="text-2xl font-semibold mb-4 text-black">OTP Sent!</h2>
-                            <p className="mb-4 text-black">An OTP has been sent to your email. Please check your inbox.</p>
-                            <p className="text-red-500">{otpError}</p>
-                            <div className="flex justify-center space-x-2 mb-4">
-                                {/* OTP Input Boxes */}
-                                {otp.map((value, index) => (
-                                    <input
-                                        key={index}
-                                        id={`otp-input-${index}`} // Unique ID for each input
-                                        type="text"
-                                        maxLength={1}
-                                        className="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600"
-                                        value={value}
-                                        onChange={(e) => handleChangeOne(e, index)}
-                                    />
-                                ))}
-                            </div>
-
-                            <button
-                                onClick={handleVerify} // Call handleVerify on button click
-                                className="w-full text-black py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition duration-200"
-                            >
-                                Verify OTP
-                            </button>
-                            {timer > 0 ? (
-                        <p className="text-black text-center mt-4 ">
-                            Resend OTP in <span className="font-bold text-black">{timer}</span> seconds
-                        </p>
-                    ) : (
-                        resendVisible && (
-                            <button
-                                onClick={handleResendOtp}
-                                className="w-full mt-4 py-2 text-black bg-gray-600 rounded-md hover:bg-gray-500 transition duration-200"
-                            >
-                                Resend OTP
-                            </button>
-                        )
-                    )}
-                        </div>
-                    </div>
-                </div>
+              <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-screen min-h-screen flex justify-center items-center p-6">
+              <div className="bg-white rounded-2xl shadow-2xl w-full sm:w-96 p-8">
+                  <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">OTP Verification</h2>
+                  <p className="text-center text-gray-600 mb-4">We've sent a 6-digit OTP to your email.</p>
+          
+                  {otpError && (
+                      <p className="text-center text-red-500 text-sm mb-2">{otpError}</p>
+                  )}
+          
+                  <div className="flex justify-center gap-2 mb-4">
+                      {otp.map((value, index) => (
+                          <input
+                              key={index}
+                              id={`otp-input-${index}`}
+                              type="text"
+                              maxLength={1}
+                              value={value}
+                              onChange={(e) => handleChangeOne(e, index)}
+                              className="w-12 h-12 text-center text-lg font-semibold text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                          />
+                      ))}
+                  </div>
+          
+             
+          
+                  {timer > 0 ? (
+                    <>
+                      <p className="text-center text-gray-600 mt-4">
+                          Resend OTP in <span className="font-semibold">{timer}</span> seconds
+                      </p>
+                           <button
+                           onClick={handleVerify}
+                           className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-500 transition duration-200"
+                       >
+                           Verify OTP
+                       </button>
+                       </>
+                  ) : (
+                      resendVisible && (
+                          <button
+                              onClick={handleResendOtp}
+                              className="w-full mt-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition duration-200"
+                          >
+                              Resend OTP
+                          </button>
+                      )
+                  )}
+              </div>
+          </div>
+          
             )}
         </div>
         </div>

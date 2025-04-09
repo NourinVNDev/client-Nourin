@@ -14,6 +14,8 @@ const PaymentCancel = () => {
     const updatePaymentStatus=async()=>{
       if(bookedId){
         const result=await updatePaymentStatusService(bookedId);
+        console.log("Result:",result);
+        
       }
   
 

@@ -3,8 +3,8 @@ import connectionImage from '../../../src/assets/new.avif';
 import '../TailwindSetup.css';
 import { managerLogin } from '../../service/managerServices/mRegister';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch } from '../../../App/store';
-import { useDispatch, UseDispatch } from 'react-redux';
+
+import { useDispatch  } from 'react-redux';
 import { setManagerDetails } from '../../../Features/managerSlice';
 const MLogin: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -29,22 +29,26 @@ const MLogin: React.FC = () => {
         e.preventDefault();
         console.log('Email:', formData.email);
         console.log('Password:', formData.password);
-        let result = await managerLogin(formData);
-        console.log("User Data checking",result.user);
         
-        if (result.message === 'Login successful.' && result.user.isBlock===false){
-            const managerData={
-                _id:result.user._id,
-                companyName:result.user.firmName,
-                email:result.user.email
-            }
+        let result = await managerLogin(formData);
+        console.log("User  Data checking", result.message);
+        
+        // Check if result is defined and has a user property
+        if (result && result.message === 'Login Success' && result.data && !result.data.isBlock) {
+            console.log("Yes");
+            
+            const managerData = {
+                _id: result.data._id,
+                companyName: result.data.firmName,
+                email: result.data.email
+            };
             dispatch(setManagerDetails(managerData));
-            localStorage.setItem('managerAuth','true');
-            localStorage.setItem('ManagerName',managerData.companyName);
+            localStorage.setItem('managerAuth', 'true');
+            localStorage.setItem('ManagerName', managerData.companyName);
             navigate('/Manager/dashboard', { replace: true });
-        }else if(result?.message ===  'Login Successful.' ||     result?.user.isBlock===true){
+        } else if (result && result.message === 'Login successful.' && result.user && result.user.isBlock) {
             setErrorMessage('Manager is Blocked by Admin');
-        }else {
+        } else {
             setErrorMessage('Username and Password do not match');
         }
     };

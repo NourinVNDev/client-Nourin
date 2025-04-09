@@ -55,18 +55,17 @@ const UserWallet: React.FC = () => {
         <div className="min-h-screen flex flex-col bg-gray-100">
             <Header />
             <div className="flex-1 flex">
-                <aside className="hidden md:block w-64 bg-gray-900 text-white min-h-[calc(100vh-4rem)] shadow-lg p-4">
+                <aside className="hidden md:block w-64 bg-gray-900 text-white min-h-[calc(100vh-4rem)] shadow-lg ">
                     <ProfileNavbar />
                 </aside>
                 <main className="flex-1 p-6 lg:p-8 bg-gray-50">
+                <div className="max-w-5xl mx-auto">
+                <h1 className="text-2xl font-bold mb-6 text-gray-800">My Wallet</h1>
                     {loading ? (
                         <div className="flex justify-center items-center min-h-[60vh]">
                             <p className="text-lg text-gray-500 animate-pulse">Loading wallet data...</p>
                         </div>
-                    ) : error ? (
-                        <div className="flex justify-center items-center min-h-[60vh]">
-                            <p className="text-lg text-red-500">{error}</p>
-                        </div>
+                   
                     ) : userWalletData ? (
                         <div className="max-w-3xl mx-auto">
                             <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
@@ -96,10 +95,11 @@ const UserWallet: React.FC = () => {
                         </div>
                     ) : (
                         <div className="flex justify-center items-center min-h-[60vh]">
-                            <p className="text-lg text-gray-500">No wallet data available.</p>
+                            <p className="text-lg text-gray-500">No Money in the Wallet.</p>
                         </div>
                     )}
-                </main>
+               
+               </div> </main>
             </div>
             <Footer />
         </div>

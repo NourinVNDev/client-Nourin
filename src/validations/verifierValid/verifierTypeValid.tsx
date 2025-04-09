@@ -1,5 +1,6 @@
 export type VerifierData = {
-    name: string;
+    verifierName: string;
     email: string;
-    password: string;
+   Events: string[];
+   _id?:string
 };

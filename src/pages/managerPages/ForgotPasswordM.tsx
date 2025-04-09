@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import newImage from '../../assets/new.avif';
 import { forgotPasswordForManager } from "../../service/managerServices/mRegister";
+import toast,{Toaster} from "react-hot-toast";
 const ForgotPasswordM=()=>{
     const [email, setEmail] = useState('');
     const navigate = useNavigate();
+    const [error,setError]=useState('');
 
     const handleData = (e: React.ChangeEvent<HTMLInputElement>) => {
      
@@ -19,19 +21,22 @@ const ForgotPasswordM=()=>{
     
       try {
         const result = await forgotPasswordForManager(email);
-        if (result === 'OTP Success') {
+        if (result === 'OTP sent successfully') {
           navigate(`/managerOtpPage/${email}`);
         } else {
-          alert('Email is not Correct!');
+            setError(result);
+          toast.error('Email is not Correct!');
         }
       } catch (error) {
         console.error('Error during Reset Password:', error);
-        alert('An error occurred during password resetting. Please try again later.');
+        toast.error('An error occurred during password resetting. Please try again later.');
       }
     };
     return (
         <div className="bg-white w-screen min-h-screen flex">
-            {/* Left Section: Form */}
+             <Toaster position="top-center" reverseOrder={false}   toastOptions={{
+    duration: 3000,
+  }} />
             <div className="bg-gray-100 w-full md:w-4/5 flex justify-center items-center p-6">
                 <div className="text-black rounded-xl w-full sm:w-4/5 lg:w-3/4 p-8 shadow-lg">
                     {/* Title */}
@@ -51,6 +56,9 @@ const ForgotPasswordM=()=>{
                                 required
                             />
                         </div>
+                        {error && (
+                            <p className=" text-red-500 text-sm mb-2">{error}</p>
+                        )}
                       
 
                         <button

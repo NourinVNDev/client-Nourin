@@ -17,7 +17,7 @@ const OtpPage:React.FC=()=>{
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30); // Timer for 30 seconds
     const [resendVisible, setResendVisible] = useState(false);
-
+  const [otpError,setOtpError]=useState<string>('');
     useEffect(() => {
         if (timer > 0) {
             const countdown = setInterval(() => {
@@ -60,20 +60,16 @@ const OtpPage:React.FC=()=>{
             const otpValue = otp.join(''); // Combine the OTP values into a single string
             console.log("Verifying OTP:", otpValue);
     
-            // Call OTP verification logic
+         
             const result = await verifyOtpForForgot(otpValue, email); // Assuming verifyOtpForForgot is async
             console.log("cheat",result);
-            if (!result) {
-                return <div>Error: Result return parameter is missing</div>;
-              }
-            
     
             if (result?.data == 'Otp is Not matched') {
-                toast.error('Otp is not Correct!');
+             setOtpError(result.data);
               
              
             } else {
-                navigate(`/reset-password/${result.email}`);
+                navigate(`/reset-password/${result?.email}`);
                
             }
         } catch (error) {
@@ -83,18 +79,16 @@ const OtpPage:React.FC=()=>{
     };
     
     return(
-        <div className="bg-white w-screen min-h-screen flex">
-        {/* OTP Confirmation Section */}
-        <Toaster position="top-center" reverseOrder={false}   toastOptions={{
-    duration: 3000, // Default duration for toasts
-  }} />
-        <div className="bg-gray-100 w-full flex justify-center items-center p-6">
-            <div className="bg-gray-800 text-white rounded-lg w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-6 shadow-lg">
-                <h2 className="text-2xl font-semibold mb-4">OTP Sent!</h2>
-                <p className="mb-4">An OTP has been sent to your email. Please check your inbox.</p>
-
-                <div className="flex justify-center space-x-2 mb-4">
-                    {/* OTP Input Boxes */}
+        <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-screen min-h-screen flex justify-center items-center p-6">
+            <div className="bg-white rounded-2xl shadow-2xl w-full sm:w-96 p-8">
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">OTP Verification</h2>
+            <p className="text-center text-gray-600 mb-4">We've sent a 6-digit OTP to your email.</p>
+       
+                {otpError && (
+                <p className="text-center text-red-500 text-sm mb-2">{otpError}</p>
+            )}
+                  <div className="flex justify-center gap-2 mb-4">
+         
                     {otp.map((value, index) => (
                         <input
                             key={index}
@@ -107,29 +101,31 @@ const OtpPage:React.FC=()=>{
                         />
                     ))}
                 </div>
-
-                <button
-                    onClick={handleVerify} // Call handleVerify on button click
-                    className="w-full py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition duration-200"
-                >
-                    Verify OTP
-                </button>
                 {timer > 0 ? (
+                    <>
                         <p className="text-gray-300 text-center mt-4">
-                            Resend OTP in <span className="font-bold">{timer}</span> seconds
+                            Resend OTP in <span className="font-semibold">{timer}</span> seconds
                         </p>
+                          <button
+                          onClick={handleVerify}
+                          className="w-full py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition duration-200"
+                      >
+                          Verify OTP
+                      </button>
+                      </>
                     ) : (
                         resendVisible && (
                             <button
                                 onClick={handleResendOtp}
-                                className="w-full mt-4 py-2 bg-gray-600 rounded-md hover:bg-gray-500 transition duration-200"
+                                className="w-full mt-4 py-2 bg-gray-600 rounded-md hover:bg-gray-600 transition duration-200"
                             >
                                 Resend OTP
                             </button>
                         )
                     )}
-            </div>
-        </div>
+            
+       
+    </div>
     </div>
     )
 

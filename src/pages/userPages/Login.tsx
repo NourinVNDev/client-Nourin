@@ -70,7 +70,7 @@ const Login: React.FC = () => {
                 }
 
 
-                navigate(`/home?categories=${encodeURIComponent(result.categoryNames)}`, { replace: true });
+                navigate(`/home`, { replace: true });
         
             
             } else if(result?.data ===  'Login Successful' && result?.user.isBlock===true){

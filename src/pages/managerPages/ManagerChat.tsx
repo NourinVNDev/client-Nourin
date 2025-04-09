@@ -116,15 +116,17 @@ const ManagerChat = () => {
       
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
+      <div className="max-h-screen flex flex-col">
             <Header />
           <div className="flex-1 flex">
-      
+          <aside className="bg-blue-100 p-4">
 
             <NavBar/>
+            </aside>
+
             
             <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-                <ManagerUserList managers={allUsers} onSelectManager={createChatSchema}  person='User'/>
+                <ManagerUserList managers={allUsers}  events={['']}onSelectManager={createChatSchema}  person='User'/>
                 <ChatWindow
                     selectedManager={selectedManager}
                     setSelectedManager={setSelectedManager}
@@ -132,6 +134,7 @@ const ManagerChat = () => {
                     setAllMessages={setAllMessages}
                     senderId={senderId}
                     managerId={userId}
+                    
                    
                 />  
             </div>

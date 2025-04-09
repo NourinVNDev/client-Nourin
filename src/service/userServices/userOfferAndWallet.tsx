@@ -11,10 +11,10 @@ const CheckOfferAvailable=async (category:string)=>{
 
         const data = response.data;
    console.log("Data form unique",data);
-        return data; // Return the OTP or any other relevant data
+        return data;
     } catch (error) {
         console.error("Error during registration:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined;
     }
 }
 const cancelEventBooking=async(bookingId:string,userId:string)=>{
@@ -28,10 +28,10 @@ const cancelEventBooking=async(bookingId:string,userId:string)=>{
 
         const data = response.data;
    console.log("Data from cancel event",data);
-        return data; // Return the OTP or any other relevant data
+        return data;
     } catch (error) {
         console.error("Error during cancelling event booking:", error);
-        return undefined; // Or throw an error if you want to handle it upstream
+        return undefined;
     }
 
 
