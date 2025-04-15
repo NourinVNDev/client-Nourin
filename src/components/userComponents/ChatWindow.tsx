@@ -56,11 +56,18 @@ const ChatWindow = ({
 
   // Send a new message
   const postNewMessage = async (message: string) => {
+    console.log("Why");
+
+
+    console.log("Checkdata:",managerId,message);
+    
+    
     if (!socket || !managerId || !message.trim()) return;
 
     const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const newMessage = { message, timestamp: currentTime, senderId };
-
+    console.log("what");
+    
     const socketMessage = { message, sender: senderId, receiver: managerId };
 
     socket.emit("post-new-message", socketMessage, (response: any) => {
@@ -72,7 +79,7 @@ const ChatWindow = ({
   };
 
   return (
-    <div className={`w-2/3 min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
+    <div className={`w-full min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
       {selectedEvent || selectedManager ? (
         <div className="flex flex-col h-full">
           {/* Chat Header */}

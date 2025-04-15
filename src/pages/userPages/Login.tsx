@@ -65,20 +65,20 @@ const Login: React.FC = () => {
                 if (userData && userData._id) {
                     console.log("UserId for  Profile",userData._id);
                     localStorage.setItem('userId', userData._id);
+                    navigate(`/home`, { replace: true });
                 } else {
                     console.log("Invalid user data: _id is missing");
                 }
 
 
-                navigate(`/home`, { replace: true });
+           
         
             
             } else if(result?.data ===  'Login Successful' && result?.user.isBlock===true){
                 setErrorMessage('User is Blocked by Admin')
             }else {
-            
                 setErrorMessage('Username and Password do not match');
-            
+                navigate('/login');
             
             }
         };    

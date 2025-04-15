@@ -8,12 +8,14 @@ import AdminLogout from "../pages/adminPages/AdminLogout";
 import AdminPrivateRoute from "../components/adminComponents/AdminPrivateRoute";
 import AdminEditCategory from "../pages/adminPages/AdminEditCategory";
 import AdminWallet from "../pages/adminPages/AdminWallet";
+import ManagerEventsDetails from "../pages/adminPages/ManagerEventsDetails";
 
 const adminRoutes = [
     { path: '/adminlogin', element: <Adminlogin /> },
     { path: '/admin/dashboard', element: <AdminPrivateRoute><Adminhome /></AdminPrivateRoute> },
     { path: '/admin/users', element: <AdminPrivateRoute><AdminUser /></AdminPrivateRoute> },
     { path: '/admin/managers', element: <AdminPrivateRoute><AdminManager /></AdminPrivateRoute> },
+    { path: '/manager/managerEvents/:managerId',element:<AdminPrivateRoute><ManagerEventsDetails/></AdminPrivateRoute>},
     { path: '/admin/category', element: <AdminPrivateRoute><AdminCategory /></AdminPrivateRoute> },
     {path:  '/admin/wallet',element:<AdminPrivateRoute><AdminWallet/></AdminPrivateRoute>},
     { path: '/admin/editCategory/:id', element: <AdminPrivateRoute><AdminEditCategory /></AdminPrivateRoute> },

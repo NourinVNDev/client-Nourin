@@ -72,11 +72,6 @@ const SinglePostDetails = () => {
       setDateRange([new Date(), new Date()]);
     }
   };
-  const generalTicket = parsedData?.data?.result?.savedEvent?.typesOfTickets[0]
-
-  const amount = generalTicket?.Amount || "Not Available";
-  const offerAmount = generalTicket?.offerDetails?.offerAmount || "Not Available";
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 relative overflow-x-hidden">
@@ -128,9 +123,21 @@ const SinglePostDetails = () => {
                     <div className="space-y-6">
                       <div className="flex justify-between items-center border-b pb-4">
                         <div className="flex flex-col">
-                          <span className="text-2xl font-bold text-gray-800">
-                            {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
-                          </span>
+                          <div className="flex items-center justify-between  gap-44 flex-nowrap w-full">
+                            <span className="text-2xl font-bold text-gray-800">
+                              {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
+                            </span>
+                            {/* <Link
+                              to={`/user/chat/${parsedData?.data?.result?.savedEvent?.companyName}/${parsedData?.data?.result?.savedEvent.eventName}`}
+                              className="text-blue-600 hover:underline font-medium"
+                            >
+                              Chat with us
+                            </Link> */}
+                          </div>
+
+
+
+
                           <span className="text-lg text-green-600 font-semibold">
                             {parsedData?.data?.result?.savedEvent?.companyName || "Company Name"}
                           </span>
@@ -368,7 +375,7 @@ const SinglePostDetails = () => {
                     isHighlightedDate(date) ? "relative" : undefined
                   }
                   tileContent={({ date }) => {
-                   
+
                     if (isHighlightedDate(date)) {
                       return (
                         <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>

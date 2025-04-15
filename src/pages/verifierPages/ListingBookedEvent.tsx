@@ -96,7 +96,7 @@ const handlePageChange = (page: number) => {
         });
 
         try {
-            const result = await markUserEntry(selectedBooking.bookingId);
+            const result = await markUserEntry(selectedBooking.bookingId,selectedBooking.bookedUser[index].user);
             if (!result.success) {
                 toast.error(result.message || "Failed to update attendance.");
                 updatedBookedUsers[index].isParticipated = !updatedBookedUsers[index].isParticipated;
@@ -125,8 +125,10 @@ const handlePageChange = (page: number) => {
     };
 
     const handleCloseModal = () => {
+        navigate(`/verifier/bookedEventDetails/${eventId}`)
         setIsModalOpen(false);
         setSelectedBooking(null);
+      
     };
 
     useEffect(() => {

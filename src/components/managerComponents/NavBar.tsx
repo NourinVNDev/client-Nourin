@@ -27,9 +27,9 @@ const NavBar:React.FC=()=>{
       <Link to="/Manager/offer" className="block hover:bg-blue-200 rounded p-2 text-black">
         Offer
       </Link>
-      <Link to="/manager/latestRequest" className="block hover:bg-blue-200 rounded p-2 text-black">
+      {/* <Link to="/manager/latestRequest" className="block hover:bg-blue-200 rounded p-2 text-black">
         Request
-      </Link>
+      </Link> */}
       <Link to="/manager/wallet" className="block hover:bg-blue-200 rounded p-2 text-black">
       Wallet
       </Link>

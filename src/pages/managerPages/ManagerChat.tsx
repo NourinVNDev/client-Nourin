@@ -129,7 +129,7 @@ const ManagerChat = () => {
                 <ManagerUserList managers={allUsers}  events={['']}onSelectManager={createChatSchema}  person='User'/>
                 <ChatWindow
                     selectedManager={selectedManager}
-                    setSelectedManager={setSelectedManager}
+                    setSelectedManager={((setSelectedManager))}
                     allMessages={allMessages}
                     setAllMessages={setAllMessages}
                     senderId={senderId}

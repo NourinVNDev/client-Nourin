@@ -3,24 +3,33 @@ import Header from '../../components/userComponents/Headers';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import useSocket from '../../utils/SocketContext';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../App/store';
 
 const PaymentSuccess = () => {
   const naavigate = useNavigate(); 
   const managerId=useParams().managerId;
   const {socket}=useSocket();
+  const userId=useSelector((state:RootState)=>state.user._id);
 
 
 
   const handleGoHome = () => {
-    naavigate('/home'); // Redirect to the home page
+    naavigate('/home');
   };
 
   useEffect(()=>{
-    console.log("HAI",managerId);
+    if(!socket &&  !userId) return;
+   
+    const socketData={senderId:userId,receiverId:managerId,message:'Your Payment SuccessFully'};
+    console.log("Hai",socketData);
+  socket?.emit('post-payment-success',socketData,(response:any)=>{
+    console.log("Message sent acknowledgment:", response);
+  })
 
 
-  },[]);
-
+  },[socket]);
+//thr ethos the fjno,apnfjigngkdorsppwrinspwrmxnje0sjn ddnidninnanfdidskdifurbuusjskerutieppjxnssmsuurieojp-mj-isbbbcnzjsieurbghdj
   return (
     <div>
       <Header/>

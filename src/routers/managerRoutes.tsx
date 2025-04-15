@@ -23,6 +23,7 @@ import AddNewVerifier from '../pages/managerPages/AddNewVerifier';
 import Manager2Page from '../pages/managerPages/Manager2page';
 import ManagerEditVerifier from '../pages/managerPages/ManagerEditVerifier';
 import ManagerResetPassword from '../pages/managerPages/ManagerResetPassword';
+import ManagerNotification from '../pages/managerPages/ManagerNotification';
 
 const managerRoutes = [
     { path: '/mLogin', element: <CheckLoginManager><MLogin /></CheckLoginManager> },
@@ -47,6 +48,7 @@ const managerRoutes = [
     {path:'/Manager/addNewVerifier',element:<ManagerPrivateRoute><AddNewVerifier/></ManagerPrivateRoute>},
     {path:'/Manager/update2Page/:id',element:<ManagerPrivateRoute><Manager2Page/></ManagerPrivateRoute>},
     {path:'/Manager/editVerifier/:verifierId',element:<ManagerPrivateRoute><ManagerEditVerifier/></ManagerPrivateRoute>},
+    {path:'/Manager/notification' ,element:<ManagerPrivateRoute><ManagerNotification/></ManagerPrivateRoute>},
     { path: '/managerLogout', element: <ManagerLogout /> },
 ];
 

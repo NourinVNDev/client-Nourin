@@ -7,6 +7,8 @@ import { postUserProfilePicture } from "../../service/userServices/userProfile";
 import { setUserDetails } from "../../../Features/userSlice"; // Import Redux action
 import { AppDispatch } from "../../../App/store";
 import toast,{Toaster} from "react-hot-toast";
+import Cropper,{Area} from 'react-easy-crop';
+import getCroppedImg from "./CropUserProfile";
 
 const ProfileNavbar = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -21,7 +23,12 @@ const ProfileNavbar = () => {
   const [selectedImage, setSelectedImage] = useState<string>(profilePhoto || profileData.profilePicture || "");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area|null>(null);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [showCropModal, setShowCropModal] = useState(false);
+  
   // Update selectedImage when profilePhoto changes
   useEffect(() => {
     if (profilePhoto) {
@@ -29,35 +36,41 @@ const ProfileNavbar = () => {
     }
   }, [profilePhoto]);
 
-  // Handle Image Upload
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setSelectedImage(URL.createObjectURL(file)); // Preview before upload
-
-      try {
-        if (!userId) return;
-        const formData = new FormData();
-        formData.append("profilePicture", file);
-        const result = await postUserProfilePicture(formData, userId);
-
-        if (result.message === "Profile Photo Uploaded") {
-          // Merge existing user details with the new profile photo
-          toast.success('Profile Photo is updated');
-          console.log("Checking the photo:",result.data.data);
-          
-          const updatedUserProfile = {
-            ...user, // Keep existing details
-            profilePhoto: result.data.data,
-          };
-
-          dispatch(setUserDetails(updatedUserProfile));
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error);
-      }
+      const imageURL = URL.createObjectURL(file);
+      setImageToCrop(imageURL);
+      setShowCropModal(true);
     }
   };
+  const handleCropConfirm = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+    const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
+    setSelectedImage(croppedImage.preview); // Set for preview
+    setShowCropModal(false);
+  
+    try {
+      if (!userId) return;
+      const file = croppedImage.file; // Cropped file
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+      const result = await postUserProfilePicture(formData, userId);
+  
+      if (result.message === "Profile Photo Uploaded") {
+        toast.success('Profile Photo is updated');
+        const updatedUserProfile = {
+          ...user,
+          profilePhoto: result.data.data,
+        };
+        dispatch(setUserDetails(updatedUserProfile));
+      }
+    } catch (error) {
+      console.error("Error uploading cropped image:", error);
+    }
+  };
+  
+  
 
   // Trigger file input when clicking the "+" button
   const handleButtonClick = () => {
@@ -76,7 +89,7 @@ const ProfileNavbar = () => {
             className="w-20 h-20 rounded-full object-cover mb-2"
             onError={(e) => (e.currentTarget.src = person)} // Fallback in case of error
           />
-          {/* Hidden File Input */}
+        
           <input
             type="file"
             accept="image/*"
@@ -92,6 +105,28 @@ const ProfileNavbar = () => {
             +
           </button>
         </div>
+        {showCropModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-4 rounded shadow-lg w-96 h-96 relative">
+      <Cropper
+        image={imageToCrop!}
+        crop={crop}
+        zoom={zoom}
+        aspect={1}
+        onCropChange={setCrop}
+        onZoomChange={setZoom}
+        onCropComplete={(_, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels)}
+      />
+      <button
+        onClick={handleCropConfirm}
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Crop & Save
+      </button>
+    </div>
+  </div>
+)}
+
         <p className="font-semibold text-lg">{firstName || "User Name"}</p>
       </div>
 

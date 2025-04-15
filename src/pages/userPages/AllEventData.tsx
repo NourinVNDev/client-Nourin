@@ -99,10 +99,10 @@ const AllEventData = () => {
       try {
         const result = await getAllEventDataDetails();
 
-        console.log("hhhhh", result.user.categories);
+        console.log("hhhhh", result.user.events);
 
         // Flatten the Events from all categories
-        setParsedData(result.user.categories.flatMap((category: any) => category.Events) || []);
+        setParsedData(result.user.events|| []);
         const category = result.user.categories.map((event: any) => event.categoryName); // Access the category object
         console.log("Better ", category);
         setCategoryNames(category);
@@ -250,13 +250,6 @@ const AllEventData = () => {
     setFilteredData(updatedData); // Set the final processed data
   }, [ selectedCategory, selectedPrice]);
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(event.target.value);
-  }
-
-  const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPrice(event.target.value);
-  }
 
 
 
@@ -280,32 +273,18 @@ const AllEventData = () => {
         </div>
       </div>
 
-      {/* Search & Filters Section */}
+    
       <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full min-h-screen pt-10 pb-10 flex justify-center">
         <div className="w-full max-w-7xl flex flex-col items-center">
           <div className="relative flex items-center bg-white rounded-full shadow-lg w-full max-w-lg mt-6">
 
             <SearchBar onSelectLocation={(coordinates, placeName) => handleSearchChange(coordinates, placeName)}
               initialValue={searchQuery}
-            />
+            />  
           </div>
 
 
-          <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
-
-
-
-
-            {/* Sort Dropdown */}
-            <div className="flex items-center space-x-3 w-full md:w-auto">
-              <span className="font-semibold text-lg">Sort By:</span>
-              <select className="border px-4 py-2 rounded-lg bg-white text-black text-lg w-full md:w-auto" onChange={handlePriceChange}
-                value={selectedPrice}>
-                <option>Price: Low - High</option>
-                <option>Price: High - Low</option>
-              </select>
-            </div>
-          </div>
+  
 
           <br /><br />
 
@@ -318,12 +297,14 @@ const AllEventData = () => {
                 >
                   
                   <div className="relative group bg-white rounded-lg shadow-md">
-  {/* Discount Badge */}
-  {post.typesOfTickets && post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
-    <div className="absolute top-4 right-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-      {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
-    </div>
-  )}
+
+                  {post.typesOfTickets && 
+ post.typesOfTickets[0]?.offerDetails?.offerPercentage > 0 && (
+  <div className="absolute top-4 right-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+    {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
+  </div>
+)}
+
 
   <div className="relative overflow-hidden rounded-lg">
     <img

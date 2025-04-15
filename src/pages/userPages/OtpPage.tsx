@@ -95,7 +95,7 @@ const OtpPage:React.FC=()=>{
                             id={`otp-input-${index}`} // Unique ID for each input
                             type="text"
                             maxLength={1}
-                            className="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600"
+                            className="w-12 h-12 text-center bg-white text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600"
                             value={value}
                             onChange={(e) => handleChangeOne(e, index)}
                         />
@@ -103,7 +103,7 @@ const OtpPage:React.FC=()=>{
                 </div>
                 {timer > 0 ? (
                     <>
-                        <p className="text-gray-300 text-center mt-4">
+                        <p className="text-black text-center mt-4">
                             Resend OTP in <span className="font-semibold">{timer}</span> seconds
                         </p>
                           <button

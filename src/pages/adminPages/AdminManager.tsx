@@ -6,9 +6,9 @@ import Header from "../../components/adminComponents/Header";
 import Footer from "../../components/adminComponents/Footer";
 import { useState, useEffect } from "react";
 import { getManagerDetails, updateMangerBlockStatus } from "../../service/adminServices/adminUserManager";
-
+import { useNavigate } from "react-router-dom";
 interface Manager {
-  _id: string; // Assuming _id is a string
+  _id: string; 
   firmName: string;
   phoneNo: number;
   experience: number;
@@ -22,6 +22,7 @@ const AdminManager = () => {
   const [managers, setManagers] = useState<Manager[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const navigate=useNavigate();
 
   const handleManagerIsBlock = async (managerId: string, currentStatus: boolean) => {
     try {
@@ -69,14 +70,18 @@ const AdminManager = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentManagers = managers.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(managers.length / itemsPerPage);
-
+const showManagerInformation=(managerId:string)=>{
+  console.log("Blank");
+  
+  navigate(`/manager/managerEvents/${managerId}`)
+}
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-50">
-      {/* Header */}
+
       <Header />
 
       <div className="flex flex-1 w-full">
-        {/* Navigation Bar */}
+        
         <NavBar />
 
         <div className="flex flex-col items-center flex-1 bg-gradient-to-br from-gray-100 to-gray-300">
@@ -98,7 +103,7 @@ const AdminManager = () => {
                 {currentManagers.length > 0 ? (
                   currentManagers.map((manager) => (
                     <tr key={manager._id} className="odd:bg-white even:bg-gray-100 hover:bg-blue-50 text-black">
-                      <td className="border border-gray-400 p-3">{manager.firmName}</td>
+                      <td  onClick={() => showManagerInformation(manager._id)} className="border border-gray-400 p-3">{manager.firmName}</td>
                       <td className="border border-gray-400 p-3">{manager.email}</td>
                       <td className="border border-gray-400 p-3">{manager.experience}</td>
                       <td className="border border-gray-400 p-3">{manager.phoneNo}</td>

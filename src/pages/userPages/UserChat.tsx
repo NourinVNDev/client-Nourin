@@ -5,11 +5,12 @@ import ProfileNavbar from "../../components/userComponents/ProfileNavbar";
 import ManagerUserList from "../../components/userComponents/ManagerUserList";
 import ChatWindow from "../../components/userComponents/ChatWindow";
 import { getManagerNames, createConversationSchema } from "../../service/userServices/userProfile";
-
+import { useParams } from "react-router-dom";
 
 const UserChat = () => {
   const userId = localStorage.getItem("userId");
-
+  const {companyName,eventName}=useParams();
+  console.log("Params:", companyName, eventName);
 
   const [allManagers, setAllManagers] = useState<string[]>([]);
   const [allEvents,setAllEvents]=useState<string[]>([]);
@@ -18,7 +19,14 @@ const UserChat = () => {
   const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string ,senderId:string}[]>([]);
   const [senderId, setSenderId] = useState<string>("");
  const [selectedEvent,setSelectedEvent]=useState('');
+useEffect(()=>{
+  if(eventName && companyName){
+    console.log("Evenntsfd",eventName,companyName);
+    
+    createChatSchema(companyName,eventName)
+  }
 
+},[eventName,companyName])
   useEffect(() => {
     const fetchManagerNames = async () => {
       if (!userId) return;
@@ -39,6 +47,8 @@ const UserChat = () => {
 
     fetchManagerNames();
   }, [userId]);
+
+
 
   // Create conversation schema
   const createChatSchema = async (manager: string,event:string) => {

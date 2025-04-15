@@ -22,9 +22,7 @@ const SearchBar: React.FC<MapboxAutocompleteProps> = ({
     onSelectLocationRef.current = onSelectLocation;
   }, [onSelectLocation]);
 
-  // Add styles to document head
   useEffect(() => {
-    // Create style element for Mapbox overrides
     const styleElement = document.createElement('style');
     styleElement.textContent = `
       .mapboxgl-ctrl-geocoder {
@@ -98,8 +96,7 @@ const SearchBar: React.FC<MapboxAutocompleteProps> = ({
     `;
     document.head.appendChild(styleElement);
     styleElementRef.current = styleElement;
-    
-    // Cleanup function
+  
     return () => {
       if (styleElementRef.current) {
         document.head.removeChild(styleElementRef.current);

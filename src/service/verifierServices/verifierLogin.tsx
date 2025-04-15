@@ -113,10 +113,10 @@ const fetchAllBooking=async(eventId:string)=>{
     }
 }
 
-const markUserEntry=async(bookingId:string)=>{
+const markUserEntry=async(bookingId:string,userName:string)=>{
     try {
         console.log('BookingID',bookingId);
-        const response = await VERIFIER_API(`markUserEntry/${bookingId}`, {
+        const response = await VERIFIER_API(`markUserEntry/${bookingId}/${userName}`, {
             method: "GET",
         });
 

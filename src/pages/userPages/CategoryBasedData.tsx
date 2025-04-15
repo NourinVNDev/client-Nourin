@@ -308,13 +308,13 @@ const CategoryBasedData = () => {
           </div>
 
 
-          <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
-
+          {/* <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
+ */}
 
 
 
             {/* Sort Dropdown */}
-            <div className="flex items-center space-x-3 w-full md:w-auto">
+            {/* <div className="flex items-center space-x-3 w-full md:w-auto">
               <span className="font-semibold text-lg">Sort By:</span>
               <select className="border px-4 py-2 rounded-lg bg-white text-black text-lg w-full md:w-auto" onChange={handlePriceChange}
                 value={selectedPrice}>
@@ -322,7 +322,7 @@ const CategoryBasedData = () => {
                 <option>Price: High - Low</option>
               </select>
             </div>
-          </div>
+          </div> */}
 
           <br /><br />
 

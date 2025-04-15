@@ -4,7 +4,7 @@ import connectionImage from '../../../src/assets/new.avif';
 import {register,verifyOtp,handleResentOtp} from '../../service/userServices/register';
 import { useNavigate } from "react-router-dom";
 import { registerValidation } from "../../validations/userValid/RegisterValid";
-import toast from "react-hot-toast";
+import toast,{Toaster} from "react-hot-toast";
 import axios from "axios";
 
 const Register: React.FC = () => {
@@ -116,12 +116,17 @@ const Register: React.FC = () => {
             try {
               
                 const result=await register(formData); // Await the register function
-
+              if(result.error){
+                toast.error(result.error);
+              }else{
                 console.log("Result Details:",result);
                 
                 setIsOtp(true);
                 setTimer(30);
                 console.log("User Registered Details:", result.message);
+
+              }
+
             } catch (error) {
                 console.error("Error registering user:", error);
                 alert("Registration failed. Please try again.");
@@ -185,6 +190,7 @@ const Register: React.FC = () => {
     return (
 <div className="w-screen min-h-screen h-screen overflow-hidden">
 <div className="bg-white w-screen min-h-screen flex">
+<Toaster position="top-center" reverseOrder={false} toastOptions={{ duration: 3000 }} />
             {/* Conditional Rendering */}
             {!isOtp ? (
                 <>
@@ -324,7 +330,7 @@ const Register: React.FC = () => {
                               maxLength={1}
                               value={value}
                               onChange={(e) => handleChangeOne(e, index)}
-                              className="w-12 h-12 text-center text-lg font-semibold text-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                              className="w-12 h-12 text-center bg-white text-lg font-semibold text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                           />
                       ))}
                   </div>

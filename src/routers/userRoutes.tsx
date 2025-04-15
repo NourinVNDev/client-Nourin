@@ -20,7 +20,7 @@ import EntryHome from "../pages/userPages/EntryHome";
 import AllEventData from "../pages/userPages/AllEventData";
 import CheckLoginUser from "../components/userComponents/CheckLogin";
 import UserWallet from "../pages/userPages/UserWallet";
-
+import Notification from "../pages/userPages/Notification";
 const userRoutes = [
     { path: '/', element: <EntryHome /> },
     { path: '/login', element: <CheckLoginUser><Login /></CheckLoginUser> },
@@ -34,7 +34,7 @@ const userRoutes = [
     { path: '/logout', element: <Logout /> },
     { path: '/getAllEvents', element: <PrivateRoute><AllEventData /></PrivateRoute> },
     { path: '/user/categoryBasedData/:id', element: <PrivateRoute><CategoryBasedData /></PrivateRoute> },
-    { path: '/user/resetP   assword', element: <PrivateRoute><ResetPasswordALogin /></PrivateRoute> },
+    { path: '/user/resetPassword', element: <PrivateRoute><ResetPasswordALogin /></PrivateRoute> },
     { path: '/singlePostDetails', element: <PrivateRoute><SinglePostDetails /></PrivateRoute> },
     { path: '/checkEventDetails/:id/:selectedType', element: <PrivateRoute><EventDetails /></PrivateRoute> },
     { path: '/payment-success/:managerId', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
@@ -42,7 +42,8 @@ const userRoutes = [
     { path: '/event-history', element: <PrivateRoute><EventHistory /></PrivateRoute> },
     { path: '/user/chat', element: <PrivateRoute><UserChat /></PrivateRoute> },
     { path: '/user/bookedEvent', element: <PrivateRoute><EventBooking /></PrivateRoute> },
-    {path:  '/user/wallet', element: <PrivateRoute><UserWallet/></PrivateRoute>}
+    {path:  '/user/wallet', element: <PrivateRoute><UserWallet/></PrivateRoute>},
+    {path:  '/notification',element:<PrivateRoute><Notification/></PrivateRoute>},
 ];
 
 export default userRoutes;

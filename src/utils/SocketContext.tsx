@@ -45,7 +45,7 @@ import React, {
         if (loggedUser) {
           const role = getRole();
           console.log("Role being sent to backend:", role);
-          const newSocket = io("http://localhost:3001", { // Replace with your backend URL
+          const newSocket = io("http://localhost:3001", { 
             query: {
               userId: loggedUser,
               role,

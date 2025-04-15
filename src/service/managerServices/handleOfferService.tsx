@@ -3,8 +3,7 @@ import { OfferData } from "../../validations/userValid/TypeValid";
 const getAllOffers=async(managerId:string)=>{
     const response = await MANAGER_API(`/getOffers/${managerId}`,{
         method: "GET",
-        
-        withCredentials: true,
+      
       });
       console.log('suucesss from offer');
       const result = await response.data;
@@ -21,7 +20,7 @@ const fetchSearchData=async(searchTerm:string)=>{
     
     const response = await MANAGER_API(`/searchOfferInput/${searchTerm}`, {
       method: "GET",
-      withCredentials: true,
+
     });
     const result = response.data; // No need to await here, as response.data is already resolved
     console.log("result message", result.message);
@@ -41,7 +40,7 @@ const addEventOffer = async (formData:{ [key: string]: string }) => {
       method: "POST",
  
       data: formData,
-      withCredentials: true,
+     
     });
 
     console.log('success');
@@ -61,9 +60,6 @@ const getSpecificOffer = async (offerId: string ) => {
     
     const response = await MANAGER_API(`/getSelectedOffer/${offerId}`, {
       method: "GET",
- 
-    
-      withCredentials: true,
     });
 
     console.log('success');
@@ -84,7 +80,6 @@ const updateOffer=async(formData:OfferData)=>{
     const response = await MANAGER_API("/updateOffer", {
       method: "POST",
       data:formData,
-      withCredentials: true,
     });
 
     console.log('success');
