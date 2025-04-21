@@ -14,9 +14,13 @@ const ManagerChat = () => {
     const managerName = localStorage.getItem("ManagerName");
     const managerId = useSelector((state: RootState) => state.manager._id) || "";
     const [selectedManager, setSelectedManager] = useState<string | null>(null);
+    const [messages, setMessages] = useState<{ message: string; time: string ,readCount:number}[]>([]);
     const [userId, setUserId] = useState<string>("");
     const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string,senderId:string }[]>([]);
     const [senderId, setSenderId] = useState<string>("");
+    const [chatIds,setAllChatIds]=useState<string[]>([])
+   
+  
 
     // Fetch User Names for the Manager
     useEffect(() => {
@@ -24,10 +28,27 @@ const ManagerChat = () => {
             if (!managerName) return;
             try {
                 const result = await getUserNames(managerName);
-                if (result.success && Array.isArray(result.data)) {
-                    console.log("Result:", result.data.map((user: any) => user.firstName));
+                if (result.success && Array.isArray(result.data.users) && Array.isArray(result.data.lastMessages)) {
+                    console.log("Result:", result.data.users.map((user: any) => user.firstName));
                 
-                    setAllUsers(result.data.map((user: any) => user.firstName));
+                    setAllUsers(result.data.users.map((user: any) => user.firstName));
+                    setAllChatIds(result.data.chatIds.map((chatId:string)=>chatId));
+                    const formattedMessages = result.data.lastMessages.map((msg: any) => {
+                      const rawTime = msg.time;
+                      const date = new Date(rawTime);
+                      const time = !isNaN(date.getTime())
+                        ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                        : "Invalid time";
+            
+                      return {
+                        message: msg.message || "No message",
+                        time,
+                        readCount:msg.count
+                      };
+                    });
+
+            
+                    setMessages(formattedMessages);
                 }
                 else {
                     console.error("Unexpected response format:", result);
@@ -45,46 +66,6 @@ const ManagerChat = () => {
         console.log("User List Updated:",selectedManager,allMessages);
     }, [selectedManager]);
 
-    // Create Chat Schema when selecting a user
-    // const createChatSchema = async (user: string) => {
-    //     console.log("Hai",user,managerId);
-    //     setSelectedManager(user);
-        
-    //     if (!managerId) {
-    //         console.error("Manager ID is missing");
-    //         return;
-    //     }
-
-    //     try {
-    //         const sender=managerId;
-    //         const receiver=user;
-    //         const result = await createConversationSchemaOfManager(sender, receiver);
-    //         console.log("Fan",result.data.data.userId);
-            
-    //         if (result?.data?.data?.userId) {
-    //             setUserId(result.data.data.userId);
-    //             setSenderId(result.data.data.conversation?.participants[0] || "");
-    //             console.log("Thaayii", result.data.data.allMessages);
-                
-    //             setAllMessages(
-    //                 result.data.data.allMessages.map((msg: any) => ({
-                    
-                        
-    //                     message: msg.message,
-    //                     timestamp: new Date(msg.createdAt).toLocaleTimeString([], {
-    //                         hour: "2-digit",
-    //                         minute: "2-digit",
-    //                     }),
-            
-    //                 })) || []
-    //             );
-    //         } else {
-    //             console.error("Manager ID not found in response", result);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error creating chat schema:", error);
-    //     }
-    // };
 
     const createChatSchema = async (user: string) => {
         setSelectedManager(user);
@@ -96,7 +77,7 @@ const ManagerChat = () => {
       
         try {
           const result = await createConversationSchemaOfManager(managerId, user);
-          console.log("Result of Manager:",result.data.data.allMessages[0].senderId);
+
           
           if (result?.data?.data?.userId) {
             setUserId(result.data.data.userId);
@@ -120,13 +101,12 @@ const ManagerChat = () => {
             <Header />
           <div className="flex-1 flex">
           <aside className="bg-blue-100 p-4">
-
             <NavBar/>
             </aside>
 
             
             <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-                <ManagerUserList managers={allUsers}  events={['']}onSelectManager={createChatSchema}  person='User'/>
+                <ManagerUserList managers={allUsers}  events={['']}onSelectManager={createChatSchema} messages={messages}  setMessages={setMessages}  chatIds={chatIds}person='User'/>
                 <ChatWindow
                     selectedManager={selectedManager}
                     setSelectedManager={((setSelectedManager))}
@@ -134,7 +114,9 @@ const ManagerChat = () => {
                     setAllMessages={setAllMessages}
                     senderId={senderId}
                     managerId={userId}
-                    
+                    setMessages={setMessages}
+                  
+ 
                    
                 />  
             </div>

@@ -13,6 +13,7 @@ import { cancelEventBooking } from "../../service/userServices/userOfferAndWalle
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { useNavigate } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const EventBooking = () => {
   const [eventDetails, setEventDetails] = useState<EventDetails[]>([]);
@@ -167,6 +168,14 @@ console.log("Selected:",eventDetails);
                         <div className="bg-gray-100 px-2 py-1 rounded-full">
                           Status: <span className="text-gray-900 font-medium">{event.paymentStatus}</span>
                         </div>
+                       
+                        <Link
+                              to={`/user/chat/${event?.companyName}/${event?.eventName}`}
+                              className="text-blue-600 hover:underline font-medium"
+                            >
+                              Chat with us
+                        </Link>
+
                       </div>
 
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1">

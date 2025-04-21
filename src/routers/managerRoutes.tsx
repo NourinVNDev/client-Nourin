@@ -24,6 +24,7 @@ import Manager2Page from '../pages/managerPages/Manager2page';
 import ManagerEditVerifier from '../pages/managerPages/ManagerEditVerifier';
 import ManagerResetPassword from '../pages/managerPages/ManagerResetPassword';
 import ManagerNotification from '../pages/managerPages/ManagerNotification';
+import VideoCall from '../components/userComponents/VideoCall';
 
 const managerRoutes = [
     { path: '/mLogin', element: <CheckLoginManager><MLogin /></CheckLoginManager> },
@@ -49,6 +50,7 @@ const managerRoutes = [
     {path:'/Manager/update2Page/:id',element:<ManagerPrivateRoute><Manager2Page/></ManagerPrivateRoute>},
     {path:'/Manager/editVerifier/:verifierId',element:<ManagerPrivateRoute><ManagerEditVerifier/></ManagerPrivateRoute>},
     {path:'/Manager/notification' ,element:<ManagerPrivateRoute><ManagerNotification/></ManagerPrivateRoute>},
+    {path:'/room/:roomId',element:<ManagerPrivateRoute><VideoCall/></ManagerPrivateRoute>},
     { path: '/managerLogout', element: <ManagerLogout /> },
 ];
 

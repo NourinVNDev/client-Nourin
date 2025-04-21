@@ -127,12 +127,12 @@ const SinglePostDetails = () => {
                             <span className="text-2xl font-bold text-gray-800">
                               {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
                             </span>
-                            {/* <Link
+                            <Link
                               to={`/user/chat/${parsedData?.data?.result?.savedEvent?.companyName}/${parsedData?.data?.result?.savedEvent.eventName}`}
                               className="text-blue-600 hover:underline font-medium"
                             >
                               Chat with us
-                            </Link> */}
+                            </Link>
                           </div>
 
 

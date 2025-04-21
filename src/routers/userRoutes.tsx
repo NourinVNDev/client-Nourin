@@ -40,7 +40,7 @@ const userRoutes = [
     { path: '/payment-success/:managerId', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
     { path: '/payment-cancel/:bookedId', element: <PrivateRoute><PaymentCancel /></PrivateRoute> },
     { path: '/event-history', element: <PrivateRoute><EventHistory /></PrivateRoute> },
-    { path: '/user/chat', element: <PrivateRoute><UserChat /></PrivateRoute> },
+    { path: '/user/chat/:companyName/:eventName', element: <PrivateRoute><UserChat /></PrivateRoute> },
     { path: '/user/bookedEvent', element: <PrivateRoute><EventBooking /></PrivateRoute> },
     {path:  '/user/wallet', element: <PrivateRoute><UserWallet/></PrivateRoute>},
     {path:  '/notification',element:<PrivateRoute><Notification/></PrivateRoute>},

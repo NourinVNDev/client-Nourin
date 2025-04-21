@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { Button } from "@nextui-org/react";
 import useSocket from "../../utils/SocketContext";
 import MessageBubble from "../userComponents/MessageBubble";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuid } from "uuid";
+
 
 interface ChatWindowProps {
   selectedManager: string | null;
@@ -13,8 +15,13 @@ interface ChatWindowProps {
   senderId: string;
   managerId: string;
   selectedEvent?: string;
+  setMessages:React.Dispatch<React.SetStateAction<{ message: string; time: string; readCount:number}[]>>
 
 }
+
+
+
+
 
 const ChatWindow = ({
   selectedManager,
@@ -23,10 +30,10 @@ const ChatWindow = ({
   setAllMessages,
   senderId,
   managerId,
-  selectedEvent
-
-
+  selectedEvent,
+  setMessages
 }: ChatWindowProps) => {
+  const navigate=useNavigate();
   const user = useSelector((state: RootState) => state.user._id);
   const manager = useSelector((state: RootState) => state.manager._id);
   const userId = user || manager;
@@ -35,48 +42,81 @@ const ChatWindow = ({
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Scroll to bottom when messages update
+ const createRoom = () => {
+  const roomId = uuid();
+  navigate(`/room/${roomId}`);
+};
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [allMessages]);
 
-  // Listen for incoming messages
+  
   useEffect(() => {
     if (!socket) return;
+  
+    const messageListener = ({ senderId, message, timestamp,totalMessage ,chatId}: { senderId: string; message: string; timestamp: string ,totalMessage:number,chatId:string}) => {
+      const date = new Date(timestamp);
+      if (!isNaN(date.getTime())) {
+        const formattedTime = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+        
+        setAllMessages(prev => [...prev, { message, timestamp: formattedTime, senderId }]);
+        if (localStorage.getItem('chatId') === chatId) {
+          setMessages(prev => [...prev, { message, time: formattedTime, readCount: 0 }]);
+        } else {
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.message === message && msg.time === formattedTime
+                ? { ...msg, readCount: totalMessage }
+                : msg
+            )
+          );
+        }
+        
 
-    const messageListener = ({ senderId, message, timestamp }: { senderId: string; message: string; timestamp: string }) => {
-      setAllMessages((prevMessages) => [...prevMessages, { message, timestamp, senderId }]);
+      } else {
+        console.warn("Invalid date received:", timestamp);
+      }
     };
-
+  
     socket.on("receive-message", messageListener);
     return () => {
       socket.off("receive-message", messageListener);
     };
   }, [socket]);
+  
 
-  // Send a new message
+
   const postNewMessage = async (message: string) => {
-    console.log("Why");
-
-
-    console.log("Checkdata:",managerId,message);
-    
-    
     if (!socket || !managerId || !message.trim()) return;
-
+  
     const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const newMessage = { message, timestamp: currentTime, senderId };
-    console.log("what");
-    
     const socketMessage = { message, sender: senderId, receiver: managerId };
-
+  
     socket.emit("post-new-message", socketMessage, (response: any) => {
       console.log("Message sent acknowledgment:", response);
+      
+      const rawTime = response.data.createdAt;
+      const msg = response.data.content;
+      const totalCount=response.data.totalCount;
+  
+      if (rawTime) {
+        const date = new Date(rawTime);
+        if (!isNaN(date.getTime())) {
+          const formattedTime = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+  
+          setMessages(prev => [...prev, { message: msg, time: formattedTime ,readCount:totalCount}]);
+        } else {
+          console.warn("Invalid date format in ack:", rawTime);
+        }
+      }
     });
-
-    setAllMessages((prevMessages) => [...prevMessages, newMessage]);
+  
+    // Update UI immediately
+    setAllMessages(prev => [...prev, newMessage]);
     setMessage("");
   };
+  
 
   return (
     <div className={`w-full min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
@@ -89,7 +129,8 @@ const ChatWindow = ({
                <h2 className="text-lg font-bold">{selectedEvent}</h2>
                <h4 className="font-semibold">{selectedManager}</h4>
              </div>
-             <Button onPress={() => setSelectedManager(null)}>Close</Button>
+             {/* <Button onPress={() => setSelectedManager(null)}>Close</Button> */}
+             <button onClick={createRoom}>Start New Call</button>
            </div>
 
           ):(
@@ -97,7 +138,7 @@ const ChatWindow = ({
             <div>
               <h2 className="text-lg font-bold">{selectedManager}</h2>
             </div>
-            <Button onPress={() => setSelectedManager(null)}>Close</Button>
+            <button onClick={createRoom}>Start New Call</button>;
           </div>
           )}
          

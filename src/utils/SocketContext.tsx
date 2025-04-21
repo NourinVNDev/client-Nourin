@@ -34,13 +34,11 @@ import React, {
 
 
     const getRole = useCallback((): string | null => {
-        if (user) return "user";
+        if (user ) return "user";
     
         if (manager) return "manager";
         return null;
       }, [user, manager]);
-
-      
       useEffect(() => {
         if (loggedUser) {
           const role = getRole();

@@ -17,9 +17,6 @@ const Logout=()=>{
         localStorage.removeItem('userId');
         persistor.purge();
         navigate('/');
-
-
-
     },[navigate]);
     return(
         <div>

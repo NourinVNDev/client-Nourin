@@ -147,7 +147,7 @@ const ProfileNavbar = () => {
         <Link to="/notifications" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">
           Notifications
         </Link>
-        <Link to="/user/chat" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">
+        <Link to="/user/chat/null/null" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">
           Chat
         </Link>
         <Link to="/user/resetPassword" className="text-black hover:bg-[#e0e0e0] px-4 py-2 rounded-md transition duration-200">

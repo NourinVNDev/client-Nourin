@@ -29,7 +29,7 @@ const PaymentSuccess = () => {
 
 
   },[socket]);
-//thr ethos the fjno,apnfjigngkdorsppwrinspwrmxnje0sjn ddnidninnanfdidskdifurbuusjskerutieppjxnssmsuurieojp-mj-isbbbcnzjsieurbghdj
+
   return (
     <div>
       <Header/>

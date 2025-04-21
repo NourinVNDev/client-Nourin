@@ -9,24 +9,29 @@ import { useParams } from "react-router-dom";
 
 const UserChat = () => {
   const userId = localStorage.getItem("userId");
-  const {companyName,eventName}=useParams();
+  const { companyName, eventName } = useParams();
   console.log("Params:", companyName, eventName);
 
   const [allManagers, setAllManagers] = useState<string[]>([]);
-  const [allEvents,setAllEvents]=useState<string[]>([]);
+  const [allEvents, setAllEvents] = useState<string[]>([]);
+  const [messages, setMessages] = useState<{ message: string; time: string,readCount:number }[]>([]);
   const [selectedManager, setSelectedManager] = useState<string | null>(null);
   const [managerId, setManagerId] = useState<string>("");
-  const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string ,senderId:string}[]>([]);
+  const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string, senderId: string }[]>([]);
   const [senderId, setSenderId] = useState<string>("");
- const [selectedEvent,setSelectedEvent]=useState('');
-useEffect(()=>{
-  if(eventName && companyName){
-    console.log("Evenntsfd",eventName,companyName);
-    
-    createChatSchema(companyName,eventName)
-  }
+  const [selectedEvent, setSelectedEvent] = useState('');
 
-},[eventName,companyName])
+  const [messageCount,setMessageCount]=useState(0);
+  const [chatIds,setAllChatIds]=useState<string[]>([])
+
+  useEffect(() => {
+    if (eventName && companyName) {
+      console.log("Evenntsfd", eventName, companyName);
+
+      createChatSchema(companyName, eventName)
+    }
+
+  }, [eventName, companyName, ])
   useEffect(() => {
     const fetchManagerNames = async () => {
       if (!userId) return;
@@ -34,8 +39,28 @@ useEffect(()=>{
         const result = await getManagerNames(userId);
 
         if (result.success && Array.isArray(result.data.companyNames) && Array.isArray(result.data.eventNames)) {
-          setAllManagers(result.data.companyNames.map((companyName:string)=>companyName));
-          setAllEvents(result.data.eventNames.map((event:string)=>event));
+          console.log("Result:", result);
+
+          setAllManagers(result.data.companyNames.map((companyName: string) => companyName));
+          setAllEvents(result.data.eventNames.map((event: string) => event));
+
+          setAllChatIds(result.data.chatIds.map((chatId:string)=>chatId));
+          const formattedMessages = result.data.lastMessages.map((msg: any) => {
+            const rawTime = msg.time;
+            const date = new Date(rawTime);
+            const time = !isNaN(date.getTime())
+              ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+              : "Invalid time";
+  
+            return {
+              message: msg.message || "No message",
+              time,
+              readCount:msg.count
+            };
+          });
+  
+          setMessages(formattedMessages);
+  
 
         } else {
           console.error("Unexpected response format:", result);
@@ -50,27 +75,27 @@ useEffect(()=>{
 
 
 
-  // Create conversation schema
-  const createChatSchema = async (manager: string,event:string) => {
+ 
+  const createChatSchema = async (manager: string, event: string) => {
     console.log("confirm");
     if (!userId) return;
     console.log("confirm");
     setSelectedEvent(event);
 
-    
+
     try {
-      const sender=userId;const receiver=manager;
+      const sender = userId; const receiver = manager;
       const result = await createConversationSchema(receiver, sender);
-      console.log("Result:",result);
-      
+      console.log("Result:", result);
+
       if (result?.data?.data?.managerId) {
         setManagerId(result.data.data.managerId);
-    
+
         setSenderId(result.data.data.conversation?.participants[0] || "");
         setSelectedManager(manager);
         setAllMessages(result.data.data.allMessages.map((msg: any) => ({
           message: msg.message,
-          senderId:msg.senderId,
+          senderId: msg.senderId,
           timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         })) || []);
       } else {
@@ -83,13 +108,17 @@ useEffect(()=>{
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <div>
+      <Header  /> 
+    
+      </div>
       <div className="flex-1 flex">
-        <aside className="hidden md:block w-64 bg-gray-800 text-white min-h-[calc(100vh-4rem)] shadow-lg">
+      <aside className="bg-gray-800 mb-10">
+
           <ProfileNavbar />
         </aside>
         <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-          <ManagerUserList managers={allManagers} events={allEvents}onSelectManager={createChatSchema}   person='Event Manager'/>
+          <ManagerUserList managers={allManagers} events={allEvents} onSelectManager={createChatSchema} messages={messages} chatIds={chatIds}  setMessages={setMessages} person='Event Manager' />
           <ChatWindow
             selectedManager={selectedManager}
             setSelectedManager={setSelectedManager}
@@ -98,9 +127,15 @@ useEffect(()=>{
             senderId={userId as string}
             managerId={managerId}
             selectedEvent={selectedEvent}
-         
+            setMessages={setMessages}
+        
+        
             
-          
+        
+
+
+
+
           />
 
         </div>
