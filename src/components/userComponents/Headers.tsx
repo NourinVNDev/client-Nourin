@@ -33,9 +33,27 @@ export default function Header() {
 
 
   const  handleNotification=()=>{
-    navigate('/notification')
+    navigate('/notifications')
 
   }
+
+
+  useEffect(()=>{
+    if(!socket)return;
+    const messageListener = ({heading,message,count}: { heading: string; message: string; count:number}) => {
+      console.log("Hai");
+      
+      console.log("Count",heading,message,count);
+      
+      setNotificationCount(count);
+    }
+ 
+   
+    
+      socket.on('new-notification',messageListener)
+    
+
+  },[socket])
   return (
     <header className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg">
       <div className="container mx-auto px-6 py-6 flex justify-between items-center">

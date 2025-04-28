@@ -21,6 +21,7 @@ export type PaymentData = {
     actualAmount:number;
     bookedMembers:string[];
     location:string;
+    amount?:number
    
   };
   export type EventData = {
@@ -34,7 +35,7 @@ export type PaymentData = {
     endDate: string;
     time: string; // Required property
     noOfPerson: number;
-
+    amount:number;
     destination: string;
    
     tags: string[]; // Ensure this is an array of strings

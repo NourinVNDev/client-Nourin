@@ -147,9 +147,11 @@ console.log("Selected:",eventDetails);
                           <p className="text-xs">
                             Package: <span className="text-gray-900 font-medium">{event.title}</span>
                           </p>
+                          {event.title!='Virtual' &&(
                           <p className="text-xs">
                             Ticket-Type: <span className="text-gray-900 font-medium">{event.type}</span>
                           </p>
+                          )}
                         </div>
                       </div>
 

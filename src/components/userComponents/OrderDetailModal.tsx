@@ -69,20 +69,26 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, onClose, 
                 <p><span className="font-semibold">Event Name:</span> {event.eventName}</p>
                 <p><span className="font-semibold">Company:</span> {event.companyName}</p>
                 <p><span className="font-semibold">Package:</span> {event.title}</p>
-                <p><span className="font-semibold">Persons:</span> {event.bookedUser.map((per:any)=>per.user+",")}</p>
-                <p><span className="font-semibold">Ticket Type:</span> {event.type}</p>
+                <p><span className="font-semibold">Persons:</span> {event.bookedUser.map((per:any)=>per.user+" ,")}</p>
+                {event.title!='Virtual' && (
+            <p><span className="font-semibold">Ticket Type:</span> {event.type}</p>
+                )}
+    
               </div>
+          {event.title!='Virtual' && (
+               <div className="p-3 bg-purple-100 rounded-lg shadow-md">
+               <p className="text-purple-600 font-semibold flex items-center gap-2">
+                 <CheckCircleIcon className="w-5 h-5 text-purple-500" />
+                 Included: <span className="text-gray-800">{event.Included?.join(", ") || "N/A"}</span>
+               </p>
+               <p className="text-red-400 font-semibold flex items-center gap-2">
+                 <XCircleIcon className="w-5 h-5 text-red-500" />
+                 Not Included: <span className="text-gray-800">{event.notIncluded?.join(", ") || "N/A"}</span>
+               </p>
+             </div>
 
-              <div className="p-3 bg-purple-100 rounded-lg shadow-md">
-                <p className="text-purple-600 font-semibold flex items-center gap-2">
-                  <CheckCircleIcon className="w-5 h-5 text-purple-500" />
-                  Included: <span className="text-gray-800">{event.Included?.join(", ") || "N/A"}</span>
-                </p>
-                <p className="text-red-400 font-semibold flex items-center gap-2">
-                  <XCircleIcon className="w-5 h-5 text-red-500" />
-                  Not Included: <span className="text-gray-800">{event.notIncluded?.join(", ") || "N/A"}</span>
-                </p>
-              </div>
+          )}
+           
 
               <p className="text-xl font-bold text-purple-600 text-center">
                 Total Amount: ₹{event.amount.toLocaleString()}

@@ -46,32 +46,28 @@ const ManagerEditSelectedEvents = () => {
       
       console.log("Form Submitted", values);
       const formData = new FormData();
-      formData.append("id", values._id)
-      formData.append("eventName", values.eventName); 
-      formData.append("title", values.title);
-      formData.append("content", values.content);
-      formData.append('companyName',managerCompanyName||'');
-      if(location){
-        formData.append("address", location);
-      }
-    
-      formData.append("startDate", values.startDate);
-      formData.append("endDate", values.endDate);
-      formData.append("time", values.time);
-      formData.append("destination", values.destination);
-      // formData.append("noOfPerson", values.noOfPerson.toString());
-      // formData.append("amount", values.Amount.toString()); 
-      // formData.append("Included", values.Included.join(","));
-      // formData.append("notIncluded", values.notIncluded.join(","));
-   
-      
-      if (values.images.length > 0) {
-        values.images.forEach((file) => {
-          if (file instanceof File) {
-            formData.append("images", file);
+      Object.entries(values).forEach(([key, value]) => {
+        if (key === 'images') {
+          values.images.forEach((file) => {
+            if (file instanceof File) {
+              formData.append("images", file);
+            }
+          });
+        } else if (value !== null && value !== undefined) {
+          if (value instanceof Date) {
+            formData.append(key, value.toISOString());
+          } else {
+            formData.append(key, value.toString());
           }
-        });
+        }
+      });
+      if(formik.values.title==='Virtual'){
+        formData.append('address','null');
+        formData.append('destination','null');
+      }else{
+        formData.append('amount','null');
       }
+
   
       console.log("Maad", formData);
       const postEditEventData=async ()=>{
@@ -119,7 +115,7 @@ const ManagerEditSelectedEvents = () => {
     endDate: "",
     noOfPerson: 0,
     time: "",
- 
+    amount:0,
     destination: "",
    
     tags: [""],
@@ -143,6 +139,8 @@ const ManagerEditSelectedEvents = () => {
             ...prevValues,
             ...result.data.result,
             address:result.data.result.address||"",
+            amount:result.data.result.amount||0,
+            time:result.data.result.time||'',
          
             images: result.data.result.images || [],
           }));
@@ -220,11 +218,14 @@ const ManagerEditSelectedEvents = () => {
 
         <main className="flex-1 p-6">
           <h2 className="text-3xl font-bold mb-6 text-gray-800">Edit Event</h2>
-          <div className=" flex justify-end">
-          <Link to={`/Manager/update2Page/${formik.values._id}`}>
-        <button  className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition">Update Tickets</button>
-        </Link>
-        </div>
+          {formik.values.title!='Virtual' && (
+              <div className=" flex justify-end">
+              <Link to={`/Manager/update2Page/${formik.values._id}`}>
+            <button  className="px-6 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition">Update Tickets</button>
+            </Link>
+            </div>
+          )}
+        
         <br />
           {loading ? (
             <p>Loading...</p> // Show loading state
@@ -283,25 +284,71 @@ const ManagerEditSelectedEvents = () => {
             <div className="text-red-500 text-sm">{formik.errors.content}</div>
           ) : null}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-400">Address</label>
-                  <MapboxAutocomplete onSelectLocation={handleLocationSelect} />
-                  <input
-                type="text"
-                name="address"
-                value={formik.values.address}
-                onChange={formik.handleChange}
-                placeholder="Address"
-                readOnly
-                className="border p-2 bg-white text-black mt-2 w-1/2" 
-              />
-                      {formik.touched.address && formik.errors.address ? (
-              <div className="text-red-500 text-sm">{formik.errors.address}</div>
-            ) : null}
+              {formik.values.title!='Virtual' ? (
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-400">
+                  Address
+                </label>
+                <MapboxAutocomplete onSelectLocation={handleLocationSelect} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-2">
+                  <div>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formik.values.address}
+                      onChange={formik.handleChange}
+                      placeholder="Address"
+                      readOnly
+                      className={`w-full p-2 border rounded bg-white text-black ${
+                        formik.touched.address && formik.errors.address ? 'border-red-500' : ''
+                      }`}
+                    />
+                    {formik.touched.address && formik.errors.address && (
+                      <div className="text-red-500 text-sm">{formik.errors.address}</div>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="destination" className="block text-sm font-medium text-gray-400">
+                      Destination
+                    </label>
+                    <input
+                      type="text"
+                      id="destination"
+                      name="destination"
+                      value={formik.values.destination}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={`w-full p-2 border rounded focus:outline-blue-400 bg-white text-black ${
+                        formik.touched.destination && formik.errors.destination ? 'border-red-500' : ''
+                      }`}
+                    />
+                    {formik.touched.destination && formik.errors.destination && (
+                      <div className="text-red-500 text-sm">{formik.errors.destination}</div>
+                    )}
+                  </div>
                 </div>
-      
               </div>
+            ) : (
+              <div>
+                <label htmlFor="amount" className="block text-sm font-medium text-gray-400">
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  value={formik.values.amount}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`w-full p-2 border rounded focus:outline-blue-400 bg-white text-black ${
+                    formik.touched.amount && formik.errors.amount ? 'border-red-500' : ''
+                  }`}
+                />
+                {formik.touched.amount && formik.errors.amount && (
+                  <div className="text-red-500 text-sm">{formik.errors.amount}</div>
+                )}
+              </div>
+            )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                  <div>
                          <label htmlFor="startDate" className="block text-sm font-medium text-gray-400">
@@ -331,21 +378,7 @@ const ManagerEditSelectedEvents = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="destination" className="block text-sm font-medium text-gray-400">Destination</label>
-                <input
-                  type="text"
-                  id="destination"
-                  name="destination"
-                  value={formik.values.destination}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full mt-1 p-2 border rounded focus:outline-blue-400 bg-white text-black"
-                />
-                {formik.touched.destination && formik.errors.destination ? (
-            <div className="text-red-500 text-sm">{formik.errors.destination}</div>
-          ) : null}
-              </div>
+       
          
               </div>
            

@@ -8,6 +8,9 @@ import NavBar from "../../components/managerComponents/NavBar";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
+import useSocket from "../../utils/SocketContext";
+
+const CHANNEL='meetCraft'
 interface Location {
   address: string;
   city: string;
@@ -46,6 +49,7 @@ interface EventData {
 }
 
 const ManagerAllEvents = () => {
+  const {socket}=useSocket();
   const [events, setEvents] = useState<EventData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 5;
@@ -107,6 +111,32 @@ const ManagerAllEvents = () => {
     setCurrentPage(1); // Reset to first page when searching
   };
 
+  const startVideoCall=()=>{
+    navigate('/Manager/videoCall');
+  }
+
+
+  const handleGenerateLink = async (eventId: string) => {
+    try {
+      // 1. Construct the join link
+      const joinLink = `join-stream/${CHANNEL}`;
+      console.log("JOin LInk",joinLink);
+      
+      const socketMessage={link:joinLink,managerId:managerId,eventId:eventId}
+      socket?.emit('post-videoCallLink',socketMessage,(response:any)=>{
+        console.log("Message sent Aknowledgement",response);
+        
+      })
+      
+
+      
+      alert('Notification sent with join link!');
+    } catch (error) {
+      console.error('Failed to generate link or send notification', error);
+      alert('Something went wrong.');
+    }
+  };
+  
   
   
   return (
@@ -159,7 +189,7 @@ const ManagerAllEvents = () => {
                   <table className="min-w-full border-collapse border border-gray-300">
                     <thead>
                       <tr className="bg-gray-100">
-                        {["EventName", "Images", "Title", "Location", "Date", "Seat Information", "Actions"].map((header) => (
+                        {["EventName", "Images", "Title", "Location/Link", "Date", "Seat Information/Video Call", "Actions"].map((header) => (
                           <th
                             key={header}
                             className="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-600"
@@ -193,35 +223,63 @@ const ManagerAllEvents = () => {
                             )}
                           </td>
                           <td className="border border-gray-300 px-4 py-3">{event.title}</td>
+                          {event.title!='Virtual'?(
                           <td className="border border-gray-300 px-4 py-3">{event.destination}</td>
+                        ):(
+                          <div className="px-4 p-10">
+                    
+                        
+                          <button
+onClick={() => handleGenerateLink(event._id)}
+className="ml-4 text-blue-600 underline hover:text-blue-800 text-sm flex"
+>
+Generate a Link
+</button>
+
+                        </div>
+                        
+                        )}
                           <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
                           <td className="border  px-4 py-3">
-                            <div className="flex flex-col space-y-2">
-                              {event.typesOfTickets.map((ticket, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-between "
-                                >
-                                  <span className="font-semibold text-indigo-700">{ticket.type}</span>
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
-                                    <span className="text-gray-500 text-sm">
-                                      ({ticket.noOfSeats} seats available)
-                                    </span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                            {event.title!=='Virtual'?(
+                                   <div className="flex flex-col space-y-2">
+                                   {event.typesOfTickets.map((ticket, index) => (
+                                     <div
+                                       key={index}
+                                       className="flex items-center justify-between "
+                                     >
+                                       <span className="font-semibold text-indigo-700">{ticket.type}</span>
+                                       <div className="flex items-center space-x-2">
+                                         <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
+                                         <span className="text-gray-500 text-sm">
+                                           ({ticket.noOfSeats} seats available)
+                                         </span>
+                                       </div>
+                                     </div>
+                                   ))}
+                                 </div>
+                            ):(
+                              <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition-all duration-300" onClick={startVideoCall}>
+                              Start Video Call
+                            </button>
+                            
+                            )}
+                       
                           </td>
                           <td>
-                            <div className=" px-4">
-                            <button
-                              onClick={() => handleEventEdit(event._id)}
-                              className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
-                            >
-                              Edit
-                            </button>
-                            </div>
+                          
+                                  <div className=" px-4">
+                                  <button
+                                    onClick={() => handleEventEdit(event._id)}
+                                    className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
+                                  >
+                                    Edit
+                                  </button>
+                                  </div>
+
+
+                       
+                        
                           </td>
                         </tr>
                       ))}

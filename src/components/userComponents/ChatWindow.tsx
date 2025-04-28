@@ -9,7 +9,7 @@ import { v4 as uuid } from "uuid";
 
 interface ChatWindowProps {
   selectedManager: string | null;
-  setSelectedManager: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedManager: React.Dispatch<React.SetStateAction<string>>;
   allMessages: { message: string; timestamp: string, senderId: string }[];
   setAllMessages: React.Dispatch<React.SetStateAction<{ message: string; timestamp: string, senderId: string }[]>>;
   senderId: string;
@@ -98,7 +98,7 @@ const ChatWindow = ({
       
       const rawTime = response.data.createdAt;
       const msg = response.data.content;
-      const totalCount=response.data.totalCount;
+      const totalCount=response.data.totalMessage;
   
       if (rawTime) {
         const date = new Date(rawTime);
@@ -108,6 +108,7 @@ const ChatWindow = ({
           setMessages(prev => [...prev, { message: msg, time: formattedTime ,readCount:totalCount}]);
         } else {
           console.warn("Invalid date format in ack:", rawTime);
+          
         }
       }
     });
@@ -123,7 +124,7 @@ const ChatWindow = ({
       {selectedEvent || selectedManager ? (
         <div className="flex flex-col h-full">
           {/* Chat Header */}
-          {selectedEvent && selectedManager?(
+          {selectedEvent &&selectedManager?(
              <div className="p-4 bg-purple-500 text-white flex justify-between items-start">
              <div>
                <h2 className="text-lg font-bold">{selectedEvent}</h2>

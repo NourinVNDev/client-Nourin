@@ -51,7 +51,8 @@ const EventDetails = () => {
     bookingId: "",
     actualAmount: 0,
     bookedMembers: [],
-    location:''
+    location:'',
+    amount:0
 
 
   });
@@ -62,7 +63,7 @@ const EventDetails = () => {
       return;
     }
     try {
-
+      
       const result = await makeStripePayment(eventData);
       console.log("Results:", result);
       if (!result.success) {
@@ -82,38 +83,73 @@ const EventDetails = () => {
         console.log("Results12:", result);
 
         const event = result?.data?.result?.savedEvent || {};
-        const ticket = event?.typesOfTickets?.find(
-          (ticket: any) => ticket.type.toLowerCase() === selectedType
-        );
-        console.log("Ticket", ticket);
+        if(event.title!='Virtual'){
+          const ticket = event?.typesOfTickets?.find(
+            (ticket: any) => ticket.type.toLowerCase() === selectedType
+          );
+          console.log("Ticket", ticket);
+  
+          setEventData((prevData) => ({
+            ...prevData,
+            userId: user?._id || prevData.userId,
+            firstName: user?.firstName || prevData.firstName || "",
+            lastName: user?.lastName || prevData.lastName || "",
+            email: user?.email || prevData.email || "",
+            phoneNo: user?.phoneNo || prevData.phoneNo || '',
+            categoryName: event?.title || prevData.categoryName,
+            companyName: event?.companyName || prevData.companyName,
+            images: event?.images || prevData.images,
+            eventName: event?.eventName || prevData.eventName,
+            address: user?.Address || prevData.address,
+            location:event.address,
+            noOfPerson: event?.noOfPerson || prevData.noOfPerson,
+            noOfDays: event?.noOfDays || prevData.noOfDays,
+            Amount: ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
+            actualAmount: ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
+            bookedId: prevData.bookedId,
+            bookingId: prevData.bookingId,
+            type: selectedType || "",
+            managerId: event?.Manager || prevData.managerId,
+            Included: event?.typesOfTickets.find((ticket: any) => ticket.type?.toLowerCase()=== selectedType)?.Included || [],
+            notIncluded: event?.typesOfTickets.find((ticket: any) => ticket.type?.toLowerCase() === selectedType)?.notIncluded || [],
+            bookedMembers: [],
+            startDate:event?.startDate,
+            amount:event.amount
+  
+          }));
 
-        setEventData((prevData) => ({
-          ...prevData,
-          userId: user?._id || prevData.userId,
-          firstName: user?.firstName || prevData.firstName || "",
-          lastName: user?.lastName || prevData.lastName || "",
-          email: user?.email || prevData.email || "",
-          phoneNo: user?.phoneNo || prevData.phoneNo || '',
-          categoryName: event?.title || prevData.categoryName,
-          companyName: event?.companyName || prevData.companyName,
-          images: event?.images || prevData.images,
-          eventName: event?.eventName || prevData.eventName,
-          address: user?.Address || prevData.address,
-          location:event.address,
-          noOfPerson: event?.noOfPerson || prevData.noOfPerson,
-          noOfDays: event?.noOfDays || prevData.noOfDays,
-          Amount: ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
-          actualAmount: ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
-          bookedId: prevData.bookedId,
-          bookingId: prevData.bookingId,
-          type: selectedType || "",
-          managerId: event?.Manager || prevData.managerId,
-          Included: event?.typesOfTickets.find((ticket: any) => ticket.type?.toLowerCase()=== selectedType)?.Included || [],
-          notIncluded: event?.typesOfTickets.find((ticket: any) => ticket.type?.toLowerCase() === selectedType)?.notIncluded || [],
-          bookedMembers: [],
-          startDate:event?.startDate
+        }else{
+          
+          setEventData((prevData) => ({
+            ...prevData,
+            userId: user?._id || prevData.userId,
+            firstName: user?.firstName || prevData.firstName || "",
+            lastName: user?.lastName || prevData.lastName || "",
+            email: user?.email || prevData.email || "",
+            phoneNo: user?.phoneNo || prevData.phoneNo || '',
+            categoryName: event?.title || prevData.categoryName,
+            companyName: event?.companyName || prevData.companyName,
+            images: event?.images || prevData.images,
+            eventName: event?.eventName || prevData.eventName,
+            address: user?.Address || prevData.address,
+            location:event.address,
+            noOfPerson: event?.noOfPerson || prevData.noOfPerson,
+            noOfDays: event?.noOfDays || prevData.noOfDays,
 
-        }));
+            bookedId: prevData.bookedId,
+            bookingId: prevData.bookingId,
+            type: selectedType || "",
+            managerId: event?.Manager || prevData.managerId,
+            Included: event?.typesOfTickets.find((ticket: any) => ticket.type?.toLowerCase()=== selectedType)?.Included || [],
+            notIncluded: event?.typesOfTickets.find((ticket: any) => ticket.type?.toLowerCase() === selectedType)?.notIncluded || [],
+            bookedMembers: [],
+            startDate:event?.startDate,
+            amount:event.amount
+  
+          }));
+
+        }
+    
 
       } catch (error) {
         console.error("Error fetching event data:", error);
@@ -174,7 +210,8 @@ const EventDetails = () => {
       email: eventData.email,
       phoneNo: eventData.phoneNo,
       address: eventData.address,
-      ticketType: selectedType || ''
+      ticketType: selectedType || '',
+      categoryType:eventData.categoryName
     }
     console.log("Helloo");
 
@@ -332,7 +369,7 @@ const EventDetails = () => {
               />
               <div className="space-y-4 pt-4 text-black">
                 <h2 className="text-2xl font-semibold">{eventData.eventName}</h2>
-                <p className="text-sm text-gray-600">📍 {eventData.location}</p>
+                <p className="text-sm text-gray-600">📍 {eventData.location||'Virtual Event'}</p>
                 {/* <div className="flex items-center gap-2">
          <div className="flex">
           {[...Array(5)].map((_, i) => (
@@ -358,7 +395,7 @@ const EventDetails = () => {
                   </div>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">₹{eventData.Amount}</span>
+                  <span className="text-2xl font-bold">₹{eventData.Amount||eventData.amount}</span>
                 </div>
                 <p className="text-lg font-semibold text-gray-800 border-b-2 pb-1">No of People</p>
                 <ul className="mt-4 space-y-2">

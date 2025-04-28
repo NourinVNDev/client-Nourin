@@ -7,15 +7,24 @@ import ChatWindow from "../../components/userComponents/ChatWindow";
 import { getManagerNames, createConversationSchema } from "../../service/userServices/userProfile";
 import { useParams } from "react-router-dom";
 
+export interface ManagerData {
+  chatId: string;
+  companyName: string;
+  lastMessage:{message:string,time:string} ;
+
+  unreadCount: number;
+  events:string[]
+}
+
 const UserChat = () => {
   const userId = localStorage.getItem("userId");
   const { companyName, eventName } = useParams();
   console.log("Params:", companyName, eventName);
 
-  const [allManagers, setAllManagers] = useState<string[]>([]);
-  const [allEvents, setAllEvents] = useState<string[]>([]);
+  const [allManagers, setAllManagers] = useState<ManagerData[]>([]);
+  // const [allEvents, setAllEvents] = useState<string[]>([]);
   const [messages, setMessages] = useState<{ message: string; time: string,readCount:number }[]>([]);
-  const [selectedManager, setSelectedManager] = useState<string | null>(null);
+  const [selectedManager, setSelectedManager] = useState<string>("");
   const [managerId, setManagerId] = useState<string>("");
   const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string, senderId: string }[]>([]);
   const [senderId, setSenderId] = useState<string>("");
@@ -28,7 +37,8 @@ const UserChat = () => {
     if (eventName && companyName) {
       console.log("Evenntsfd", eventName, companyName);
 
-      createChatSchema(companyName, eventName)
+      createChatSchema(companyName)
+      setSelectedEvent(eventName);
     }
 
   }, [eventName, companyName, ])
@@ -38,31 +48,47 @@ const UserChat = () => {
       try {
         const result = await getManagerNames(userId);
 
-        if (result.success && Array.isArray(result.data.companyNames) && Array.isArray(result.data.eventNames)) {
-          console.log("Result:", result);
-
-          setAllManagers(result.data.companyNames.map((companyName: string) => companyName));
-          setAllEvents(result.data.eventNames.map((event: string) => event));
-
-          setAllChatIds(result.data.chatIds.map((chatId:string)=>chatId));
-          const formattedMessages = result.data.lastMessages.map((msg: any) => {
-            const rawTime = msg.time;
+        console.log("Result:", result);
+        if (result.success && Array.isArray(result.data)) {
+          const updatedManagers = result.data.map((manager: any) => {
+            const rawTime = manager?.lastMessage?.time;
             const date = new Date(rawTime);
             const time = !isNaN(date.getTime())
               ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
               : "Invalid time";
-  
-            return {
-              message: msg.message || "No message",
-              time,
-              readCount:msg.count
-            };
+        
+              return {
+                ...manager,
+                lastMessage: manager.lastMessage
+                  ? { ...manager.lastMessage, time }
+                  : null,
+              };
           });
+        
+          setAllManagers(updatedManagers); 
+        }
+        
+          
+          // setAllEvents(result.data.eventNames.map((event: string) => event));
+
+          // const formattedMessages = result.data.lastMessages.map((msg: any) => {
+          //   const rawTime = msg.time;
+          //   const date = new Date(rawTime);
+          //   const time = !isNaN(date.getTime())
+          //     ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          //     : "Invalid time";
   
-          setMessages(formattedMessages);
+          //   return {
+          //     message: msg.message || "No message",
+          //     time,
+          //     readCount:msg.count
+          //   };
+          // });
+  
+          // setMessages(formattedMessages);
   
 
-        } else {
+         else {
           console.error("Unexpected response format:", result);
         }
       } catch (error) {
@@ -74,13 +100,12 @@ const UserChat = () => {
   }, [userId]);
 
 
-
  
-  const createChatSchema = async (manager: string, event: string) => {
+  const createChatSchema = async (manager: string) => {
     console.log("confirm");
     if (!userId) return;
     console.log("confirm");
-    setSelectedEvent(event);
+
 
 
     try {
@@ -118,7 +143,7 @@ const UserChat = () => {
           <ProfileNavbar />
         </aside>
         <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-          <ManagerUserList managers={allManagers} events={allEvents} onSelectManager={createChatSchema} messages={messages} chatIds={chatIds}  setMessages={setMessages} person='Event Manager' />
+          <ManagerUserList managers={allManagers} onSelectManager={createChatSchema}  setSelectedEvent={setSelectedEvent}  setMessages={setMessages} person='Event Manager' />
           <ChatWindow
             selectedManager={selectedManager}
             setSelectedManager={setSelectedManager}
@@ -128,14 +153,6 @@ const UserChat = () => {
             managerId={managerId}
             selectedEvent={selectedEvent}
             setMessages={setMessages}
-        
-        
-            
-        
-
-
-
-
           />
 
         </div>

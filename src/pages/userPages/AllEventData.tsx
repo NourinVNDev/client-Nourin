@@ -324,27 +324,62 @@ const AllEventData = () => {
                     <h2 className="text-2xl font-bold text-gray-800 truncate">{post.eventName}</h2>
 
                     {/* Price Display */}
-                    <div className="flex justify-between items-center">
+                    {post.title!='Virtual'?(
+                      <div>
+                                          <div className="flex justify-between items-center">
+                                          <div className="flex items-center space-x-2">
+                                            <span className="text-xl font-bold text-green-600">₹{post.typesOfTickets[0]?.Amount}</span>
+                                            <span className="text-sm text-gray-500">per ticket</span>
+                                          </div><br />
+                                          {post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+                                            <span className="text-sm text-emerald-600 font-medium">
+                                              Save {post.typesOfTickets[0].offerDetails.offerPercentage}%
+                                            </span>
+                                          )}
+                                        </div><br />
+                    
+                                        <div className="flex items-center space-x-3 text-gray-600">
+                                          <FaBuilding className="text-blue-500 flex-shrink-0" />
+                                          <span className="text-sm truncate">{post.companyName}</span>
+                                        </div><br />
+                    
+                                        <div className="flex items-center space-x-3 text-gray-600">
+                                          <FaMapMarkerAlt className="text-red-500 flex-shrink-0" />
+                                          <span className="text-sm truncate">{post.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '') || "Unknown Location"}</span>
+                                        </div>
+                                        </div>
+
+                    ):(
+                      <div>
+                      <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold text-green-600">₹{post.typesOfTickets[0]?.Amount}</span>
+                        <span className="text-xl font-bold text-green-600">₹{post.amount}</span>
+                        <br />
                         <span className="text-sm text-gray-500">per ticket</span>
                       </div>
+                 
                       {post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
                         <span className="text-sm text-emerald-600 font-medium">
                           Save {post.typesOfTickets[0].offerDetails.offerPercentage}%
                         </span>
                       )}
                     </div>
+                    <br />
 
                     <div className="flex items-center space-x-3 text-gray-600">
                       <FaBuilding className="text-blue-500 flex-shrink-0" />
                       <span className="text-sm truncate">{post.companyName}</span>
                     </div>
+                    <br />
 
                     <div className="flex items-center space-x-3 text-gray-600">
                       <FaMapMarkerAlt className="text-red-500 flex-shrink-0" />
-                      <span className="text-sm truncate">{post.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '') || "Unknown Location"}</span>
+                      <span className="text-sm truncate">{'Virtual Event'}</span>
                     </div>
+                  
+                    </div>
+                    )}
+
                   </div>
                   <button
                     onClick={() => handleLike(index, post._id)}

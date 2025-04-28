@@ -8,12 +8,18 @@ import ManagerUserList from "../../components/userComponents/ManagerUserList";
 import ChatWindow from "../../components/userComponents/ChatWindow";
 import { createConversationSchemaOfManager } from "../../service/managerServices/userBookingService";
 import Footer from "../../components/managerComponents/Footer";
-
+export interface ManagerData{
+  chatId:string;
+  companyName:string;
+  lastMessage:{message:string,time:string};
+  unreadCount:number;
+  events:string[]
+}
 const ManagerChat = () => {
-    const [allUsers, setAllUsers] = useState<string[]>([]);
+    const [allUsers, setAllUsers] = useState<ManagerData[]>([]);
     const managerName = localStorage.getItem("ManagerName");
     const managerId = useSelector((state: RootState) => state.manager._id) || "";
-    const [selectedManager, setSelectedManager] = useState<string | null>(null);
+    const [selectedManager, setSelectedManager] = useState<string>('');
     const [messages, setMessages] = useState<{ message: string; time: string ,readCount:number}[]>([]);
     const [userId, setUserId] = useState<string>("");
     const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string,senderId:string }[]>([]);
@@ -28,27 +34,27 @@ const ManagerChat = () => {
             if (!managerName) return;
             try {
                 const result = await getUserNames(managerName);
-                if (result.success && Array.isArray(result.data.users) && Array.isArray(result.data.lastMessages)) {
-                    console.log("Result:", result.data.users.map((user: any) => user.firstName));
-                
-                    setAllUsers(result.data.users.map((user: any) => user.firstName));
-                    setAllChatIds(result.data.chatIds.map((chatId:string)=>chatId));
-                    const formattedMessages = result.data.lastMessages.map((msg: any) => {
-                      const rawTime = msg.time;
-                      const date = new Date(rawTime);
-                      const time = !isNaN(date.getTime())
-                        ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                        : "Invalid time";
-            
+                if (result.success && Array.isArray(result.data))  {
+                    console.log("Result:", result.data.map((comp:any)=>comp));
+                    const updatedUsers=result.data.map((user:any)=>{
+                      console.log("Time:",user?.lastMessage);
+                      
+                      const rawTime=user?.lastMessage?.time;
+                      console.log("Raw time",rawTime);
+                      const date=new Date(rawTime);
+                      const time=!isNaN(date.getTime())?
+                      date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):
+                      "Invalid time"
                       return {
-                        message: msg.message || "No message",
-                        time,
-                        readCount:msg.count
-                      };
-                    });
-
-            
-                    setMessages(formattedMessages);
+                        ...user,
+                        lastMessage:user.lastMessage?
+                        {...user.lastMessage,time}
+                        :null
+                      }
+                    })
+                    setAllUsers(updatedUsers);
+                
+                 
                 }
                 else {
                     console.error("Unexpected response format:", result);
@@ -106,7 +112,7 @@ const ManagerChat = () => {
 
             
             <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-                <ManagerUserList managers={allUsers}  events={['']}onSelectManager={createChatSchema} messages={messages}  setMessages={setMessages}  chatIds={chatIds}person='User'/>
+                <ManagerUserList managers={allUsers}  onSelectManager={createChatSchema} setMessages={setMessages} setSelectedEvent={setSelectedManager}  person='User'/>
                 <ChatWindow
                     selectedManager={selectedManager}
                     setSelectedManager={((setSelectedManager))}

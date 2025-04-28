@@ -1,5 +1,5 @@
 import Adminlogin from "../pages/adminPages/Adminlogin";
-import Adminhome from "../pages/adminPages/Adminhome";
+import Adminhome from "../pages/adminPages/AdminDashboard";
 import AdminUser from "../pages/adminPages/AdminUser";
 import AdminManager from "../pages/adminPages/AdminManager";
 import AdminCategory from "../pages/adminPages/AdminCategory";

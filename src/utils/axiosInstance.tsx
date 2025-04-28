@@ -30,25 +30,24 @@ API.interceptors.request.use(
     }
 );
 
-// Response Interceptor
+
 API.interceptors.response.use(
-    (response) => response, // Forward successful responses
+    (response) => response, 
     async (error) => {
         const originalRequest = error.config;
 
         if (error.response?.status === 401  && !originalRequest._retry) {
             console.log('Data from if-case')
-            originalRequest._retry = true; // Mark this request as retried
+            originalRequest._retry = true;
 
             try {
-                // Get a new access token using the refresh token
                 const res = await API.post("/refresh-token");
 
 
-                // Save the new access token in cookies
+            
                 document.cookie = `accessToken=${res.data.accessToken};`;
 
-                // Retry the failed request with the new token
+                
                 originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
                 return API(originalRequest);
             } catch (refreshError) {

@@ -21,6 +21,7 @@ import AllEventData from "../pages/userPages/AllEventData";
 import CheckLoginUser from "../components/userComponents/CheckLogin";
 import UserWallet from "../pages/userPages/UserWallet";
 import Notification from "../pages/userPages/Notification";
+import ManagerVideoCall from "../components/userComponents/ManagerVideoCall";
 const userRoutes = [
     { path: '/', element: <EntryHome /> },
     { path: '/login', element: <CheckLoginUser><Login /></CheckLoginUser> },
@@ -43,7 +44,9 @@ const userRoutes = [
     { path: '/user/chat/:companyName/:eventName', element: <PrivateRoute><UserChat /></PrivateRoute> },
     { path: '/user/bookedEvent', element: <PrivateRoute><EventBooking /></PrivateRoute> },
     {path:  '/user/wallet', element: <PrivateRoute><UserWallet/></PrivateRoute>},
-    {path:  '/notification',element:<PrivateRoute><Notification/></PrivateRoute>},
+    {path:  '/notifications',element:<PrivateRoute><Notification/></PrivateRoute>},
+    {path:  '/join-stream/:channelName',element:<PrivateRoute><ManagerVideoCall/></PrivateRoute>}
 ];
+
 
 export default userRoutes;

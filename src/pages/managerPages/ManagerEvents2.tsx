@@ -8,7 +8,9 @@ import { createEventSeatDetails } from "../../service/managerServices/handleEven
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { validateSeatDetails } from "../../validations/managerValid/validateSeatDetails";
-
+import useSocket from "../../utils/SocketContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../App/store";
 export interface EventFormValues {
     Included: string[];
     notIncluded: string[];
@@ -25,7 +27,9 @@ interface TicketErrors {
 }
 
 const ManagerEvents2: React.FC = () => {
+    const managerId=useSelector((state:RootState)=>state.manager._id);
     const [ticketsList, setTicketsList] = useState<EventFormValues[]>([]);
+    const {socket}=useSocket();
     const [formValues, setFormValues] = useState<EventFormValues>({
         Included: [""],
         notIncluded: [""],
@@ -52,7 +56,12 @@ const ManagerEvents2: React.FC = () => {
         if(eventId){
             const result=await createEventSeatDetails(ticketsList,eventId);
             console.log("Yess Checking",result);
-            if(result.message==='Event data saved successfully'){
+            if(result.message==='Event data saved successfully' && managerId){
+                const socketMessage={senderId:managerId,message:`${result.data.eventName} has just been hosted by ${result.data.companyName}`}
+                socket?.emit('post-new-event',socketMessage,(response:any)=>{
+                    console.log("Message sent from new-event",response);
+                    
+                })
                 navigate('/Manager/events');
             }
         }

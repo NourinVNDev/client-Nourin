@@ -22,12 +22,7 @@ const createEventpost = async (formData: FormData) => {
   console.log('data from client', formData);
   const response = await MANAGER_API("/createEvent", {
     method: "POST",
-
     data: formData,
-    withCredentials: true,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   });
 
 
@@ -42,7 +37,6 @@ const createEventSeatDetails = async (ticketList: eventSeat[], id: string) => {
     method: "POST",
 
     data: ticketList,
-    withCredentials: true,
 
   });
 
@@ -63,7 +57,6 @@ const getCategoryEventType = async () => {
     headers: {
       'Content-Type': 'application/json'
     },
-    withCredentials: true,
 
 
 
@@ -124,7 +117,6 @@ const updateEvent = async (eventDetails: FormData) => {
         'Content-Type': 'multipart/form-data'
       },
       data: eventDetails,
-      withCredentials: true,
     });
 
     console.log('success');

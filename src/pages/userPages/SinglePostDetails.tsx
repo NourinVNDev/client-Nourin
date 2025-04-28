@@ -158,7 +158,7 @@ const SinglePostDetails = () => {
                           <p className="text-yellow-700 pl-2 ">
                             {parsedData?.data?.result?.savedEvent?.address
                               ? `${parsedData.data.result.savedEvent.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '')}`
-                              : "Address"}
+                              : "Virtual"}
                           </p>
                         </div>
 
@@ -405,19 +405,24 @@ const SinglePostDetails = () => {
               </div>
 
               <br />
-              <div className="bg-gray-200 p-6 rounded-lg shadow-md items-center flex justify-center">
-                {selectedTicket ? (
-                  <Link to={`/checkEventDetails/${parsedData.data?.result.savedEvent._id}/${selectedTicket.type.toLowerCase()}`}>
-                    <button className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 transition items-center">
+              <div className="bg-gray-200 p-6 rounded-lg shadow-md flex justify-center items-center">
+                {selectedTicket || (parsedData.data?.result?.savedEvent?.title == 'Virtual' && selectedTicket !== null) ? (
+                  <Link
+                    to={`/checkEventDetails/${parsedData.data?.result?.savedEvent?._id}/${selectedTicket?.type?.toLowerCase()}`}
+                    className="w-full" // Make link take full width
+                  >
+                    <button className="bg-purple-700 text-white px-6 py-3 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-200 w-full">
                       Book The Slots
                     </button>
                   </Link>
                 ) : (
                   <button
                     disabled
-                    className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                    className="bg-gray-400 text-gray-600 px-6 py-3 rounded-lg cursor-not-allowed w-full"
                   >
-                    Select a Ticket First
+                    {parsedData.data?.result?.savedEvent?.title === 'Virtual' ?
+                      "Select a Ticket First" :
+                      "Select a Ticket Type First"}
                   </button>
                 )}
               </div>

@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useEffect,useState } from 'react';
 import NavBar from '../../components/adminComponents/NavBar';
 import { BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import Header from '../../components/adminComponents/Header';
 import Footer from '../../components/adminComponents/Footer';
+import { fetchUserManagerCountAndRevenue } from '../../service/adminServices/adminDashboard';
 
 const bookingData = [
   { month: "Jan", bookings: 65 },
@@ -31,38 +32,55 @@ const pieData = [
 const COLORS = ["#FF6B00", "#36A2EB", "#4BC0C0", "#FF5252", "#9966FF"];
 
 const DashboardPage: React.FC = () => {
+    const [dash, setDash] = useState({ userCount: 0,managerCount:0, revenue: 0 });
+  useEffect(()=>{
+    const fetchUserManagerAndRevenue = async () => {
+   
+        const result = await fetchUserManagerCountAndRevenue();
+        if (result.result.message ==='Manager User count fetched') {
+     
+          
+          setDash({
+            userCount: result.result.user.user,
+            managerCount:result.result.user.manager,
+            revenue: result.result.user.revenue,
+          });
+        
+      }
+    };
+    fetchUserManagerAndRevenue();
+
+  },[])
   return (
     <div className="w-screen h-screen flex flex-col bg-white">
-      {/* Header */}
+  
     <Header/>
 
-      {/* Main Content */}
       <div className="flex flex-1 w-full">
     
         <NavBar/>
       
 
-        {/* Content Area */}
         <main className="flex-1 bg-white p-8 space-y-12 overflow-hidden">
-          {/* Stats Section */}
+       
           <br />
           <div className="flex justify-between mb-8 space-x-8">
             <div className="bg-blue-100 p-4 rounded shadow-md w-1/4 text-center">
               <h2 className="font-bold text-black">Users</h2>
-              <p className="text-2xl text-black">389</p>
+              <p className="text-2xl text-black">{dash.userCount}</p>
             </div>
             <div className="bg-blue-100 p-4 rounded shadow-md w-1/4 text-center">
               <h2 className="font-bold text-black">Managers</h2>
-              <p className="text-2xl text-black">25</p>
+              <p className="text-2xl text-black">{dash.managerCount}</p>
             </div>
             <div className="bg-blue-100 p-4 rounded shadow-md w-1/4 text-center">
               <h2 className="font-bold text-black">Revenue</h2>
-              <p className="text-2xl text-black">₹1,93,900</p>
+              <p className="text-2xl text-black">₹{dash.revenue}</p>
             </div>
           </div>
      
 
-          {/* Charts Section */}
+     
           <section className="space-y-8">
           <br /><br /><br /><br /><br />
             <h3 className="font-bold text-black">Booked:</h3>
