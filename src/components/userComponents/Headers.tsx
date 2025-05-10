@@ -8,6 +8,8 @@ import { useLocation } from "react-router-dom";
 import { FaBell } from 'react-icons/fa'
 import useSocket from "../../utils/SocketContext";
 import { useNavigate } from "react-router-dom";
+import { fetchNotificationCount } from "../../service/userServices/userProfile";
+
 
 
 export default function Header() {
@@ -23,6 +25,21 @@ export default function Header() {
   const [notificationCount, setNotificationCount] = useState(0);
 
   const { socket } = useSocket();
+
+
+
+  useEffect(()=>{
+    const fetchNotificationData=async()=>{
+      if(user._id){
+      const result=await fetchNotificationCount(user._id);
+      console.log("Result:",result);
+      setNotificationCount(result.data)
+      
+      }
+
+    }
+    fetchNotificationData();
+  },[])
 
   useEffect(() => {
     if (profilePhoto) {
@@ -50,7 +67,7 @@ export default function Header() {
  
    
     
-      socket.on('new-notification',messageListener)
+      socket.on('new-notification',messageListener);
     
 
   },[socket])
@@ -58,7 +75,7 @@ export default function Header() {
     <header className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg">
       <div className="container mx-auto px-6 py-6 flex justify-between items-center">
         {/* Logo Section */}
-        <Link to="/" className="text-3xl font-extrabold text-white tracking-wide hover:text-blue-300 transition-all duration-300">
+        <Link to="/home" className="text-3xl font-extrabold text-white tracking-wide hover:text-blue-300 transition-all duration-300">
           MeetCraft
         </Link>
 

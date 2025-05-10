@@ -13,7 +13,7 @@ export default function Hero() {
                 Create, innovate, and embrace a journey of endless possibilities.
               </p>
               <p className="text-lg mb-6 opacity-80">
-                At VisionGrid, we curate unforgettable events, from corporate conferences to cultural festivals. Let’s make memories together.
+                At MeetCraaft, we curate unforgettable events, from corporate conferences to cultural festivals. Let’s make memories together.
               </p>
               <button className="px-8 py-4 text-lg font-semibold bg-blue-700 rounded-lg shadow-lg hover:bg-blue-800 transition-all duration-300 transform hover:scale-105">
                 Book Packages

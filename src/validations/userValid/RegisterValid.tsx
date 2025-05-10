@@ -54,19 +54,13 @@ export const registerValidation = (formData: FormData) => {
     } else if (!/[!@#$%^&*]/.test(formData.password)) {
         errors.password = "Password must contain at least one special character (!@#$%^&*).";
     }
-
-    // Validate confirm password
     if (!formData.confirmPassword) {
         errors.confirmPassword = "Confirm password is required.";
     } else if (formData.password !== formData.confirmPassword) {
         errors.confirmPassword = "Passwords do not match.";
     }
-
-    // Return errors if any
     if (Object.keys(errors).length > 0) {
         return { success: false, errors };
     }
-
-    // If no errors, return success
     return { success: true, errors: {} };
 };

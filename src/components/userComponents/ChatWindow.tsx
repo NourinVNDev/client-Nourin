@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import useSocket from "../../utils/SocketContext";
 import MessageBubble from "../userComponents/MessageBubble";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
+import { ManagerData } from "../../pages/userPages/UserChat";
 
 
 interface ChatWindowProps {
@@ -16,7 +17,7 @@ interface ChatWindowProps {
   managerId: string;
   selectedEvent?: string;
   setMessages:React.Dispatch<React.SetStateAction<{ message: string; time: string; readCount:number}[]>>
-
+  setAllManagers: React.Dispatch<React.SetStateAction<ManagerData[]>>;
 }
 
 
@@ -31,7 +32,8 @@ const ChatWindow = ({
   senderId,
   managerId,
   selectedEvent,
-  setMessages
+  setMessages,
+  setAllManagers
 }: ChatWindowProps) => {
   const navigate=useNavigate();
   const user = useSelector((state: RootState) => state.user._id);
@@ -47,7 +49,7 @@ const ChatWindow = ({
   navigate(`/room/${roomId}`);
 };
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   }, [allMessages]);
 
   
@@ -71,6 +73,20 @@ const ChatWindow = ({
             )
           );
         }
+        setAllManagers(prevManagers =>
+          prevManagers.map(chat =>
+            chat.chatId === chatId
+              ? {
+                  ...chat,
+                  lastMessage: {
+                    message,
+                    time: formattedTime,
+                    readCount:0
+                  },
+                }
+              : chat
+          )
+        );
         
 
       } else {
@@ -104,8 +120,23 @@ const ChatWindow = ({
         const date = new Date(rawTime);
         if (!isNaN(date.getTime())) {
           const formattedTime = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+          
   
           setMessages(prev => [...prev, { message: msg, time: formattedTime ,readCount:totalCount}]);
+
+          setAllManagers(prevManagers =>
+            prevManagers.map((chat:any) =>
+              chat.chatId === localStorage.getItem("chatId")
+                ? {
+                    ...chat,
+                    lastMessage: {
+                      message: msg,
+                      time: formattedTime,
+                    },
+                  }
+                : chat
+            )
+          );
         } else {
           console.warn("Invalid date format in ack:", rawTime);
           
@@ -131,7 +162,7 @@ const ChatWindow = ({
                <h4 className="font-semibold">{selectedManager}</h4>
              </div>
              {/* <Button onPress={() => setSelectedManager(null)}>Close</Button> */}
-             <button onClick={createRoom}>Start New Call</button>
+             {/* <button onClick={createRoom}>Start New Call</button> */}
            </div>
 
           ):(
@@ -139,7 +170,7 @@ const ChatWindow = ({
             <div>
               <h2 className="text-lg font-bold">{selectedManager}</h2>
             </div>
-            <button onClick={createRoom}>Start New Call</button>;
+            {/* <button onClick={createRoom}>Start New Call</button>; */}
           </div>
           )}
          

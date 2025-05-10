@@ -10,10 +10,9 @@ import { useParams } from "react-router-dom";
 export interface ManagerData {
   chatId: string;
   companyName: string;
-  lastMessage:{message:string,time:string} ;
-
+  lastMessage: { message: string, time: string };
   unreadCount: number;
-  events:string[]
+  events: string[]
 }
 
 const UserChat = () => {
@@ -23,15 +22,15 @@ const UserChat = () => {
 
   const [allManagers, setAllManagers] = useState<ManagerData[]>([]);
   // const [allEvents, setAllEvents] = useState<string[]>([]);
-  const [messages, setMessages] = useState<{ message: string; time: string,readCount:number }[]>([]);
+  const [messages, setMessages] = useState<{ message: string; time: string, readCount: number }[]>([]);
   const [selectedManager, setSelectedManager] = useState<string>("");
   const [managerId, setManagerId] = useState<string>("");
   const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string, senderId: string }[]>([]);
   const [senderId, setSenderId] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState('');
 
-  const [messageCount,setMessageCount]=useState(0);
-  const [chatIds,setAllChatIds]=useState<string[]>([])
+  const [messageCount, setMessageCount] = useState(0);
+  const [chatIds, setAllChatIds] = useState<string[]>([])
 
   useEffect(() => {
     if (eventName && companyName) {
@@ -41,14 +40,14 @@ const UserChat = () => {
       setSelectedEvent(eventName);
     }
 
-  }, [eventName, companyName, ])
+  }, [eventName, companyName,])
   useEffect(() => {
     const fetchManagerNames = async () => {
       if (!userId) return;
       try {
         const result = await getManagerNames(userId);
 
-        console.log("Result:", result);
+        console.log("Result789:", result);
         if (result.success && Array.isArray(result.data)) {
           const updatedManagers = result.data.map((manager: any) => {
             const rawTime = manager?.lastMessage?.time;
@@ -56,39 +55,39 @@ const UserChat = () => {
             const time = !isNaN(date.getTime())
               ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
               : "Invalid time";
-        
-              return {
-                ...manager,
-                lastMessage: manager.lastMessage
-                  ? { ...manager.lastMessage, time }
-                  : null,
-              };
+
+            return {
+              ...manager,
+              lastMessage: manager.lastMessage
+                ? { ...manager.lastMessage, time }
+                : null,
+            };
           });
-        
-          setAllManagers(updatedManagers); 
+
+          setAllManagers(updatedManagers);
         }
-        
-          
-          // setAllEvents(result.data.eventNames.map((event: string) => event));
 
-          // const formattedMessages = result.data.lastMessages.map((msg: any) => {
-          //   const rawTime = msg.time;
-          //   const date = new Date(rawTime);
-          //   const time = !isNaN(date.getTime())
-          //     ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-          //     : "Invalid time";
-  
-          //   return {
-          //     message: msg.message || "No message",
-          //     time,
-          //     readCount:msg.count
-          //   };
-          // });
-  
-          // setMessages(formattedMessages);
-  
 
-         else {
+        // setAllEvents(result.data.eventNames.map((event: string) => event));
+
+        // const formattedMessages = result.data.lastMessages.map((msg: any) => {
+        //   const rawTime = msg.time;
+        //   const date = new Date(rawTime);
+        //   const time = !isNaN(date.getTime())
+        //     ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        //     : "Invalid time";
+
+        //   return {
+        //     message: msg.message || "No message",
+        //     time,
+        //     readCount:msg.count
+        //   };
+        // });
+
+        // setMessages(formattedMessages);
+
+
+        else {
           console.error("Unexpected response format:", result);
         }
       } catch (error) {
@@ -100,7 +99,7 @@ const UserChat = () => {
   }, [userId]);
 
 
- 
+
   const createChatSchema = async (manager: string) => {
     console.log("confirm");
     if (!userId) return;
@@ -114,6 +113,13 @@ const UserChat = () => {
       console.log("Result:", result);
 
       if (result?.data?.data?.managerId) {
+        setAllManagers(prev =>
+          prev.map(manager =>
+            manager.chatId === result.data.data.conversation._id
+              ? { ...manager, unreadCount: 0 }
+              : manager
+          )
+        );
         setManagerId(result.data.data.managerId);
 
         setSenderId(result.data.data.conversation?.participants[0] || "");
@@ -134,16 +140,16 @@ const UserChat = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div>
-      <Header  /> 
-    
+        <Header />
+
       </div>
       <div className="flex-1 flex">
-      <aside className="bg-gray-800 mb-10">
+        <aside className="bg-gray-800 mb-10">
 
           <ProfileNavbar />
         </aside>
         <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-          <ManagerUserList managers={allManagers} onSelectManager={createChatSchema}  setSelectedEvent={setSelectedEvent}  setMessages={setMessages} person='Event Manager' />
+          <ManagerUserList managers={allManagers} onSelectManager={createChatSchema} setSelectedEvent={setSelectedEvent} setMessages={setMessages} person='Event Manager' setAllManagers={setAllManagers} />
           <ChatWindow
             selectedManager={selectedManager}
             setSelectedManager={setSelectedManager}
@@ -153,6 +159,7 @@ const UserChat = () => {
             managerId={managerId}
             selectedEvent={selectedEvent}
             setMessages={setMessages}
+            setAllManagers={setAllManagers}
           />
 
         </div>

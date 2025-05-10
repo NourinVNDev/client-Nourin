@@ -19,16 +19,16 @@ const Notification = () => {
     const fetchNotification = async () => {
       if (userId) {
         const result = await fetchUserNotificaiton(userId);
-        console.log("Result:", result);
+        console.log("Result123:", result);
 
-        if (result.message === "Notifications retrieved successfully") {
-            console.log("Same:",result.data);
-            
-          setNotifications(result.data); // assuming result.data is the array
+        if (result.message =="Notifications retrieved and marked as read") {
+          console.log("Gang");
+          
+            console.log("Same:",result.data); 
+          setNotifications(result.data);
         }
       }
     };
-
     fetchNotification();
   }, [userId]);
   useEffect(()=>{

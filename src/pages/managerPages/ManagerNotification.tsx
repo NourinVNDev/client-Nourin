@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { fetchManagerNotification } from "../../service/managerServices/handleNotification";
-
+import person from '../../assets/person.png'
 const ITEMS_PER_PAGE = 5;
 
 const ManagerNotification = () => {
@@ -20,8 +20,8 @@ const ManagerNotification = () => {
         const result = await fetchManagerNotification(managerId);
         console.log("Result:", result);
 
-        if (result.message === "notification retrieve successfully") {
-          const sortedData = result.data.user.sort(
+        if (result.message === "Notifications retrieved successfully") {
+          const sortedData = result.data.sort(
             (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           setNotificationData(sortedData);
@@ -52,13 +52,13 @@ const ManagerNotification = () => {
                 className="flex items-center gap-4 mb-3 p-2"
               >
                 <img
-                  src={item.senderImage}
+                  src={item.senderImage||person}
                   alt="sender"
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div className="flex flex-col">
                   <span className="text-sm text-gray-500 font-medium">
-                    {item.senderName}
+                    {item.senderName||''}
                   </span>
                   <span className="text-base font-semibold text-gray-800">
                     {item.heading}
@@ -68,7 +68,7 @@ const ManagerNotification = () => {
   {new Date(item.createdAt).toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true, // set to false if you want 24-hour format
+    hour12: true, 
   })}
 </span>
 

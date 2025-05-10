@@ -47,11 +47,13 @@ import storage from "redux-persist/lib/storage"; // Local storage
 import userReducer from "../Features/userSlice";
 import managerReducer from "../Features/managerSlice";
 import { combineReducers } from "redux";
+import verifierReducer from "../Features/verifierSlice";
 
 // Combine reducers
 const rootReducer = combineReducers({
   user: userReducer,
   manager: managerReducer,
+  verifier:verifierReducer
 });
 
 // Persist config

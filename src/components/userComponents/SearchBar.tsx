@@ -118,11 +118,11 @@ const SearchBar: React.FC<MapboxAutocompleteProps> = ({
       placeholder: 'Search for a location...',
       marker: false,
       flyTo: false,
-      // Force these options for better suggestion behavior
-      countries: undefined, // Don't restrict by country
-      limit: 5, // Show more results
-      minLength: 2, // Start showing results with fewer characters
-      proximity: undefined, // Don't bias by proximity
+    
+      countries: 'in',
+      limit: 5, 
+      minLength: 2, 
+      proximity: undefined, 
     });
     
     geocoderRef.current = geocoder;

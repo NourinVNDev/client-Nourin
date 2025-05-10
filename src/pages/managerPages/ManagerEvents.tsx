@@ -95,7 +95,6 @@ const ManagerEvents: React.FC = () => {
         }else{
           formData.append('amount','null');
         }
-
         const result = await createEventpost(formData) as EventPostResponse;
         
         if (result.message === "Event data saved successfully" && result.data) {

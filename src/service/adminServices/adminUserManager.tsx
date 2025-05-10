@@ -4,7 +4,7 @@ const getUserDetails = async () => {
     try {
         const response = await ADMIN_API('/admin/users', {
             method: 'GET',
- 
+            withCredentials:true
         });
         const data = response.data;
         console.log("hello", data);

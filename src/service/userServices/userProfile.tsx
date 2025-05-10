@@ -115,6 +115,23 @@ const createConversationSchema = async (manager: string, userId: string) => {
 
 };
 
+const fetchNotificationCount=async(userId:string)=>{
+    try{
+
+    const response = await API(`/fetchNotificationCount/${userId}`, {
+        method: "GET"
+
+    });
+
+    const data = response.data;
+    return data;
+} catch (error) {
+    console.error("Error creating conversation schema:", error);
+    return undefined;
+}
+
+}
+
 const postUserProfilePicture=async(formData:FormData,userId:string)=>{
     try {
      
@@ -148,5 +165,6 @@ export {
     eventBookingDetails,
     createConversationSchema,
     postUserProfilePicture,
-    getUserNames
+    getUserNames,
+    fetchNotificationCount
 };

@@ -3,10 +3,14 @@ import { Link } from "react-router-dom";
 import { FaBell } from 'react-icons/fa'
 import { useNavigate } from "react-router-dom";
 import useSocket from "../../utils/SocketContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../App/store";
+import { fetchManagerNotificationCount } from "../../service/managerServices/handleNotification";
 
 const Header:React.FC=()=>{
     const {socket}=useSocket();
     const navigate=useNavigate();
+    const manager=useSelector((state:RootState)=>state.manager._id);
       const [notificationCount, setNotificationCount] = useState(0);
       const  handleNotification=()=>{
         navigate('/Manager/notification')
@@ -15,25 +19,41 @@ const Header:React.FC=()=>{
       useEffect(() => {
 
         if (!socket) return;
-        const messageData = ({ senderId, message }: { senderId: string; message: string; }) => {
+        const messageData = ({ senderId, message,count }: { senderId: string; message: string; count:number}) => {
             console.log("Hellom");
             
-          setNotificationCount(prevCount => prevCount + 1);
+          setNotificationCount(count);
 
           console.log("black", senderId, message);
     
         };
+        const messageData1=({unreadCount}:{unreadCount:number})=>{
+          setNotificationCount(unreadCount);
+        }
     
         socket.on("receive-notification-message", messageData);
+        socket.on('new-catefication',messageData1)
     
         return () => {
           socket.off("receive-notification-message", messageData);
         };
       }, [socket])
+      useEffect(()=>{
+        const fetchNotificationData=async()=>{
+          if(manager){
+          const result=await fetchManagerNotificationCount(manager);
+          console.log("Result of Manager:",result);
+          setNotificationCount(result.data)
+          
+          }
+    
+        }
+        fetchNotificationData();
+      },[])
       return (
         <div>
           {/* Header */}
-          <header className="bg-blue-500 text-white flex items-center justify-between px-12 py-8 shadow-md w-full h-24 md:h-28 lg:h-32">
+          <header className="bg-blue-500 text-white flex items-center justify-between px-12 py-8 shadow-md w-full h-10 md:h-20 lg:h-30">
             <h1 className="text-2xl font-bold">MeetCraft</h1>
             
             <div className="flex items-center space-x-8">

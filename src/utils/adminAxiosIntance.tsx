@@ -1,22 +1,24 @@
 import axios from "axios";
-import Swal from "sweetalert2";
 import { ADMIN_URL } from "./userUrl";
-// Base Axios instance
+
 const ADMIN_API = axios.create({ baseURL:ADMIN_URL, withCredentials: true });
 
 
 
 
-const getToken = () =>
-    document.cookie.split("; ").find(row => row.startsWith("adminToken="))?.split("=")[1] ||
+const getToken = () =>document.cookie.split("; ").find(row => row.startsWith("adminToken="))?.split("=")[1] ||
+  console.log("Nourin");
   
-// Request Interceptor
+  console.log("dbjn",getToken);
 ADMIN_API.interceptors.request.use(
+
     (config) => {
+          console.log("bjjj");
         const token = getToken();
+
         console.log(token, "token")
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`; // Attach access token
+            config.headers.Authorization = `Bearer ${token}`; 
         }
         return config;
     },
@@ -25,18 +27,18 @@ ADMIN_API.interceptors.request.use(
     }
 );
 
-// Response Interceptor
+
 ADMIN_API.interceptors.response.use(
-    (response) => response, // Forward successful responses
+    (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
         if (error.response?.status === 401  && !originalRequest._retry) {
             console.log('Data from if-case')
-            originalRequest._retry = true; // Mark this request as retried
+            originalRequest._retry = true; 
 
             try {
-                // Get a new access token using the refresh token
+         
                 const res = await ADMIN_API.post("/refresh-token");
 
 
@@ -50,14 +52,6 @@ ADMIN_API.interceptors.response.use(
                 console.error("Token refresh failed:", refreshError);
                 window.location.href = "/adminlogin"; // Redirect to login if refresh fails
             }
-        }else if(error.response?.status===403){
-            Swal.fire({
-                title: "Access Denied",
-                text: "Your account has been blocked by the admin.",
-                icon: "warning",
-                confirmButtonText: "OK",
-                allowOutsideClick: false,
-              });
         }
 
         return Promise.reject(error); // Forward other errors

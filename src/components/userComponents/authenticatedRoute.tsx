@@ -5,12 +5,12 @@ type PrivateRouteProps = {
     children?: ReactNode;
 };
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
+const AuthenticatedUser: React.FC<PrivateRouteProps> = ({ children }) => {
     console.log("Hello from PrivteRoute");
     
     const isUserAuthenticate = localStorage.getItem('userAuth') === 'true';
 
-    return isUserAuthenticate ? <>{children}</> : <Navigate to="/login" />;
+    return isUserAuthenticate ? <><Navigate to="/home" />;</> :<> {children}</>;
 };
 
-export default PrivateRoute;
+export default AuthenticatedUser;

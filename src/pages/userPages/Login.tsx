@@ -48,7 +48,7 @@ const Login: React.FC = () => {
             let result = await userLogin(formData);
             console.log("Wait",result);
             
-            if (result?.data ===  'Login Successful' && result?.user.isBlock===false ) {
+            if ( result?.data==='Login Successful' && result?.user.isBlock===false ) {
 
                 const userData = {
                     _id:result.user._id,
@@ -57,7 +57,13 @@ const Login: React.FC = () => {
                     phoneNo: result.user.phoneNo,
                     email: result.user.email,
                     profilePhoto:result.user.profilePhoto||null,
-                    Address:result.user.address||null
+                    Address:result.user.address||null,
+                    location: {
+                        coordinates: [
+                            result.user.location.coordinates[0] || 0,
+                            result.user.location.coordinates[1] || 0
+                        ] as [number, number]
+                    }
                 };
                 dispatch(setUserDetails(userData));
                 localStorage.setItem('userAuth','true');
@@ -69,11 +75,6 @@ const Login: React.FC = () => {
                 } else {
                     console.log("Invalid user data: _id is missing");
                 }
-
-
-           
-        
-            
             } else if(result?.data ===  'Login Successful' && result?.user.isBlock===true){
                 setErrorMessage('User is Blocked by Admin')
             }else {
@@ -98,7 +99,13 @@ const Login: React.FC = () => {
               _id:result.data.user._id,
               phoneNo:result.data.user.phoneNo||null,
               Address:result.data.user.address||null,
-              profilePhoto:result.data.user.profilePhoto||null
+              profilePhoto:result.data.user.profilePhoto||null,
+              location: {
+                coordinates: [
+                    result.user.location.coordinates[0] || 0,
+                    result.user.location.coordinates[1] || 0
+                ] as [number, number]
+            }
 
             };
       

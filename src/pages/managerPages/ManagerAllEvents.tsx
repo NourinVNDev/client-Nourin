@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import useSocket from "../../utils/SocketContext";
 
-const CHANNEL='meetCraft'
+
 interface Location {
   address: string;
   city: string;
@@ -49,13 +49,13 @@ interface EventData {
 }
 
 const ManagerAllEvents = () => {
-  const {socket}=useSocket();
+  const { socket } = useSocket();
   const [events, setEvents] = useState<EventData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 5;
   const navigate = useNavigate();
   const managerId = useSelector((state: RootState) => state.manager._id);
-  const [searchTerm,setSearchTerm]=useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -111,34 +111,33 @@ const ManagerAllEvents = () => {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  const startVideoCall=()=>{
-    navigate('/Manager/videoCall');
+  const startVideoCall = () => {
+    navigate('/Manager/videoCall?channelName=' + 'meetCraft' + '&role=' + 'manager' + '&token=' + '007eJxTYFA4pbjs+hSWpmST0192JP32T8idbftL4Po5XscmxSdHxXcqMJgYmCRbGlgYJaUZJJukWSQnJpkYJCUZmVhapKYaJhsZzU6VyWgIZGTosVvLwsgAgSA+J0NuamqJc1FiWgkDAwAQqCGI');
   }
 
 
   const handleGenerateLink = async (eventId: string) => {
     try {
-      // 1. Construct the join link
-      const joinLink = `join-stream/${CHANNEL}`;
-      console.log("JOin LInk",joinLink);
-      
-      const socketMessage={link:joinLink,managerId:managerId,eventId:eventId}
-      socket?.emit('post-videoCallLink',socketMessage,(response:any)=>{
-        console.log("Message sent Aknowledgement",response);
-        
-      })
-      
+      const joinLink = 'join-stream?channelName=' + 'meetCraft' + '&token=' + '007eJxTYFA4pbjs+hSWpmST0192JP32T8idbftL4Po5XscmxSdHxXcqMJgYmCRbGlgYJaUZJJukWSQnJpkYJCUZmVhapKYaJhsZzU6VyWgIZGTosVvLwsgAgSA+J0NuamqJc1FiWgkDAwAQqCGI';
+      console.log("Join LInk", joinLink);
 
-      
+      const socketMessage = { link: joinLink, managerId: managerId, eventId: eventId }
+      socket?.emit('post-videoCallLink', socketMessage, (response: any) => {
+        console.log("Message sent Aknowledgement", response);
+
+      })
+
+
+
       alert('Notification sent with join link!');
     } catch (error) {
       console.error('Failed to generate link or send notification', error);
       alert('Something went wrong.');
     }
   };
-  
-  
-  
+
+
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 text-black">
       <Header />
@@ -156,33 +155,33 @@ const ManagerAllEvents = () => {
               </Link>
             </div>
             <div className="max-w-md mx-auto">
-            <div className="relative flex items-center w-full h-12 bg-white rounded-lg focus-within:shadow-lg overflow-hidden">
-              <div className="grid place-items-center h-full w-12 text-gray-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+              <div className="relative flex items-center w-full h-12 bg-white rounded-lg focus-within:shadow-lg overflow-hidden">
+                <div className="grid place-items-center h-full w-12 text-gray-300">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  className="peer h-full w-full outline-none text-sm  bg-white text-gray-700 pr-2"
+                  type="text"
+                  id="search"
+                  onChange={handleSearchEvent}
+                  placeholder="Search by Event Name..."
+                />
               </div>
-              <input
-                className="peer h-full w-full outline-none text-sm  bg-white text-gray-700 pr-2"
-                type="text"
-                id="search"
-                onChange={handleSearchEvent}
-                placeholder="Search by Event Name..."
-              />
             </div>
-            </div>
-            <br /><br />  
+            <br /><br />
             {currentEvents && currentEvents.length > 0 ? (
               <>
                 <div className="overflow-x-auto bg-white shadow-md rounded">
@@ -223,63 +222,63 @@ const ManagerAllEvents = () => {
                             )}
                           </td>
                           <td className="border border-gray-300 px-4 py-3">{event.title}</td>
-                          {event.title!='Virtual'?(
-                          <td className="border border-gray-300 px-4 py-3">{event.destination}</td>
-                        ):(
-                          <div className="px-4 p-10">
-                    
-                        
-                          <button
-onClick={() => handleGenerateLink(event._id)}
-className="ml-4 text-blue-600 underline hover:text-blue-800 text-sm flex"
->
-Generate a Link
-</button>
+                          {event.title != 'Virtual' ? (
+                            <td className="border border-gray-300 px-4 py-3">{event.destination}</td>
+                          ) : (
+                            <div className="px-4 p-10">
 
-                        </div>
-                        
-                        )}
+
+                              <button
+                                onClick={() => handleGenerateLink(event._id)}
+                                className="ml-4 text-blue-600 underline hover:text-blue-800 text-sm flex"
+                              >
+                                Generate a Link
+                              </button>
+
+                            </div>
+
+                          )}
                           <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
                           <td className="border  px-4 py-3">
-                            {event.title!=='Virtual'?(
-                                   <div className="flex flex-col space-y-2">
-                                   {event.typesOfTickets.map((ticket, index) => (
-                                     <div
-                                       key={index}
-                                       className="flex items-center justify-between "
-                                     >
-                                       <span className="font-semibold text-indigo-700">{ticket.type}</span>
-                                       <div className="flex items-center space-x-2">
-                                         <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
-                                         <span className="text-gray-500 text-sm">
-                                           ({ticket.noOfSeats} seats available)
-                                         </span>
-                                       </div>
-                                     </div>
-                                   ))}
-                                 </div>
-                            ):(
+                            {event.title !== 'Virtual' ? (
+                              <div className="flex flex-col space-y-2">
+                                {event.typesOfTickets.map((ticket, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between "
+                                  >
+                                    <span className="font-semibold text-indigo-700">{ticket.type}</span>
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
+                                      <span className="text-gray-500 text-sm">
+                                        ({ticket.noOfSeats} seats available)
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
                               <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition-all duration-300" onClick={startVideoCall}>
-                              Start Video Call
-                            </button>
-                            
+                                Start Video Call
+                              </button>
+
                             )}
-                       
+
                           </td>
                           <td>
-                          
-                                  <div className=" px-4">
-                                  <button
-                                    onClick={() => handleEventEdit(event._id)}
-                                    className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
-                                  >
-                                    Edit
-                                  </button>
-                                  </div>
+
+                            <div className=" px-4">
+                              <button
+                                onClick={() => handleEventEdit(event._id)}
+                                className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
+                              >
+                                Edit
+                              </button>
+                            </div>
 
 
-                       
-                        
+
+
                           </td>
                         </tr>
                       ))}
@@ -287,7 +286,7 @@ Generate a Link
                   </table>
                 </div>
 
-            
+
                 <div className="flex justify-center items-center mt-4 space-x-2">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}

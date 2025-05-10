@@ -24,6 +24,7 @@
     "dotenv": "^16.4.7",
     "express-session": "^1.18.1",
     "formik": "^2.4.6",
+    "html5-qrcode": "^2.3.8",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.462.0",
     "mapbox-gl": "^3.10.0",

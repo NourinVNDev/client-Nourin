@@ -7,7 +7,8 @@ interface UserState {
   phoneNo: string | null;
   Address:string| null;
   profilePhoto:string|null;
-  _id:string|null
+  _id:string|null,
+  location: {  coordinates: [number, number] };
 }
 
 
@@ -26,6 +27,7 @@ const initialState: UserState = {
   phoneNo: null,
   Address:null,
   profilePhoto:null,
+  location:{coordinates:[0,0]}
 };
 
 
@@ -43,6 +45,7 @@ const userSlice = createSlice({
       state._id=action.payload._id;
       state.Address=action.payload.Address;
       state.profilePhoto=action.payload.profilePhoto;
+      state.location = action.payload.location; 
     },
     // Clear user details
     clearUserDetails: (state) => {

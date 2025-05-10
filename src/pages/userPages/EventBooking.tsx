@@ -99,6 +99,13 @@ console.log("Selected:",eventDetails);
     }
   };
 
+  const onRetryPayment=(bookingId:string)=>{
+    console.log("Working?");
+    
+    navigate(`/events/retry-payment/${bookingId}`);
+
+  }
+
   const handleOpenModal = (event: EventDetails) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
@@ -227,6 +234,7 @@ console.log("Selected:",eventDetails);
         onClose={handleCloseModal}
         event={selectedEvent}
         onCancelEvent={onCancelEventfn}
+        onRetryPayment={onRetryPayment}
       />
 
       <Footer />

@@ -2,6 +2,7 @@ import Header from "../../components/adminComponents/Header";
 import NavBar from "../../components/adminComponents/NavBar";
 import Footer from "../../components/adminComponents/Footer";
 import { addNewCategoryDetails } from "../../service/adminServices/adminCategoryAndWallet";
+import useSocket from "../../utils/SocketContext";
 import  { useState } from "react";
 import toast ,{Toaster} from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,8 @@ const AdminAddCategory = () => {
      description:''
       });
       const navigate=useNavigate();
+
+      const {socket}=useSocket();
 
     const handleFormSubmit=async (e:React.FormEvent)=>{
     
@@ -31,10 +34,12 @@ const AdminAddCategory = () => {
   
           if (result.message=='Category data saved successfully') {
             toast.success("New Category created successfully!")
-            setEventCategory({
-              categoryName:'',
-              description:''
-            });
+         
+            socket?.emit('post-new-category',eventCategory.categoryName,(response:any)=>{
+              console.log("Acknowledgement",response);
+              
+            })
+
             navigate('/admin/category')
           
           } else {

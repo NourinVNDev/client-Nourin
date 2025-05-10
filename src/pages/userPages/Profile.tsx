@@ -9,6 +9,7 @@ import { AppDispatch } from '../../../App/store';
 import { setUserDetails } from '../../../Features/userSlice';
 import { useFormik } from 'formik';
 import { profileValidSchema } from '../../validations/userValid/profileValidSchema';
+import MapboxAutocomplete from '../../components/managerComponents/LocationSearch';
 
 const ProfilePage = () => {
   const userId = localStorage.getItem('userId');
@@ -21,7 +22,8 @@ const ProfilePage = () => {
     phoneNo:string,
     Address:string
     profilePhoto:string,
-    _id:string
+    _id:string,
+    location:{coordinates:[number,number]}
 
   }
   // Formik Setup
@@ -47,6 +49,13 @@ const ProfilePage = () => {
             phoneNo:result.user.phoneNo,
             Address:result.user.address,
             profilePhoto:result.user.profilePhoto||null,
+            location: {
+            
+              coordinates: [
+                result.user.location.coordinates[0],
+                result.user.location.coordinates[1]
+              ],
+            },
             _id:result.user._id,
           }
           dispatch(setUserDetails(userData));
@@ -58,7 +67,11 @@ const ProfilePage = () => {
     }
   });
 
-  // Fetch user data on mount
+  
+  const handleLocationSelect = (lat: number, lng: number, place: string): void => {
+    formik.setFieldValue("address", place);
+    console.log("Latitude,longitude",lat,lng);
+  };
   useEffect(() => {
     const fetchUserData = async () => {
       console.log("User Details:",userId);
@@ -166,16 +179,18 @@ const ProfilePage = () => {
                     </div>
 
                     {/* Address */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col w-1/2">
                       <label className="font-medium text-gray-700">Address:</label>
-                      <input
+                 
+                      <MapboxAutocomplete onSelectLocation={handleLocationSelect}/>
+                         <input
                         type="text"
                         name="address"
                         value={formik.values.address}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         className="border-2 border-gray-300 p-2 rounded-md mt-1 bg-white"
-                      />
+                      /> 
                       {formik.touched.address && formik.errors.address && (
                         <p className="text-red-500 text-xs">{formik.errors.address}</p>
                       )}

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import NavBar from '../../components/managerComponents/NavBar';
-import {  LineChart, Line , XAxis, YAxis, PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import Header from '../../components/managerComponents/Header';
 import Footer from '../../components/managerComponents/Footer';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/store';
-import { fetchUserCountAndRevenue, fetchDashboardGraphData ,fetchPieChatData} from '../../service/managerServices/handleDashboard';
+import { fetchUserCountAndRevenue, fetchDashboardGraphData, fetchPieChatData } from '../../service/managerServices/handleDashboard';
 
 
 const COLORS = ["#FF6B00", "#36A2EB", "#4BC0C0", "#FF5252", "#9966FF"];
@@ -29,7 +29,7 @@ const DashboardPage: React.FC = () => {
     fetchUserAndRevenue();
   }, [managerId]);
 
-  
+
 
 
 
@@ -37,7 +37,7 @@ const DashboardPage: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState("Yearly");
   const [selectedType, setSelectedType] = useState("Booking");
   const [graphData, setGraphData] = useState([]);
-  const [pieData,setPieData]=useState([]);
+  const [pieData, setPieData] = useState([]);
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTime(event.target.value);
@@ -58,29 +58,24 @@ const DashboardPage: React.FC = () => {
     };
     fetchData();
   }, [managerId, selectedType, selectedTime]);
-  useEffect(()=>{
-    const fetchPieChat=async()=>{
-      if(managerId){
-        const result=await fetchPieChatData(managerId);
-        console.log("Result of Pie chart",result);
-        if(result.message==='Top booked events retrieved'){
+  useEffect(() => {
+    const fetchPieChat = async () => {
+      if (managerId) {
+        const result = await fetchPieChatData(managerId);
+        console.log("Result of Pie chart", result);
+        if (result.message === 'Top booked events retrieved') {
           const formatted = result.data.map((item: any) => ({
             name: item.eventName,
             value: item.noOfBookings,
           }));
-  
+
           setPieData(formatted);
         }
 
       }
-      
-  
-      
-
     }
-    
     fetchPieChat()
-  },[]);
+  }, []);
   const chartData = graphData;
   const chartKey = selectedType === "Booking" ? "bookings" : "revenue";
   const allWeeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
@@ -134,33 +129,33 @@ const DashboardPage: React.FC = () => {
               </div>
 
               <div className="w-full h-72">
-              <ResponsiveContainer width="100%" height="100%">
-  <LineChart data={normalizedData}>
-    <XAxis
-      dataKey={selectedTime === 'Monthly' ? 'week' : 'month'}
-      stroke="#8884d8"
-      tick={{ fontSize: 12, fill: '#333' }}
-    />
-    <YAxis tick={{ fontSize: 12, fill: '#333' }} />
-    <Tooltip
-      contentStyle={{
-        backgroundColor: '#f9f9f9',
-        border: '1px solid #ccc',
-        fontSize: 14,
-        color: '#333',
-      }}
-    />
-    <Line
-      type="monotone"
-      dataKey={chartKey}
-      stroke="#FF6B00"
-      strokeWidth={3}
-      dot={false} 
-      activeDot={{ r: 6 }} 
-      isAnimationActive={false}
-    />
-  </LineChart>
-</ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={normalizedData}>
+                    <XAxis
+                      dataKey={selectedTime === 'Monthly' ? 'week' : 'month'}
+                      stroke="#8884d8"
+                      tick={{ fontSize: 12, fill: '#333' }}
+                    />
+                    <YAxis tick={{ fontSize: 12, fill: '#333' }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#f9f9f9',
+                        border: '1px solid #ccc',
+                        fontSize: 14,
+                        color: '#333',
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={chartKey}
+                      stroke="#FF6B00"
+                      strokeWidth={3}
+                      dot={false}
+                      activeDot={{ r: 6 }}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
 
 
               </div>
@@ -204,7 +199,6 @@ const DashboardPage: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
-              
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -227,7 +221,7 @@ const DashboardPage: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
-                 
+
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

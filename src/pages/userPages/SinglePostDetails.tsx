@@ -8,8 +8,7 @@ import "react-calendar/dist/Calendar.css";
 import { Link } from "react-router-dom";
 
 
-// import { CheckOfferAvailable } from "../../service/userServices/userOffer";
-// import { OfferData } from "../../validations/userValid/TypeValid";
+
 const SinglePostDetails = () => {
   const location = useLocation();
   const data = JSON.stringify(location.state?.data);
@@ -33,15 +32,13 @@ const SinglePostDetails = () => {
   console.log('Amount:', generalTicketAmount);
   const [selectedTicket, setSelectedTicket] = useState<selectTicket>();
 
-  // const seatOrder = ["GENERAL", "VIP", "PREMIUM"];
+  
 
   const tickets = (parsedData?.data?.result?.savedEvent?.typesOfTickets || [])
     .map((ticket: any) => ({
       ...ticket,
       type: ticket.type.toUpperCase(),
     }))
-  //   .sort((a: any, b: any) => seatOrder.indexOf(a.type) - seatOrder.indexOf(b.type));
-
 
 
   const initialStartDate = parsedData?.data?.result.savedEvent.startDate
@@ -50,10 +47,6 @@ const SinglePostDetails = () => {
   const initialEndDate = parsedData?.data?.result.savedEvent.endDate
     ? new Date(parsedData.data?.result.savedEvent.endDate)
     : new Date();
-
-
-
-  // State for the calendar date range
   const [dateRange, setDateRange] = useState<[Date, Date]>([initialStartDate, initialEndDate]);
   const [activeTab, setActiveTab] = useState("information");
 
@@ -381,8 +374,7 @@ const SinglePostDetails = () => {
                         <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>
                       );
                     }
-                    // For non-highlighted dates, just return the date number
-                    // return <span className="text-black">{date.getDate()}</span>;
+
                   }}
                   navigationLabel={({ date }) => (
                     <div className="flex justify-between items-center p-4 bg-gray-100 rounded-t-lg shadow-md">

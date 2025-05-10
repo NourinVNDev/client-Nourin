@@ -9,16 +9,19 @@ interface OrderDetailsModalProps {
   onClose: () => void;
   event: EventDetails | null;
   onCancelEvent: (eventId: string) => void;
+  onRetryPayment: (eventId: string) => void;
 }
 
-const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, onClose, event, onCancelEvent }) => {
-
-  if (!event || !isOpen) return null;
-
+const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
+  isOpen,
+  onClose,
+  event,
+  onCancelEvent,
+  onRetryPayment
+}) => {
   useEffect(() => {
-    if (event) {
+    if (event && isOpen) {
       console.log("Modal event data:", event);
-      console.log("Modal open state:", isOpen);
     }
   }, [event, isOpen]);
 
@@ -28,94 +31,108 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, onClose, 
       text: "Do you want to cancel?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#6B46C1", 
+      confirmButtonColor: "#6B46C1",
       cancelButtonColor: "#9F7AEA",
       confirmButtonText: "Yes, Cancel It!",
     }).then((result) => {
-      if (result.isConfirmed) {
+      if (result.isConfirmed && event) {
         onCancelEvent(event.bookingId);
         Swal.fire("Cancelled!", "Your event has been cancelled.", "success");
       }
     });
   };
 
+  const handleRetryPayment = () => {
+    console.log("Dheeee");
+    if (event?._id) {
+      onRetryPayment(event._id);
+    }
+  };
+
+  if (!event || !isOpen) return null;
+
   return (
-    <Modal 
-      isOpen={isOpen} 
+    <Modal
+      isOpen={isOpen}
       onClose={onClose}
       placement="center"
       backdrop="blur"
-    
+      aria-labelledby="order-details-modal"
     >
       <ModalContent className="bg-white fixed inset p-6 rounded-xl shadow-lg border border-purple-300">
-        {() => (
-          <>
-            <ModalHeader className="text-2xl font-bold text-gray-800 flex items-center justify-between">
-              <span>Order Details</span>
-              <button 
-                onClick={onClose} 
-                aria-label="Close modal" 
-                className="text-gray-600 hover:text-purple-500 transition"
-              >
-                ✖
-              </button>
-            </ModalHeader>
+        <ModalHeader className="text-2xl font-bold text-gray-800 flex items-center justify-between">
+          <span id="order-details-modal">Order Details</span>
+          <button
+            onClick={onClose}
+            aria-label="Close modal"
+            className="text-gray-600 hover:text-purple-500 transition"
+          >
+            ✖
+          </button>
+        </ModalHeader>
 
-            <ModalBody className="space-y-4">
-              <p className="text-gray-600 text-sm">Here are the details for your order.</p>
+        <ModalBody className="space-y-4">
+          <p className="text-gray-600 text-sm">Here are the details for your order.</p>
 
-              <div className="grid grid-cols-2 gap-4 text-gray-800">
-                <p><span className="font-semibold">Booking ID:</span> {event.bookingId}</p>
-                <p><span className="font-semibold">Event Name:</span> {event.eventName}</p>
-                <p><span className="font-semibold">Company:</span> {event.companyName}</p>
-                <p><span className="font-semibold">Package:</span> {event.title}</p>
-                <p><span className="font-semibold">Persons:</span> {event.bookedUser.map((per:any)=>per.user+" ,")}</p>
-                {event.title!='Virtual' && (
-            <p><span className="font-semibold">Ticket Type:</span> {event.type}</p>
-                )}
-    
-              </div>
-          {event.title!='Virtual' && (
-               <div className="p-3 bg-purple-100 rounded-lg shadow-md">
-               <p className="text-purple-600 font-semibold flex items-center gap-2">
-                 <CheckCircleIcon className="w-5 h-5 text-purple-500" />
-                 Included: <span className="text-gray-800">{event.Included?.join(", ") || "N/A"}</span>
-               </p>
-               <p className="text-red-400 font-semibold flex items-center gap-2">
-                 <XCircleIcon className="w-5 h-5 text-red-500" />
-                 Not Included: <span className="text-gray-800">{event.notIncluded?.join(", ") || "N/A"}</span>
-               </p>
-             </div>
+          <div className="grid grid-cols-2 gap-4 text-gray-800">
+            <p><span className="font-semibold">Booking ID:</span> {event.bookingId}</p>
+            <p><span className="font-semibold">Event Name:</span> {event.eventName}</p>
+            <p><span className="font-semibold">Company:</span> {event.companyName}</p>
+            <p><span className="font-semibold">Package:</span> {event.title}</p>
+            <p><span className="font-semibold">Persons:</span> {event.bookedUser.map((per: any) => per.user).join(", ")}</p>
+            {event.title !== 'Virtual' && (
+              <p><span className="font-semibold">Ticket Type:</span> {event.type}</p>
+            )}
+          </div>
 
-          )}
-           
-
-              <p className="text-xl font-bold text-purple-600 text-center">
-                Total Amount: ₹{event.amount.toLocaleString()}
+          {event.title !== 'Virtual' && (
+            <div className="p-3 bg-purple-100 rounded-lg shadow-md">
+              <p className="text-purple-600 font-semibold flex items-center gap-2">
+                <CheckCircleIcon className="w-5 h-5 text-purple-500" />
+                Included: <span className="text-gray-800">{event.Included?.join(", ") || "N/A"}</span>
               </p>
-            </ModalBody>
+              <p className="text-red-400 font-semibold flex items-center gap-2">
+                <XCircleIcon className="w-5 h-5 text-red-500" />
+                Not Included: <span className="text-gray-800">{event.notIncluded?.join(", ") || "N/A"}</span>
+              </p>
+            </div>
+          )}
 
-            <ModalFooter>
-              <Button 
-                variant="light" 
-                className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white" 
-                onPress={onClose}
-              >
-                Close
-              </Button>
+          <p className="text-xl font-bold text-purple-600 text-center">
+            Total Amount: ₹{event.amount.toLocaleString()}
+          </p>
+        </ModalBody>
 
-         {event.paymentStatus.toLowerCase() !== "cancelled" && new Date(event.startDate) > new Date() && (
-  <Button 
-    className="w-1/2 bg-red-500 hover:bg-red-600 text-white" 
-    onPress={handleCancelClick}
+     <ModalFooter>
+  <Button
+    variant="light"
+    className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white"
+    onPress={onClose}
   >
-    Cancel Event
+    Close
   </Button>
-)}
+  {event.paymentStatus.toLowerCase() !== "cancelled" && 
+   new Date(event.startDate) > new Date() && (
+    <Button
+      className="w-1/2 bg-red-500 hover:bg-red-600 text-white"
+      onPress={handleCancelClick}
+    >
+      Cancel Event
+    </Button>
+  )}
 
-            </ModalFooter>
-          </>
-        )}
+  {/* Retry Payment - Only shown for past events with failed (but not cancelled) payments */}
+  {event.paymentStatus.toLowerCase() === "cancelled" && 
+   new Date(event.startDate) >= new Date() && (
+    <Button
+      variant="light"
+      className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white"
+      onPress={handleRetryPayment}
+    >
+      Retry Payment
+    </Button>
+  )}
+</ModalFooter>
       </ModalContent>
     </Modal>
   );

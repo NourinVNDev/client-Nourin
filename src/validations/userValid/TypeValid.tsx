@@ -21,9 +21,34 @@ export type PaymentData = {
     actualAmount:number;
     bookedMembers:string[];
     location:string;
-    amount?:number
+    amount:number,
+    bookedEmails:string[]
    
   };
+
+  export  type retryPayment={
+    firstName:string;
+    lastName:string;
+    email:string;
+    phoneNo:string;
+    address:string;
+    images:string[];
+    eventName:string;
+    location:string;
+    companyName:string;
+    amount:number;
+    noOfDays:string;
+    bookedMembers:string[];
+    bookedEmails:string[];
+    bookedId:string,
+    type?:string,
+    paymentStatus:string,
+    userId:string,
+    managerId:string,
+    title:string
+    _id:string
+  }
+
   export type EventData = {
     _id:string;
     eventName: string;
@@ -64,6 +89,16 @@ export type PaymentData = {
     phoneNo:string,
     address:string,
     ticketType:string
+  }
+
+    export type retryBillingData={
+    userId:string,
+    firstName:string,
+    lastName:string,
+    email:string,
+    phoneNo:string,
+    address:string,
+    _id:string
   }
 
   export interface EventDetails {

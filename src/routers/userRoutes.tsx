@@ -22,8 +22,9 @@ import CheckLoginUser from "../components/userComponents/CheckLogin";
 import UserWallet from "../pages/userPages/UserWallet";
 import Notification from "../pages/userPages/Notification";
 import ManagerVideoCall from "../components/userComponents/ManagerVideoCall";
+import RetryPayment from "../pages/userPages/RetryPayment";
 const userRoutes = [
-    { path: '/', element: <EntryHome /> },
+    { path: '/', element: <EntryHome />},
     { path: '/login', element: <CheckLoginUser><Login /></CheckLoginUser> },
     { path: '/register', element: <Register /> },
     { path: '/home', element: <PrivateRoute><HomePage /></PrivateRoute> },
@@ -34,8 +35,7 @@ const userRoutes = [
     { path: '/profile', element: <PrivateRoute><Profile /></PrivateRoute> },
     { path: '/logout', element: <Logout /> },
     { path: '/getAllEvents', element: <PrivateRoute><AllEventData /></PrivateRoute> },
-    { path: '/user/categoryBasedData/:id', element: <PrivateRoute><CategoryBasedData /></PrivateRoute> },
-    { path: '/user/resetPassword', element: <PrivateRoute><ResetPasswordALogin /></PrivateRoute> },
+    { path: '/user/categoryBasedData/:categoryId', element: <PrivateRoute><CategoryBasedData /></PrivateRoute> },
     { path: '/singlePostDetails', element: <PrivateRoute><SinglePostDetails /></PrivateRoute> },
     { path: '/checkEventDetails/:id/:selectedType', element: <PrivateRoute><EventDetails /></PrivateRoute> },
     { path: '/payment-success/:managerId', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
@@ -45,7 +45,9 @@ const userRoutes = [
     { path: '/user/bookedEvent', element: <PrivateRoute><EventBooking /></PrivateRoute> },
     {path:  '/user/wallet', element: <PrivateRoute><UserWallet/></PrivateRoute>},
     {path:  '/notifications',element:<PrivateRoute><Notification/></PrivateRoute>},
-    {path:  '/join-stream/:channelName',element:<PrivateRoute><ManagerVideoCall/></PrivateRoute>}
+    {path:  '/join-stream',element:<PrivateRoute><ManagerVideoCall/></PrivateRoute>},
+    {path:  '/events/retry-payment/:bookingId',element:<PrivateRoute><RetryPayment/></PrivateRoute>}
+ 
 ];
 
 

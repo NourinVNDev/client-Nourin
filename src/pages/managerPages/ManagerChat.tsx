@@ -93,6 +93,16 @@ const ManagerChat = () => {
               senderId: msg.senderId,
               timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
             })));
+
+            if (result?.data?.data?.userId) {
+              setAllUsers(prev =>
+                prev.map(user =>
+                  user.chatId === result.data.data.conversation._id
+                    ? { ...user, unreadCount: 0 }
+                    : user
+                )
+              );
+            }
           } else {
             console.error("Manager ID not found in response", result);
           }
@@ -112,7 +122,7 @@ const ManagerChat = () => {
 
             
             <div className="flex flex-1 border rounded-lg shadow-md overflow-hidden">
-                <ManagerUserList managers={allUsers}  onSelectManager={createChatSchema} setMessages={setMessages} setSelectedEvent={setSelectedManager}  person='User'/>
+                <ManagerUserList managers={allUsers}  onSelectManager={createChatSchema} setMessages={setMessages} setSelectedEvent={setSelectedManager}  person='User' setAllManagers={setAllUsers}/>
                 <ChatWindow
                     selectedManager={selectedManager}
                     setSelectedManager={((setSelectedManager))}
@@ -121,6 +131,7 @@ const ManagerChat = () => {
                     senderId={senderId}
                     managerId={userId}
                     setMessages={setMessages}
+                    setAllManagers={setAllUsers}
                   
  
                    

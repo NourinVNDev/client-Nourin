@@ -52,7 +52,7 @@ API.interceptors.response.use(
                 return API(originalRequest);
             } catch (refreshError) {
                 console.error("Token refresh failed:", refreshError);
-                window.location.href = "/"; // Redirect to login if refresh fails
+                window.location.href = "/"; 
             }
         }else if(error.response?.status===403){
             Swal.fire({
@@ -70,7 +70,7 @@ API.interceptors.response.use(
             
         }
 
-        return Promise.reject(error); // Forward other errors
+        return Promise.reject(error); 
     }
 );
 

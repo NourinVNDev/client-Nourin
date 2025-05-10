@@ -165,6 +165,7 @@ const MapboxAutocomplete: React.FC<MapboxAutocompleteProps> = ({ onSelectLocatio
       types: 'address,place',
       placeholder: 'Search for a location...',
       marker: false,
+      countries:'in'
     });
 
     geocoderRef.current = geocoder;

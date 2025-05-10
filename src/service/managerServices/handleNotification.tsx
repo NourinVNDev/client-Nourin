@@ -17,4 +17,20 @@ const fetchManagerNotification=async(managerId:string)=>{
       }
 
 }
-export {fetchManagerNotification}
+const fetchManagerNotificationCount=async(managerId:string)=>{
+  try{
+
+    const response = await MANAGER_API(`/fetchNotificationCount/${managerId}`, {
+        method: "GET"
+
+    });
+
+    const data = response.data;
+    return data;
+} catch (error) {
+    console.error("Error creating conversation schema:", error);
+    return undefined;
+}
+
+}
+export {fetchManagerNotification,fetchManagerNotificationCount}

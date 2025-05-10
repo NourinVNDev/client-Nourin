@@ -7,7 +7,7 @@ import { fetchSocialEventDetails } from "../../service/userServices/register";
 import { EventData } from "../../validations/userValid/TypeValid";
 
 export default function EntryHome() {
-  const [eventData, setEventData] = useState<EventData[]>([]); 
+  const [eventData, setEventData] = useState<EventData[]>([]);
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -46,8 +46,8 @@ export default function EntryHome() {
 
         {/* Content on top of video */}
         <div className="relative z-10 max-w-3xl px-6 -mt-8">
-    <h2 className="text-5xl font-semibold mb-4">Welcome to MeetCraft</h2>
-</div>
+          <h2 className="text-5xl font-semibold mb-4">Welcome to MeetCraft</h2>
+        </div>
 
       </section>
 
@@ -75,43 +75,43 @@ export default function EntryHome() {
 
       {/* Events Section */}
       <section id="events" className="py-16 bg-gray-100">
-  <div className="container mx-auto px-4 text-center">
-    <h2 className="text-3xl font-semibold mb-8 text-gray-800">Upcoming Events</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {eventData.length > 0 ? (
-        eventData.map((event) => (
-          <div
-            key={event._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl"
-          >
-           <div className="space-y-2 mb-4">
-              {event.images && event.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={typeof image === 'string' ? image : URL.createObjectURL(image)}
-                  alt={`Event image ${index + 1}`}
-                  className="w-full h-48 object-cover"
-                />
-              ))}
-            </div>
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-semibold mb-8 text-gray-800">Upcoming Events</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {eventData.length > 0 ? (
+              eventData.map((event) => (
+                <div
+                  key={event._id}
+                  className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl"
+                >
+                  <div className="space-y-2 mb-4">
+                    {event.images && event.images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                        alt={`Event image ${index + 1}`}
+                        className="w-full h-48 object-cover"
+                      />
+                    ))}
+                  </div>
 
-            <div className="p-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-2">{event.eventName}</h3>
-              <p className="text-gray-600 mb-4">{event.title}</p>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">{event.eventName}</h3>
+                    <p className="text-gray-600 mb-4">{event.title}</p>
 
-              {/* Event Location */}
-              <p className="text-gray-500 text-sm mb-4">
-                {`${event.location.city}, ${event.location.address}`}
-              </p>
-            </div>
+                    <p className="text-gray-500 text-sm mb-4">
+                      {event.address || 'Remote'}
+                    </p>
+
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No events available</p>
+            )}
           </div>
-        ))
-      ) : (
-        <p>No events available</p>
-      )}
-    </div>
-  </div>
-</section>
+        </div>
+      </section>
 
       {/* Contact Section */}
       <section id="contact" className="py-20 bg-gray-100">

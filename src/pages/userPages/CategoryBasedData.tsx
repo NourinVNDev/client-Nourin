@@ -5,17 +5,22 @@ import Header from '../../components/userComponents/Headers';
 import { getEventDataDetails, handleLikePost, handlePostDetails } from '../../service/userServices/userPost';
 import Footer from '../../components/userComponents/Footer';
 import useSocket from '../../utils/SocketContext';
-
-import SocialEvents from '../../assets/SocialEvents.avif'
+import infotech from '../../assets/infotech.jpg';
 import SearchBar from '../../components/userComponents/SearchBar';
-
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../App/store';
 type Like = {
   user: string;
   _id: string;
   createdAt: string;
 };
 const CategoryBasedData = () => {
-  const { id } = useParams();
+  const [userLon, userLat] = useSelector((state: RootState) => state.user.location.coordinates || []);
+
+
+
+
+  const { categoryId } = useParams();
   const { socket } = useSocket()
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
@@ -25,21 +30,25 @@ const CategoryBasedData = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
-  const [filteredData, setFilteredData] = useState(parsedData); // Store filtered events
-
-
-
-
+  const [filteredData, setFilteredData] = useState(parsedData);
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
-
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 4;
   const handleSearchChange = (coords: [number, number], placeName: string) => {
     setSearchQuery(placeName);
     setCoordinates(coords);
     console.log("Query:", placeName);
     console.log("Coordinates:", coords);
-
   };
+
+
+
+
+  useEffect(()=>{
+    console.log("Latitude",userLat);
+    console.log("Longitude",userLon);
+  },[userLat,userLon])
+
 
 
   useEffect(() => {
@@ -48,7 +57,7 @@ const CategoryBasedData = () => {
 
 
 
-    if (coordinates && coordinates.length === 2) {
+    if (coordinates && coordinates.length === 2 ) {
 
       const [lat, lng] = coordinates;
       updatedData = updatedData.filter((post) => {
@@ -61,6 +70,24 @@ const CategoryBasedData = () => {
         return distance <= 10;
       });
     }
+
+    if (userLat && userLon) {
+      const eventsWithLocation = updatedData
+        .filter((post) => post.location && post.location.coordinates)
+        .map((post) => {
+          const [postLon, postLat] = post.location.coordinates;
+          const distance = haversineDistance2(userLat, userLon, postLat, postLon);
+          return { ...post, distance };
+        })
+        .sort((a, b) => a.distance - b.distance);
+    
+      const eventsWithoutLocation = updatedData
+        .filter((post) => !post.location || !post.location.coordinates);
+    
+      updatedData = [...eventsWithLocation, ...eventsWithoutLocation];
+    }
+    
+    
 
 
 
@@ -75,8 +102,22 @@ const CategoryBasedData = () => {
     setFilteredData(updatedData);
     console.log("Fill:", filteredData);
 
-  }, [parsedData, selectedCategory, selectedPrice, searchQuery, coordinates]);
+  }, [parsedData, selectedCategory, selectedPrice, searchQuery, coordinates,userLat,userLon]);
+  function haversineDistance2(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const toRad = (x: number) => (x * Math.PI) / 180;
+    const R = 6371; // Earth's radius in km
+  
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+    return R * c; // in kilometers
+  }
 
+  
   const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const R = 6371;
@@ -92,22 +133,13 @@ const CategoryBasedData = () => {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
-
-
-
-
-
   const handleButtonClick = async (postId: string) => {
     console.log("Same");
-
     try {
       console.log("Yes");
-
       const result = await handlePostDetails(postId);
       if (result?.message === 'Retrive Post Data successfully') {
-
         navigate('/singlePostDetails', { state: { data: result } });
-
       } else {
         console.error('Unexpected response message or data structure.');
       }
@@ -116,14 +148,33 @@ const CategoryBasedData = () => {
     }
   };
 
+  const totalPages = Math.ceil(filteredData.length / eventsPerPage);
+
+  // Get current page's events
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredData.slice(indexOfFirstEvent, indexOfLastEvent) || parsedData.slice(indexOfFirstEvent,indexOfLastEvent);
+
+  // Handlers for pagination
+  const goToNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        if (!id) {
+        if (!categoryId) {
           console.error('ID is undefined');
           return;
         }
-        const result = await getEventDataDetails(id);
+        const result = await getEventDataDetails(categoryId);
+        console.log("ResultOf:", result);
+
         console.log("Nourii Safar", result.user.category.Events);
 
         setParsedData(result.user.category.Events || []);
@@ -139,7 +190,7 @@ const CategoryBasedData = () => {
       }
     };
     fetchEventDetails();
-  }, [id]);
+  }, [categoryId]);
   useEffect(() => {
     const initialInteractions = parsedData.reduce((acc, post, index) => {
       acc[index] = {
@@ -246,21 +297,12 @@ const CategoryBasedData = () => {
 
   useEffect(() => {
     let updatedData = [...parsedData];
-
-
-
-
-
-
     console.log(selectedPrice, "soumya");
-
-
     if (selectedPrice === "Price: Low - High") {
       updatedData.sort((a, b) => a.Amount - b.Amount);
     } else if (selectedPrice === "Price: High - Low") {
       updatedData.sort((a, b) => b.Amount - a.Amount);
     }
-
     setFilteredData(updatedData);
   }, [selectedPrice]);
 
@@ -276,28 +318,23 @@ const CategoryBasedData = () => {
 
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className=" bg-blue-50">
       <Header />
-      <div className="bg-[#fdeedc] min-h-screen p-8 flex flex-col items-center">
-
-        <h1 className="text-black text-6xl font-bold mb-4 self-start">Events:</h1>
-
-        <div className="flex flex-col items-center md:flex-row md:justify-end w-full">
-
+      <div className= "p-8 bg-gradient-to-b from-[#fdf6ec] via-[#fdeedc] to-[#fae1dd] flex flex-col items-center font-sans">
+        <h1 className="text-5xl md:text-5xl font-extrabold text-gray-800 mb-8 self-start tracking-tight">
+          ✨ Upcoming Events
+        </h1>
+        <div className="flex flex-col items-center md:flex-row md:justify-end w-full transition-all duration-300">
           <img
-            src={SocialEvents}
+            src={infotech}
             alt="Events"
-            className="w-[400px] md:w-[600px] lg:w-[750px] xl:w-[900px] 
-               h-[200px] md:h-[200px] lg:h-[400px] xl:h-[500px] 
-               object-cover rounded-3xl shadow-2xl border-4 border-white"
+            className="w-full md:w-[600px] lg:w-[750px] xl:w-[900px] 
+       h-[200px] md:h-[250px] lg:h-[400px] xl:h-[500px] 
+       object-cover rounded-3xl shadow-2xl border-4 border-white transform hover:scale-105 transition-transform duration-500"
           />
         </div>
-
-
-
+    
       </div>
-
-      {/* Search & Filters Section */}
       <div className="bg-gradient-to-br from-gray-100 to-gray-300 w-full min-h-screen pt-10 pb-10 flex justify-center">
         <div className="w-full max-w-7xl flex flex-col items-center">
           <div className="relative flex items-center bg-white rounded-full shadow-lg w-full max-w-lg mt-6">
@@ -306,52 +343,34 @@ const CategoryBasedData = () => {
               initialValue={searchQuery}
             />
           </div>
-
-
-          {/* <div className="mt-6 flex flex-col md:flex-row justify-center bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl gap-6">
- */}
-
-
-
-            {/* Sort Dropdown */}
-            {/* <div className="flex items-center space-x-3 w-full md:w-auto">
-              <span className="font-semibold text-lg">Sort By:</span>
-              <select className="border px-4 py-2 rounded-lg bg-white text-black text-lg w-full md:w-auto" onChange={handlePriceChange}
-                value={selectedPrice}>
-                <option>Price: Low - High</option>
-                <option>Price: High - Low</option>
-              </select>
-            </div>
-          </div> */}
-
           <br /><br />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((post: any, index: number) => (
+          {currentEvents.length > 0 ? (
+              currentEvents.map((post, index) => (
                 <div
                   key={post._id || index}
                   className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 w-full max-w-[400px] mx-auto"
                 >
-                  
-                  <div className="relative group bg-white rounded-lg shadow-md">
-  {/* Discount Badge */}
-  {post.typesOfTickets && post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
-    <div className="absolute top-4 right-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-      {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
-    </div>
-  )}
 
-  <div className="relative overflow-hidden rounded-lg">
-    <img
-      src={post.images || "fallback.jpg"}
-      className="w-full h-72 object-cover cursor-pointer"
-      alt={post.title}
-      onClick={() => handleButtonClick(post._id)}
-    />
-    <div className="absolute inset-0 bg-purple-300 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"></div>
-  </div>
-</div>
+                  <div className="relative group bg-white rounded-lg shadow-md">
+                    {/* Discount Badge */}
+                    {post.typesOfTickets && post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+                      <div className="absolute top-4 right-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
+                      </div>
+                    )}
+
+                    <div className="relative overflow-hidden rounded-lg">
+                      <img
+                        src={post.images || "fallback.jpg"}
+                        className="w-full h-72 object-cover cursor-pointer"
+                        alt={post.title}
+                        onClick={() => handleButtonClick(post._id)}
+                      />
+                      <div className="absolute inset-0 bg-purple-300 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"></div>
+                    </div>
+                  </div>
 
 
 
@@ -362,7 +381,10 @@ const CategoryBasedData = () => {
                     {/* Price Display */}
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xl font-bold text-green-600">₹{post.typesOfTickets[0].Amount}</span>
+                        <span className="text-xl font-bold text-green-600">
+                          ₹{post.typesOfTickets?.[0]?.Amount || post.amount}
+                        </span>
+
                         <span className="text-sm text-gray-500">per ticket</span>
                       </div>
                       {post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
@@ -379,7 +401,7 @@ const CategoryBasedData = () => {
 
                     <div className="flex items-center space-x-3 text-gray-600">
                       <FaMapMarkerAlt className="text-red-500 flex-shrink-0" />
-                      <span className="text-sm truncate">{post.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '') || "Unknown Location"}</span>
+                      <span className="text-sm truncate">{post.address || "Virtual Event"}</span>
                     </div>
                   </div>
                   <button
@@ -414,6 +436,28 @@ const CategoryBasedData = () => {
               </div>
             )}
           </div>
+          {totalPages > 1 && (
+            <div className="flex items-center space-x-4 mt-8">
+              <button
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-blue-200 text-blue-800 rounded-lg disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="font-medium text-gray-700">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-blue-200 text-blue-800 rounded-lg disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+
 
 
 

@@ -1,5 +1,4 @@
 import { Users, Laptop, Video, MoreHorizontal } from 'lucide-react';
-import { getEventDataFromDB } from '../../service/userServices/register';
 import { getCategoryDataDetails } from '../../service/userServices/register';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -49,15 +48,11 @@ export default function Features() {
     console.log("Fetching event data...",categoryId);
     console.log(`Category clicked: ${categoryId}`);
   
-    const result = await getEventDataFromDB(categoryId);
+   
     
-    console.log('From Component:', result);
-  
-    // if (result && result.length > 0) {
+    // console.log('From Component:', result);
       navigate(`/user/categoryBasedData/${categoryId}`);
-    // } else {
-    //   alert('No data found for the selected category.');
-    // }
+
   };
 
   return (
