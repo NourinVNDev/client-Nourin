@@ -8,31 +8,37 @@ import toast,{Toaster} from "react-hot-toast";
 import { retryStripePayment } from "../../service/userServices/userPost";
 import { saveRetryBillingDetails } from "../../service/userServices/userPost";
 import { BillingValidation } from "../../validations/userValid/BillingValidSchema";
+import { retryPayment } from "../../validations/userValid/TypeValid";
 const RetryPayment = () => {
   const { bookingId } = useParams();
 
-  const [eventData, setEventData] = useState({
+  const [eventData, setEventData] = useState<retryPayment>({
+bookedId: "",
+    userId: "",
+    categoryName: "",
     firstName: "",
     lastName: "",
     email: "",
     phoneNo: "",
     address: "",
+    companyName: "",
     images: [""],
-    eventName: '',
+    eventName: "",
+    noOfPerson: 0,
+    noOfDays: 0,
+    Amount: 0,
+    type: "",
+    managerId: "",
+    Included: [""],
+    notIncluded: [""],
+    bookingId: "",
+    actualAmount: 0,
+    bookedMembers: [],
+    bookedEmails:[],
     location: '',
-    companyName: '',
     amount: 0,
-    noOfDays: '',
-    bookedMembers:[''],
-    bookedEmails:[''],
-    noOfPerson:0,
-    bookedId:'',
-    type:'',
-    paymentStatus:'',
-    userId:'',
-    managerId:'',
-    title:'',
-    _id:'',
+    paymentStatus:''
+   
   
 
   });
@@ -69,7 +75,7 @@ const RetryPayment = () => {
   
  
      const formData = {
-      _id:eventData._id,
+      bookingId:eventData.bookingId,
        userId: eventData.userId,
        firstName: eventData.firstName,
        lastName: eventData.lastName,
@@ -88,8 +94,10 @@ const RetryPayment = () => {
        setEventData((prevData) => ({
          ...prevData,
          ...result.data.billingDetails,
-         _id: result.data?.data.id,
-         bookedId: result.data?.data.bookingId
+         bookingId: result.data?.data.id,
+         bookedId: result.data?.data.bookingId,
+         paymentStatus:result.data?.data.paymentStatus,
+      
        }));
      } else if (result.message == 'No available seats for the selected ticket type') {
        toast.error(result.message);
@@ -112,7 +120,8 @@ const RetryPayment = () => {
         ...prev,
         amount: updatedAmount,
         bookedMembers: updatedMembers,
-        bookedEmail: updatedEmails
+        bookedEmails: updatedEmails,
+        noOfPerson:updatedMembers.length
       }));
       setMemberName("");
       setMemberEmail("");
@@ -142,60 +151,72 @@ const RetryPayment = () => {
   };
 
 
-  useEffect(() => {
 
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-}, []); 
 
-  useEffect(() => {
-    if (bookingId) {
-      const fetchBookingDetails = async (id: string) => {
-        try {
-          const result = await fetchBookingData(id);
-          console.log("Result of cancel Booking:", result.data.result.savedEvent);
-          const data = result.data.result.savedEvent;
-          const memberNames = data.bookedUser.map((user: any) => user.user || "");
-          const memberEmails = data.bookedUser.map((user: any) => user.email || "");
-          setEventData({
-            firstName: data.billingDetails?.firstName || "",
-            lastName: data.billingDetails?.lastName || "",
-            email: data.billingDetails?.email || "",
-            phoneNo: data.billingDetails?.phoneNo || "",
-            address: data.billingDetails?.address || "",
-           images: data.eventId?.images?.[0] ? [data.eventId.images[0]] : [""],
-            eventName: data.eventId?.eventName || "",
-            location: data.eventId?.address || 'Virual Event',
-            companyName: data.eventId?.companyName || "",
-            amount: data.totalAmount || 0,
-            noOfDays: data.eventId?.noOfDays || "",
-            bookedMembers:memberNames.filter((name: string) => name),
-            bookedEmails:memberEmails.filter((email: string) => email),
-            noOfPerson:data.NoOfPerson,
-            bookedId:data.bookingId,
-            type:data.ticketDetails.type,
-            paymentStatus:data.paymentStatus,
-            userId:data.userId,
-            managerId:data.eventId.Manager,
-            title:data.eventId.title,
-            _id:data._id
-          });
+useEffect(() => {
+  if (bookingId) {
+    const fetchBookingDetails = async (id: string) => {
+      try {
+        const result = await fetchBookingData(id);
+        console.log("Result of cancel Booking:", result.data.result.savedEvent);
 
-          // Initialize members and emails from bookedUse   r data
-          if (data.bookedUser && Array.isArray(data.bookedUser)) {
+        const data = result.data.result.savedEvent;
+        const memberNames = data.bookedUser.map((user: any) => user.user || "");
+        const memberEmails = data.bookedUser.map((user: any) => user.email || "");
 
-            setMembers(memberNames.filter((name: string) => name));
-            setEmails(memberEmails.filter((email: string) => email));
-          }
-        } catch (error) {
-          console.error("Failed to fetch booking data:", error);
+        // Find the matching ticket
+        const matchedTicket = data.eventId?.typesOfTicketsticket?.find(
+          (ticket: any) => ticket.type === data.ticketDetails.type
+        );
+
+        const ticketAmount =
+          data.eventId?.title === "Virtual"
+            ? 0
+            : matchedTicket?.offerDetails?.offerAmount ?? matchedTicket?.Amount ?? 0;
+
+        
+        setEventData({
+          bookedId: data.bookingId || "",
+          userId: data.userId || "",
+          categoryName: data.eventId?.title || "",
+          firstName: data.billingDetails?.firstName || "",
+          lastName: data.billingDetails?.lastName || "",
+          email: data.billingDetails?.email || "",
+          phoneNo: data.billingDetails?.phoneNo || "",
+          address: data.billingDetails?.address || "",
+          companyName: data.eventId?.companyName || "",
+          images: data.eventId?.images?.[0] ? [data.eventId.images[0]] : [""],
+          eventName: data.eventId?.eventName || "",
+          location: data.eventId?.address || "Virtual Event",
+          noOfDays: Number(data.eventId?.noOfDays) || 0,
+          bookedMembers: memberNames.filter((name: string) => name),
+          bookedEmails: memberEmails.filter((email: string) => email),
+          noOfPerson: data.NoOfPerson || 0,
+          type: data.ticketDetails?.type || "",
+          paymentStatus: data.paymentStatus || "",
+          managerId: data.eventId?.Manager || "",
+          bookingId: data._id || "",
+          Amount: ticketAmount,
+          actualAmount: ticketAmount,
+          Included: data.ticketDetails?.Included || [""],
+          notIncluded: data.ticketDetails?.notIncluded || [""],
+          amount: data.totalAmount || 0,
+        });
+
+        // Set members and emails
+        if (Array.isArray(data.bookedUser)) {
+          setMembers(memberNames.filter((name: string) => name));
+          setEmails(memberEmails.filter((email: string) => email));
         }
-      };
-      fetchBookingDetails(bookingId);
-    }
-  }, [bookingId]);
+      } catch (error) {
+        console.error("Failed to fetch booking data:", error);
+      }
+    };
+
+    fetchBookingDetails(bookingId);
+  }
+}, [bookingId]);
+
 
   useEffect(() => {
     console.log("EventData:", eventData);
@@ -389,10 +410,7 @@ const RetryPayment = () => {
                         <div className="text-sm text-gray-500">{emails[index]}</div>
                       </div>
                       <button
-                        onClick={() => {
-                          setMembers((mem) => mem.filter((_, i) => i !== index));
-                          setEmails((em) => em.filter((_, i) => i !== index));
-                        }}
+                         onClick={() => removeMember(index)}
                         aria-label="Remove member"
                         className="text-gray-600 hover:text-purple-500 transition"
                       >

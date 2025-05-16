@@ -52,7 +52,7 @@ type Booking = {
       
         bookings.forEach(booking => {
           const eventId = booking.event._id;    
-          const ticketType = booking.bookingDetails.ticketType;
+          const ticketType = booking.bookingDetails.ticketType==='undefined'?'Online':booking.bookingDetails.ticketType;
           const status = booking.bookingDetails.paymentStatus;
 
 

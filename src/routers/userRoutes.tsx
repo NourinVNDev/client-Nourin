@@ -23,10 +23,11 @@ import UserWallet from "../pages/userPages/UserWallet";
 import Notification from "../pages/userPages/Notification";
 import ManagerVideoCall from "../components/userComponents/ManagerVideoCall";
 import RetryPayment from "../pages/userPages/RetryPayment";
+import CheckIsActive from '../components/userComponents/CheckIsActive';
 const userRoutes = [
-    { path: '/', element: <EntryHome />},
-    { path: '/login', element: <CheckLoginUser><Login /></CheckLoginUser> },
-    { path: '/register', element: <Register /> },
+    { path: '/', element:<CheckIsActive><EntryHome /></CheckIsActive> },
+    { path: '/login', element: <CheckIsActive><CheckLoginUser><Login /></CheckLoginUser></CheckIsActive> },
+    { path: '/register', element:<CheckIsActive> <Register /> </CheckIsActive> },
     { path: '/home', element: <PrivateRoute><HomePage /></PrivateRoute> },
     { path: '/forgot-password', element: <ForgotPassword /> },
     { path: '/otpPage/:email', element: <OtpPage /> },
@@ -39,7 +40,7 @@ const userRoutes = [
     { path: '/singlePostDetails', element: <PrivateRoute><SinglePostDetails /></PrivateRoute> },
     { path: '/checkEventDetails/:id/:selectedType', element: <PrivateRoute><EventDetails /></PrivateRoute> },
     { path: '/payment-success/:managerId', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
-    { path: '/payment-cancel/:bookedId', element: <PrivateRoute><PaymentCancel /></PrivateRoute> },
+    { path: '/payment-cancel/:bookingId', element: <PrivateRoute><PaymentCancel /></PrivateRoute> },
     { path: '/event-history', element: <PrivateRoute><EventHistory /></PrivateRoute> },
     { path: '/user/chat/:companyName/:eventName', element: <PrivateRoute><UserChat /></PrivateRoute> },
     { path: '/user/bookedEvent', element: <PrivateRoute><EventBooking /></PrivateRoute> },

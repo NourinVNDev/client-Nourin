@@ -88,6 +88,10 @@ const verifyOtp = async (otpData:string,formData:{ [key: string]: string }) => {
     }
 
 const GoogleAuth=async(response:Object)=>{
+
+
+    console.log("Why?");
+    
     const res = await API('/googleAuth', {
         method: 'POST',
         data: { code: response },

@@ -4,14 +4,14 @@ const getUserDetails = async () => {
     try {
         const response = await ADMIN_API('/admin/users', {
             method: 'GET',
-            withCredentials:true
+          
         });
         const data = response.data;
         console.log("hello", data);
-        return data; // Return the resolved data
+        return data; 
     } catch (error) {
         console.error('Error fetching user details:', error);
-        return []; // Return an empty array or handle it based on your app's needs
+        return []; 
     }
 };
 

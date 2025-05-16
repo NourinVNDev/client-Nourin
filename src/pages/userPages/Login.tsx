@@ -58,10 +58,11 @@ const Login: React.FC = () => {
                     email: result.user.email,
                     profilePhoto:result.user.profilePhoto||null,
                     Address:result.user.address||null,
+                    role:'user',
                     location: {
                         coordinates: [
-                            result.user.location.coordinates[0] || 0,
-                            result.user.location.coordinates[1] || 0
+                            result.user.location?.coordinates[0] || 0,
+                            result.user.location?.coordinates[1] || 0
                         ] as [number, number]
                     }
                 };
@@ -102,10 +103,11 @@ const Login: React.FC = () => {
               profilePhoto:result.data.user.profilePhoto||null,
               location: {
                 coordinates: [
-                    result.user.location.coordinates[0] || 0,
-                    result.user.location.coordinates[1] || 0
+                    result.data.user.location?.coordinates[0] || 0,
+                    result.data.user.location?.coordinates[1] || 0
                 ] as [number, number]
-            }
+            },
+            role:'user'
 
             };
       

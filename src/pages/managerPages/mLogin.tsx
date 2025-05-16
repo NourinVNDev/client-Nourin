@@ -40,7 +40,8 @@ const MLogin: React.FC = () => {
             const managerData = {
                 _id: result.data._id,
                 companyName: result.data.firmName,
-                email: result.data.email
+                email: result.data.email,
+                role:'manager'
             };
             dispatch(setManagerDetails(managerData));
             localStorage.setItem('managerAuth', 'true');

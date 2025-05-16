@@ -16,13 +16,13 @@ const DashboardPage: React.FC = () => {
     const fetchUserManagerAndRevenue = async () => {
    
         const result = await fetchUserManagerCountAndRevenue();
-        if (result.result.message ==='Manager User count fetched') {
+        if (result.message ==='Manager User count fetched') {
      
           
           setDash({
-            userCount: result.result.user.user,
-            managerCount:result.result.user.manager,
-            revenue: result.result.user.revenue,
+            userCount: result.data.user,
+            managerCount:result.data.manager,
+            revenue: result.data.revenue,
           });
         
       }

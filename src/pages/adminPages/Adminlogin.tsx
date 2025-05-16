@@ -3,12 +3,16 @@ import connectionImage from '../../../src/assets/new.avif';
 import '../TailwindSetup.css';
 import { AdminLogin } from '../../service/adminServices/adminlogin';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, UseDispatch } from 'react-redux';
+import { setAdminDetails } from '../../../Features/adminSlice';
 
 const Adminlogin: React.FC = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
+
+    const dispatch=useDispatch();
       const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const navigate=useNavigate();
 
@@ -28,7 +32,14 @@ const Adminlogin: React.FC = () => {
        let result= await AdminLogin(formData);
        if(result==='Login successful.'){
         localStorage.setItem('adminAuth','true');
+
+        const formData1={
+            email:formData.email,
+            role:'admin'
+        }
+        dispatch(setAdminDetails(formData1));
         navigate('/admin/dashboard',{replace:true});
+        
        }else{
         setErrorMessage('Username and Password do not match');
        }

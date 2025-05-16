@@ -141,6 +141,8 @@ const retryStripePayment = async (eventData: retryPayment) => {
   
     try {
      
+
+        console.log("BookedEmails:",eventData.bookedEmails);
         const PUBLISHABLE_KEY = "pk_test_51QjGncHTmAq9EwyH7hFljKers4qMvfKCMLy5Rww0cjJDMXRpDIO7acQ2lRmgklw84ichb4Pbk906AFmpprdu7C7G00yjPaeCF8";
         console.log(PUBLISHABLE_KEY);
 
@@ -223,6 +225,24 @@ const saveRetryBillingDetails=async(formData:retryBillingData)=>{
     }
 }
 
+const checkIfUserIsBooked=async(email:string,eventName:string)=>{
+      try {
+     
+        const response = await API(`/checkIfUserValid/${email}/${eventName}`, {
+            method: 'GET',
+    
+        });
+
+        const data = response.data;
+   console.log("Data form booked user checking",data);
+        return data.data.result.savedEvent;
+    } catch (error) {
+        console.error("Error during retry-booking:", error);
+        return undefined;
+    }
+
+}
+
 const updatePaymentStatusService=async(bookedId:string)=>{
     try {
         console.log("BookedID",bookedId)
@@ -262,4 +282,4 @@ const fetchBookingData=async(bookingId:string)=>{
 
 
 
-export {getEventDataDetails,getAllEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,retryStripePayment,saveBillingDetailsOfUser,updatePaymentStatusService,fetchBookingData,saveRetryBillingDetails};
+export {getEventDataDetails,checkIfUserIsBooked,getAllEventDataDetails,handleLikePost,handlePostDetails,getEventData,makeStripePayment,retryStripePayment,saveBillingDetailsOfUser,updatePaymentStatusService,fetchBookingData,saveRetryBillingDetails};

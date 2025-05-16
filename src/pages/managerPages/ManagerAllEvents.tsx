@@ -111,16 +111,21 @@ const ManagerAllEvents = () => {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  const startVideoCall = () => {
-    navigate('/Manager/videoCall?channelName=' + 'meetCraft' + '&role=' + 'manager' + '&token=' + '007eJxTYFA4pbjs+hSWpmST0192JP32T8idbftL4Po5XscmxSdHxXcqMJgYmCRbGlgYJaUZJJukWSQnJpkYJCUZmVhapKYaJhsZzU6VyWgIZGTosVvLwsgAgSA+J0NuamqJc1FiWgkDAwAQqCGI');
-  }
+const token = '007eJxTYJh2fX1CbDXHm/ke6xOSfnOsVexbdcx2nt9laVGWRplwV34FBiMLA0MLozSjZEuzVBOTpCRLI+M0IwMTU6NU09SUFFNDrcWqGQ2BjAwv1u1gYWSAQBCfkyE5P68kMTMvtYiBAQBmwR+m';
+
+const startVideoCall = () => {
+  navigate(
+    '/Manager/videoCall?channelName=container' +
+    '&role=manager' +
+    '&token=' + encodeURIComponent(token)
+  );
+};
 
 
-  const handleGenerateLink = async (eventId: string) => {
+  const handleGenerateLink = async (eventId: string,eventName:string) => {
     try {
-      const joinLink = 'join-stream?channelName=' + 'meetCraft' + '&token=' + '007eJxTYFA4pbjs+hSWpmST0192JP32T8idbftL4Po5XscmxSdHxXcqMJgYmCRbGlgYJaUZJJukWSQnJpkYJCUZmVhapKYaJhsZzU6VyWgIZGTosVvLwsgAgSA+J0NuamqJc1FiWgkDAwAQqCGI';
+const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(token)}&eventName=${eventName}`;
       console.log("Join LInk", joinLink);
-
       const socketMessage = { link: joinLink, managerId: managerId, eventId: eventId }
       socket?.emit('post-videoCallLink', socketMessage, (response: any) => {
         console.log("Message sent Aknowledgement", response);
@@ -229,11 +234,12 @@ const ManagerAllEvents = () => {
 
 
                               <button
-                                onClick={() => handleGenerateLink(event._id)}
+                                onClick={() => handleGenerateLink(event._id,event.eventName)}
                                 className="ml-4 text-blue-600 underline hover:text-blue-800 text-sm flex"
                               >
                                 Generate a Link
                               </button>
+                              {/* <p>Online</p> */}
 
                             </div>
 

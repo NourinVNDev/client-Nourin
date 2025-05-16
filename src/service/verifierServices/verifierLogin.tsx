@@ -129,6 +129,23 @@ const markUserEntry=async(bookingId:string,userName:string)=>{
     }
 
 }
+
+const fetchSingleUserData=async(bookedId:string,userName:string)=>{
+        try {
+     
+        const response = await VERIFIER_API(`/fetchSingleUser/${bookedId}/${userName}`, {
+            method: "GET",
+        });
+
+        const data = response.data;
+        console.log("fetching single booked user:", data);
+        return data;
+    } catch (error) {
+        console.error("Error fetching booked user Data:", error);
+        return undefined;
+    }
+
+}
     
     
-    export {checkManagerHaveEvent,sendResendOtp,verifyOtp,handleVerifierData,fetchAllCompanyEvents,fetchAllBooking,markUserEntry};
+    export {checkManagerHaveEvent,sendResendOtp,verifyOtp,handleVerifierData,fetchAllCompanyEvents,fetchAllBooking,markUserEntry,fetchSingleUserData};

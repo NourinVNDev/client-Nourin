@@ -3,13 +3,15 @@ interface ManagerState {
     companyName: string | null;
     email: string | null;
     _id:string|null
+    role:string|null
   }
 
 
 const initialState:ManagerState={
     _id:null,
     companyName:null,
-    email:null
+    email:null,
+    role:null
 }
 const ManagerSlice=createSlice({
     name:'manager',
@@ -19,11 +21,12 @@ const ManagerSlice=createSlice({
             state.companyName=action.payload.companyName;
             state.email=action.payload.email;
             state._id=action.payload._id;
+            state.role=action.payload.role;
         },
         clearManagerDetails:(state)=>{
-            state.companyName=null;
-            state.email=null;
-            state._id=null;
+            console.log("Maahn checking");
+            
+         return initialState
         }
     }
 });

@@ -9,8 +9,8 @@ const ManagerLogout=()=>{
     const navigate=useNavigate();
     const dispatch=useDispatch();
     useEffect(()=>{
-        Cookies.remove('managerToken');
-        Cookies.remove('managerRefreshToken');
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
         localStorage.removeItem('managerAuth');
         dispatch(clearManagerDetails());
         persistor.purge();

@@ -23,6 +23,10 @@ const ListAllEvents = () => {
     const {email}=useParams<{email:string}>()
     useEffect(() => {
         const fetchAllEvents = async () => {
+
+
+            console.log("Why",email);
+            
             if ( email) {
                 const result = await fetchAllCompanyEvents(email);
                 if (result.message === "No Events hosted in this company") {

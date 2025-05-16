@@ -4,7 +4,9 @@ import { updatePaymentStatusService } from '../../service/userServices/userPost'
 import Header from '../../components/userComponents/Headers';
 const PaymentCancel = () => {
 
-  const {bookedId}=useParams();
+  const {bookingId}=useParams();
+  console.log("BookingID",bookingId);
+  
   const navigate = useNavigate(); // For navigating to the home page
 
   const handleGoHome = () => {
@@ -12,8 +14,10 @@ const PaymentCancel = () => {
   };
   useEffect(()=>{
     const updatePaymentStatus=async()=>{
-      if(bookedId){
-        const result=await updatePaymentStatusService(bookedId);
+      if(bookingId){
+        console.log("Yes");
+        
+        const result=await updatePaymentStatusService(bookingId);
         console.log("Result:",result);
         
       }

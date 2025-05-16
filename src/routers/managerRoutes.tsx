@@ -26,10 +26,11 @@ import ManagerResetPassword from '../pages/managerPages/ManagerResetPassword';
 import ManagerNotification from '../pages/managerPages/ManagerNotification';
 import VideoCall from '../components/userComponents/VideoCall';
 import ManagerVideoCall from '../components/userComponents/ManagerVideoCall';
+import CheckIsActive from '../components/userComponents/CheckIsActive';
 
 const managerRoutes = [
-    { path: '/mLogin', element: <CheckLoginManager><MLogin /></CheckLoginManager> },
-    { path: '/mRegister', element: <ManagerRegister /> },
+    { path: '/mLogin', element:<CheckIsActive><CheckLoginManager><MLogin /></CheckLoginManager></CheckIsActive> },
+    { path: '/mRegister', element:<CheckIsActive><ManagerRegister /> </CheckIsActive> },
     { path: '/Manager/dashboard', element: <ManagerPrivateRoute><DashBoard /></ManagerPrivateRoute> },
     { path: '/forgot-passwordM', element: <ForgotPasswordM /> },
     {path:'/manager/Reset-password/:email',element:<ManagerResetPassword/>},

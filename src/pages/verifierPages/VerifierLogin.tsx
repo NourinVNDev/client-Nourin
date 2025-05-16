@@ -91,9 +91,11 @@ const VerifierLogin = () => {
             localStorage.setItem('verifierAuth','true');
             const formData={
                 email:email,
-                companyName:''
+                companyName:'',
+                role:'verifier'
             }
             dispatch(setVerifierDetails(formData));
+            localStorage.setItem('email',email);
             navigate(`/verifier/listAllEvents/${email}`);
         } else {
 

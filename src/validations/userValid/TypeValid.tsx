@@ -21,8 +21,9 @@ export type PaymentData = {
     actualAmount:number;
     bookedMembers:string[];
     location:string;
-    amount:number,
-    bookedEmails:string[]
+    amount:number;
+    bookedEmails:string[];
+    paymentStatus:string;
    
   };
 
@@ -37,7 +38,7 @@ export type PaymentData = {
     location:string;
     companyName:string;
     amount:number;
-    noOfDays:string;
+    noOfDays:number;
     bookedMembers:string[];
     bookedEmails:string[];
     bookedId:string,
@@ -45,8 +46,14 @@ export type PaymentData = {
     paymentStatus:string,
     userId:string,
     managerId:string,
-    title:string
-    _id:string
+    bookingId:string,
+    noOfPerson:number,
+    categoryName:string,
+    Amount:number,
+    Included:[string],
+    notIncluded:[string],
+    actualAmount:number,
+
   }
 
   export type EventData = {
@@ -98,7 +105,7 @@ export type PaymentData = {
     email:string,
     phoneNo:string,
     address:string,
-    _id:string
+    bookingId:string
   }
 
   export interface EventDetails {

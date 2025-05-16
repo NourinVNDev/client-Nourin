@@ -9,9 +9,10 @@ import AdminPrivateRoute from "../components/adminComponents/AdminPrivateRoute";
 import AdminEditCategory from "../pages/adminPages/AdminEditCategory";
 import AdminWallet from "../pages/adminPages/AdminWallet";
 import ManagerEventsDetails from "../pages/adminPages/ManagerEventsDetails";
+import CheckIsActive from "../components/userComponents/CheckIsActive";
 
 const adminRoutes = [
-    { path: '/adminlogin', element: <Adminlogin /> },
+    { path: '/adminlogin', element:<CheckIsActive><Adminlogin /></CheckIsActive>  },
     { path: '/admin/dashboard', element: <AdminPrivateRoute><Adminhome /></AdminPrivateRoute> },
     { path: '/admin/users', element: <AdminPrivateRoute><AdminUser /></AdminPrivateRoute> },
     { path: '/admin/managers', element: <AdminPrivateRoute><AdminManager /></AdminPrivateRoute> },

@@ -72,7 +72,8 @@ const EventDetails = () => {
     bookedMembers: [],
     bookedEmails:[],
     location: '',
-    amount: 0
+    amount: 0,
+    paymentStatus:''
   });
   const makePayment = async () => {
     console.log("Match");
@@ -131,11 +132,14 @@ const EventDetails = () => {
           notIncluded: ticket?.notIncluded || [],
           actualAmount: isVirtual ? 0 : ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
           Amount: isVirtual ? 0 : ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
-          bookedId: prevData.bookedId,
-          bookingId: prevData.bookingId,
+          bookedId: prevData.bookedId||'',
+          bookingId: prevData.bookingId||'',
           bookedMembers: [],
           startDate: event?.startDate,
-          amount: isVirtual? event.amount:0
+          amount: isVirtual? event.amount:0,
+          paymentStatus:prevData.paymentStatus||'',
+          
+        
         }));
 
 
@@ -148,6 +152,11 @@ const EventDetails = () => {
 
     fetchEventData();
   }, [id, user]);
+
+
+  useEffect(()=>{
+    console.log("Event PaymentStatus:",eventData.paymentStatus,eventData.bookingId);
+  },[eventData]);
 
   const SaveBillingDetails = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,7 +190,8 @@ const EventDetails = () => {
       phoneNo: eventData.phoneNo,
       address: eventData.address,
       ticketType: selectedType || '',
-      categoryType: eventData.categoryName
+      categoryType: eventData.categoryName,
+   
     }
     console.log("Helloo");
 
@@ -193,8 +203,9 @@ const EventDetails = () => {
       setEventData((prevData) => ({
         ...prevData,
         ...result.data.billingDetails,
-        bookedId: result.data?.data.id,
-        bookingId: result.data?.data.bookingId
+        bookedId: result.data?.data.bookingId,
+        bookingId: result.data?.data.id,
+        paymentStatus:result.data?.data.paymentStatus
       }));
     } else if (result.message == 'No available seats for the selected ticket type') {
       toast.error(result.message);

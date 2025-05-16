@@ -1,30 +1,14 @@
 import axios from "axios";
 
 import { VERIFIER_URL } from "./userUrl";
-// Base Axios instance
+import { clearVerifierDetails } from "../../Features/verifierSlice";
+
 const VERIFIER_API = axios.create({ baseURL: VERIFIER_URL, withCredentials: true });
+let storeDispatch: any = null;
 
-
-
-
-const getToken = () =>document.cookie.split("; ").find(row => row.startsWith("verifierAccessToken="))?.split("=")[1];
-
-
-
-VERIFIER_API.interceptors.request.use(
-    (config) => {
-        const token = getToken();
-        console.log(token, "token")
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`; // Attach access token
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
+export const setAxiosDispatch = (dispatch: any) => {
+    storeDispatch = dispatch;
+};
 VERIFIER_API.interceptors.response.use(
     (response) => response, 
     async (error) => {
@@ -38,18 +22,21 @@ VERIFIER_API.interceptors.response.use(
               
                 const res = await VERIFIER_API.post("/refresh-token");
 
+                document.cookie = `accessToken=${res.data.verifierAccessToken};`;
 
-                // Save the new access token in cookies
-                document.cookie = `verifierAccessToken=${res.data.verifierAccessToken};`;
-
-                // Retry the failed request with the new token
                 originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
                 return VERIFIER_API(originalRequest);
             } catch (refreshError) {
                 console.error("Token refresh failed:", refreshError);
                 window.location.href = "/verifier/login"; 
             }
-        }
+        }else if(error.response?.status ===404) {
+                    console.log("Yes");
+                    localStorage.removeItem('verifierAuth');
+                    storeDispatch && storeDispatch(clearVerifierDetails());
+                    window.location.href = '/mLogin'
+        
+                }
 
         return Promise.reject(error); // Forward other errors
     }

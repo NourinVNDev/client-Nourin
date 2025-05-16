@@ -2,35 +2,19 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { USER_URL } from "./userUrl";
 
+import { clearUserDetails } from "../../Features/userSlice";
+
+
 const API = axios.create({ baseURL: USER_URL, withCredentials: true });
+let storeDispatch: any = null;
 
-
-
-
-const getToken = () =>
-    document.cookie.split("; ").find(row => row.startsWith("accessToken="))?.split("=")[1];
-
+export const setAxiosDispatch = (dispatch: any) => {
+  storeDispatch = dispatch;
+};
 const clearCookies = () => {
     document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 };
-   
-
-API.interceptors.request.use(
-    (config) => {
-        const token = getToken();
-        console.log(token, "token")
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`; // Attach access token
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-
 API.interceptors.response.use(
     (response) => response, 
     async (error) => {
@@ -64,10 +48,18 @@ API.interceptors.response.use(
             }).then(() => {
                 clearCookies();
                 localStorage.removeItem('userAuth');
+              storeDispatch && storeDispatch(clearUserDetails());
                 window.location.href = '/';
-                
+            
             });
             
+        }else  if(error.response?.status===404){
+            console.log("Yes");
+            clearCookies();
+            localStorage.removeItem('userAuth');
+        storeDispatch && storeDispatch(clearUserDetails());
+            window.location.href='/'
+
         }
 
         return Promise.reject(error); 

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-// Define the shape of the user state
+
 interface UserState {
   firstName: string | null;
   lastName:string|null;
@@ -9,6 +9,7 @@ interface UserState {
   profilePhoto:string|null;
   _id:string|null,
   location: {  coordinates: [number, number] };
+  role:string|null
 }
 
 
@@ -17,8 +18,6 @@ interface LoginAuthState{
   lastName:string|null;
   email:string|null;
 }
-
-// Initial state
 const initialState: UserState = {
     _id:null,
   firstName: null,
@@ -27,7 +26,8 @@ const initialState: UserState = {
   phoneNo: null,
   Address:null,
   profilePhoto:null,
-  location:{coordinates:[0,0]}
+  location:{coordinates:[0,0]},
+  role:null
 };
 
 
@@ -36,7 +36,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    // Set user details
+
     setUserDetails: (state, action: PayloadAction<UserState>) => {
       state.firstName = action.payload.firstName;
       state.lastName=action.payload.lastName;
@@ -46,8 +46,9 @@ const userSlice = createSlice({
       state.Address=action.payload.Address;
       state.profilePhoto=action.payload.profilePhoto;
       state.location = action.payload.location; 
+      state.role=action.payload.role
     },
-    // Clear user details
+
     clearUserDetails: (state) => {
       return initialState
     },
@@ -67,8 +68,8 @@ const userSlice = createSlice({
   },
 });
 
-// Export actions
+
 export const { setUserDetails, clearUserDetails,updateAddress,setLoginAuthentication,updateAddressPhone} = userSlice.actions;
 
-// Export reducer
+
 export default userSlice.reducer;
