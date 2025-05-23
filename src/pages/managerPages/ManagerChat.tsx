@@ -29,43 +29,47 @@ const ManagerChat = () => {
   
 
     // Fetch User Names for the Manager
-    useEffect(() => {
-        const fetchUserNames = async () => {
-            if (!managerName) return;
-            try {
-                const result = await getUserNames(managerName);
-                if (result.success && Array.isArray(result.data))  {
-                    console.log("Result:", result.data.map((comp:any)=>comp));
-                    const updatedUsers=result.data.map((user:any)=>{
-                      console.log("Time:",user?.lastMessage);
-                      
-                      const rawTime=user?.lastMessage?.time;
-                      console.log("Raw time",rawTime);
-                      const date=new Date(rawTime);
-                      const time=!isNaN(date.getTime())?
-                      date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):
-                      "Invalid time"
-                      return {
+useEffect(() => {
+    const fetchUserNames = async () => {
+        if (!managerName) return;
+        try {
+            const result = await getUserNames(managerName);
+            console.log("Reee",result.data);
+            if (Array.isArray(result.data)) {
+                const updatedUsers = result.data.map((user: any) => {
+                    const rawTime = user?.lastMessage?.time;
+                    const date = new Date(rawTime);
+                    const time = !isNaN(date.getTime())
+                        ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : "Invalid time";
+                    
+                    return {
                         ...user,
-                        lastMessage:user.lastMessage?
-                        {...user.lastMessage,time}
-                        :null
-                      }
-                    })
-                    setAllUsers(updatedUsers);
-                
-                 
-                }
-                else {
-                    console.error("Unexpected response format:", result);
-                }
-            } catch (error) {
-                console.error("Error fetching Users:", error);
-            }
-        };
+                        lastMessage: user.lastMessage
+                            ? { ...user.lastMessage, time }
+                            : null
+                    };
+                });
 
-        fetchUserNames();
-    }, [managerName]);
+                // Sort users by updatedAt in descending order (latest first)
+                const sortedUsers = updatedUsers.sort((a: any, b: any) => {
+                    const dateA = new Date(a.updatedAt);
+                    const dateB = new Date(b.updatedAt);
+                    return dateB.getTime() - dateA.getTime();
+                });
+
+                setAllUsers(sortedUsers);
+            } else {
+                console.error("Unexpected response format:", result);
+            }
+        } catch (error) {
+            console.error("Error fetching Users:", error);
+        }
+    };
+
+    fetchUserNames();
+}, [managerName]);
+
 
     // Logging allUsers when updated
     useEffect(() => {
@@ -87,7 +91,9 @@ const ManagerChat = () => {
           
           if (result?.data?.data?.userId) {
             setUserId(result.data.data.userId);
-            setSenderId(managerId); // The manager is always the sender
+            setSenderId(managerId); 
+            console.log("Caant",result.data.data.allMessages);
+            
             setAllMessages(result.data.data.allMessages.map((msg: any) => ({
               message: msg.message,
               senderId: msg.senderId,
@@ -114,7 +120,9 @@ const ManagerChat = () => {
 
     return (
       <div className="max-h-screen flex flex-col">
+        <div>
             <Header />
+            </div>
           <div className="flex-1 flex">
           <aside className="bg-blue-100 p-4">
             <NavBar/>

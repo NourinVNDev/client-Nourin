@@ -3,9 +3,10 @@ import { useLocation } from "react-router-dom";
 import Header from "../../components/userComponents/Headers";
 import SocialEvents1 from "../../assets/SocialEvents1.avif";
 import Footer from "../../components/userComponents/Footer";
-import Calendar, { CalendarProps } from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import { DayPicker,DateRange } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 import { Link } from "react-router-dom";
+import { format } from 'date-fns';
 
 
 
@@ -47,24 +48,147 @@ const SinglePostDetails = () => {
   const initialEndDate = parsedData?.data?.result.savedEvent.endDate
     ? new Date(parsedData.data?.result.savedEvent.endDate)
     : new Date();
-  const [dateRange, setDateRange] = useState<[Date, Date]>([initialStartDate, initialEndDate]);
+const [dateRange, setDateRange] = useState<DateRange>({
+  from: initialStartDate,
+  to: initialEndDate
+});
   const [activeTab, setActiveTab] = useState("information");
 
-  const isHighlightedDate = (date: Date) => {
-    const [start, end] = dateRange;
-    return date >= start && date <= end;
-  };
+  // const isHighlightedDate = (date: Date) => {
+  //   const [start, end] = dateRange;
+  //   return date >= start && date <= end;
+  // };
 
 
-  const handleDateChange: CalendarProps['onChange'] = (value) => {
-    if (Array.isArray(value)) {
-      setDateRange(value as [Date, Date]);
-    } else if (value instanceof Date) {
-      setDateRange([value, value]);
-    } else {
-      setDateRange([new Date(), new Date()]);
-    }
-  };
+  // const handleDateChange: CalendarProps['onChange'] = (value) => {
+  //   if (Array.isArray(value)) {
+  //     setDateRange(value as [Date, Date]);
+  //   } else if (value instanceof Date) {
+  //     setDateRange([value, value]);
+  //   } else {
+  //     setDateRange([new Date(), new Date()]);
+  //   }
+  // };
+const customStyles = `
+  /* Base calendar styles */
+  .rdp {
+    --rdp-cell-size: 42px;
+    --rdp-accent-color: #8b5cf6;
+    --rdp-background-color: #ede9fe;
+    --rdp-outside-color: #6b7280;  /* Changed to darker gray */
+    --rdp-disabled-color: #e2e8f0;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Day cells - ALL dates black by default */
+  .rdp-day {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #000000 !important;  /* Force black text for all dates */
+  }
+
+  /* Selected range styling */
+  .rdp-day_selected:not(.rdp-day_disabled):not(.rdp-day_outside) {
+    background-color: var(--rdp-accent-color);
+    color: white !important;  /* White text for selected dates */
+    font-weight: 600;
+  }
+
+  /* First and last day of range */
+  .rdp-day_range_start:not(.rdp-day_outside),
+  .rdp-day_range_end:not(.rdp-day_outside) {
+    background-color: var(--rdp-accent-color);
+    color: white !important;
+  }
+
+  /* Days in between selected range */
+  .rdp-day_range_middle {
+    background-color: var(--rdp-background-color);
+    color: var(--rdp-accent-color) !important;
+  }
+
+  /* Today's date */
+  .rdp-day_today {
+    font-weight: 700;
+    color: var(--rdp-accent-color) !important;
+  }
+
+  .rdp-day_today:not(.rdp-day_selected)::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--rdp-accent-color);
+  }
+
+  /* Days from other months - now visible in dark gray */
+  .rdp-day_outside {
+    color: var(--rdp-outside-color) !important;
+    opacity: 1;  /* Make fully visible */
+  }
+
+  /* Disabled dates */
+  .rdp-day_disabled {
+    color: var(--rdp-disabled-color) !important;
+  }
+
+  /* Hover effects - subtle change */
+  .rdp-day:not(.rdp-day_disabled):not(.rdp-day_selected):hover {
+    background-color: #f3f4f6;
+  }
+
+  /* Rest of your styles remain the same */
+  .rdp-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px 12px;
+  }
+
+  .rdp-caption_label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1.1rem;
+  }
+
+  .rdp-nav {
+    display: flex;
+    gap: 8px;
+  }
+
+  .rdp-nav_button {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .rdp-nav_button:hover {
+    background-color: #f1f5f9;
+  }
+
+  .rdp-head_cell {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    padding-bottom: 8px;
+  }
+  .rdp-day {
+    color: #000 !important;
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 relative overflow-x-hidden">
@@ -347,54 +471,51 @@ const SinglePostDetails = () => {
                 </p>
                 <br />
                 <div className="flex justify-center items-center">
-                  <input
-                    type="date"
-                    value={dateRange[0] ? dateRange[0].toLocaleDateString('en-CA') : ""
-                    }
-                    onChange={() => handleDateChange}
-                    className="px-4 py-2 border rounded-lg text-gray-700 bg-white w-3/5 focus:outline-none focus:ring-2 focus:ring-purple-700 text-center"
-                  />
+               <input
+  type="text"
+  value={`${dateRange.from ? format(dateRange.from, 'MM/dd/yyyy') : ''} ${
+    dateRange.to ? `- ${format(dateRange.to, 'MM/dd/yyyy')}` : ''}`}
+  readOnly
+  className="px-4 py-2 border rounded-lg text-gray-700 bg-white w-3/5 focus:outline-none focus:ring-2 focus:ring-purple-700 text-center"
+/>
                 </div>
                 <br /><br />
               </div>
 
-              <div className="p-6 bg-white rounded-lg shadow-md">
-                <Calendar
-                  onChange={handleDateChange}
-                  value={dateRange}
-                  selectRange={true}
-                  className="w-full border border-gray-300 rounded-lg"
-                  tileClassName={({ date }) =>
-                    isHighlightedDate(date) ? "relative" : undefined
-                  }
-                  tileContent={({ date }) => {
 
-                    if (isHighlightedDate(date)) {
-                      return (
-                        <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-green-500 rounded-full"></div>
-                      );
-                    }
 
-                  }}
-                  navigationLabel={({ date }) => (
-                    <div className="flex justify-between items-center p-4 bg-gray-100 rounded-t-lg shadow-md">
-                      <span className="text-lg font-bold text-gray-700">
-                        {date.toLocaleString("default", { month: "long", year: "numeric" })}
-                      </span>
-                    </div>
-                  )}
-                  prevLabel={
-                    <span className="text-purple-700 hover:text-purple-500 transition duration-200">
-                      &larr;
-                    </span>
-                  }
-                  nextLabel={
-                    <span className="text-purple-700 hover:text-purple-500 transition duration-200">
-                      &rarr;
-                    </span>
-                  }
-                />
-              </div>
+<div className="p-6 bg-white rounded-lg shadow-md">
+  <style>{customStyles}</style>
+  <DayPicker
+    mode="range"
+    selected={dateRange}
+    onSelect={(range) => setDateRange(range || { from: new Date(), to: new Date() })}
+    modifiers={{
+      selected: dateRange,
+      today: new Date()
+    }}
+    modifiersClassNames={{
+      selected: 'my-selected',
+      today: 'my-today'
+    }}
+    showOutsideDays  // This shows days from previous/next months
+    fixedWeeks       // Always shows 6 weeks (42 days)
+    numberOfMonths={1}
+    captionLayout="dropdown"
+    fromYear={new Date().getFullYear()}
+    toYear={new Date().getFullYear() + 2}
+    classNames={{
+      months: 'w-full',
+      month: 'w-full',
+      table: 'w-full',
+      head_row: 'w-full',
+      head_cell: 'w-10 h-10',
+      row: 'w-full',
+      cell: 'w-10 h-10',
+    }}
+  />
+</div>
+
 
               <br />
               <div className="bg-gray-200 p-6 rounded-lg shadow-md flex justify-center items-center">

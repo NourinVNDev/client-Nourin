@@ -237,7 +237,7 @@ const checkIfUserIsBooked=async(email:string,eventName:string)=>{
    console.log("Data form booked user checking",data);
         return data.data.result.savedEvent;
     } catch (error) {
-        console.error("Error during retry-booking:", error);
+        console.error("Error during video  call:", error);
         return undefined;
     }
 

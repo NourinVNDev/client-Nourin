@@ -23,7 +23,8 @@ const ProfilePage = () => {
     Address:string
     profilePhoto:string,
     _id:string,
-    location:{coordinates:[number,number]}
+    location:{coordinates:[number,number]},
+    role:string
 
   }
   // Formik Setup
@@ -49,6 +50,7 @@ const ProfilePage = () => {
             phoneNo:result.user.phoneNo,
             Address:result.user.address,
             profilePhoto:result.user.profilePhoto||null,
+            role:'user',
             location: {
             
               coordinates: [

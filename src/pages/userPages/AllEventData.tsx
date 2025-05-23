@@ -9,7 +9,7 @@ import { handleLikePost, handlePostDetails, getAllEventDataDetails } from "../..
 import SearchBar from "../../components/userComponents/SearchBar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
-import { parse } from "path";
+
 
 const AllEventData = () => {
   const [userLon, userLat] = useSelector((state: RootState) => state.user.location.coordinates || []);

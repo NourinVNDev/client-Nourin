@@ -8,20 +8,22 @@ import { RootState } from '../../../App/store';
 
 const PaymentSuccess = () => {
   const naavigate = useNavigate(); 
-  const managerId=useParams().managerId;
+  const {managerId,eventName}=useParams();
+
   const {socket}=useSocket();
-  const userId=useSelector((state:RootState)=>state.user._id);
+  const user=useSelector((state:RootState)=>state.user);
 
 
+console.log('EventName:',managerId,eventName);
 
   const handleGoHome = () => {
     naavigate('/home');
   };
 
   useEffect(()=>{
-    if(!socket &&  !userId) return;
+    if(!socket &&  !user._id) return;
    
-    const socketData={senderId:userId,receiverId:managerId,message:'Your Payment SuccessFully'};
+    const socketData={senderId:user._id,receiverId:managerId,message:`${user.firstName} Payment SuccessFul!`,eventName:eventName};
     console.log("Hai",socketData);
   socket?.emit('post-payment-success',socketData,(response:any)=>{
     console.log("Message sent acknowledgment:", response);

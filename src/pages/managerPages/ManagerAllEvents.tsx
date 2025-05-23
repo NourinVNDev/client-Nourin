@@ -111,12 +111,13 @@ const ManagerAllEvents = () => {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-const token = '007eJxTYJh2fX1CbDXHm/ke6xOSfnOsVexbdcx2nt9laVGWRplwV34FBiMLA0MLozSjZEuzVBOTpCRLI+M0IwMTU6NU09SUFFNDrcWqGQ2BjAwv1u1gYWSAQBCfkyE5P68kMTMvtYiBAQBmwR+m';
+const token = '007eJxTYPDo7Pp++166Z+WGqb/Ymr613VhnPyl/wpK/SX0zylvOcm5UYDCyMDC0MEozSrY0SzUxSUqyNDJOMzIwMTVKNU1NSTE1XJ2jn9EQyMiwu2EnMyMDBIL4nAzJ+XkliZl5qUUMDADePCQw';
 
-const startVideoCall = () => {
+const startVideoCall = (eventName:string) => {
   navigate(
     '/Manager/videoCall?channelName=container' +
     '&role=manager' +
+    '&eventName='+eventName+
     '&token=' + encodeURIComponent(token)
   );
 };
@@ -264,7 +265,7 @@ const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(t
                                 ))}
                               </div>
                             ) : (
-                              <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition-all duration-300" onClick={startVideoCall}>
+                              <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition-all duration-300" onClick={()=>startVideoCall(event.eventName)}>
                                 Start Video Call
                               </button>
 

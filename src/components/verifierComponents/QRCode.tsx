@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import  { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { FiCameraOff, FiCamera, FiRotateCw } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,7 @@ const QRCodeScanner = () => {
   const [bookedUser, setBookedUser] = useState<QRCodeData | null>(null);
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     if (bookedUser?.BookedID && bookedUser?.User) {
       console.log("Mallu");

@@ -7,15 +7,21 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { fetchManagerNotification } from "../../service/managerServices/handleNotification";
 import person from '../../assets/person.png'
-const ITEMS_PER_PAGE = 5;
+import useSocket from "../../utils/SocketContext";
+const ITEMS_PER_PAGE = 4;
 
 const ManagerNotification = () => {
   const managerId = useSelector((state: RootState) => state.manager._id);
   const [notificationData, setNotificationData] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const { socket } = useSocket();
+  const userId = useSelector((state: RootState) => state.manager._id);
+  const [isFetch, setIsFetch] = useState(false);
 
   useEffect(() => {
     const ManagerNotification = async () => {
+      console.log("loading");
+      
       if (managerId) {
         const result = await fetchManagerNotification(managerId);
         console.log("Result:", result);
@@ -29,7 +35,19 @@ const ManagerNotification = () => {
       }
     };
     ManagerNotification();
-  }, [managerId]);
+  }, [managerId,isFetch]);
+
+
+
+
+  useEffect(() => {
+    if (!socket && !userId) return;
+    const socketData = { senderId: userId,role:'Manager'};
+    socket?.emit('change-isRead', socketData, (response: any) => {
+      console.log("Message send acknowledgement", response);
+
+    })
+  }, [socket])
 
   // Pagination Logic
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -38,7 +56,7 @@ const ManagerNotification = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      <Header />
+      <Header setIsFetch={setIsFetch} />
       <Toaster position="top-center" />
       <div className="flex flex-1">
         <NavBar />
@@ -52,25 +70,25 @@ const ManagerNotification = () => {
                 className="flex items-center gap-4 mb-3 p-2"
               >
                 <img
-                  src={item.senderImage||person}
+                  src={item.senderImage || person}
                   alt="sender"
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div className="flex flex-col">
                   <span className="text-sm text-gray-500 font-medium">
-                    {item.senderName||''}
+                    {item.senderName || ''}
                   </span>
                   <span className="text-base font-semibold text-gray-800">
                     {item.heading}
                   </span>
                   <span className="text-sm text-gray-600">{item.message}</span>
                   <span className="text-sm text-gray-600">
-  {new Date(item.createdAt).toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true, 
-  })}
-</span>
+                    {new Date(item.createdAt).toLocaleTimeString("en-US", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </span>
 
                 </div>
               </div>

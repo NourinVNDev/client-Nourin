@@ -62,9 +62,11 @@ const eventBookingDetails = async (userId:string) => {
     }
 };
 
-const getManagerNames = async (userId: string) => {
+const getManagerNames = async (userId:string) => {
     try {
-        const response = await API(`/getManagerName/${userId}`, {
+        console.log("Hai123",userId);
+        
+        const response = await API(`/getManagerName?name=${userId}`, {
             method: "GET",
         });
 
@@ -80,10 +82,12 @@ const getManagerNames = async (userId: string) => {
 
 const getUserNames=async(managerName:string)=>{
     try {
-
-        const response=await MANAGER_API(`/getUserNames/${managerName}`,{
+        console.log("Get",managerName);
+        
+        const response=await MANAGER_API(`/getUserNames?name=${encodeURIComponent(managerName)}`,{
             method:"GET"
         });
+        console.log("res",response.data)
         const data=response.data.data;
         console.log("user Names Data",data);
         return data;

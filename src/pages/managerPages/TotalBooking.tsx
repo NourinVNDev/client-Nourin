@@ -16,8 +16,15 @@ const TotalBooking = () => {
                 const result = await fetchTotalBooking(managerId);
 
                 if (result.message === "Manager's bookings retrieved successfully") {
-                    setBookings(result.data);
+                    
                     console.log("Safe", result.data);
+                    const sortedData=result.data.sort((a:any,b:any)=>{
+                        const dateA=new Date(a.updatedAt);
+                        const dateB=new Date(b.updatedAt);
+                        return dateB.getTime()-dateA.getTime();
+                    })
+                    setBookings(sortedData);
+
                 }
 
             }
@@ -61,7 +68,7 @@ const TotalBooking = () => {
                                         <p className="text-gray-600 mt-2">Email: {booking.billingDetails.email}</p>
                                         <p className="text-gray-600">Phone: {booking.billingDetails.phoneNo}</p>
                                         <p className="text-gray-600">Event Name: {booking.eventId.eventName}</p>
-                                        <p className="text-gray-600">Event Name: {booking.paymentStatus==='Confirmed'?<span className="text-green-500">Confirmed</span>:<span className="text-red-500">Cancelled</span>}</p>
+                                        <p className="text-gray-600">Event Name: {booking.paymentStatus==='Completed'?<span className="text-green-500">Confirmed</span>:<span className="text-red-500">Cancelled</span>}</p>
                                         <div className="flex justify-between items-center mt-4">
                                             <span className="text-lg font-bold text-green-600">₹{booking.totalAmount}</span>
                                         </div>

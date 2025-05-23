@@ -9,7 +9,7 @@ const fetchManagerNotification=async(managerId:string)=>{
      
         });
         const result = response.data; 
-        console.log("result message", result.message);
+        console.log("result message", result);
         return result;
       } catch (error) {
         console.error("Error in updateEvent:", error);
@@ -33,4 +33,25 @@ const fetchManagerNotificationCount=async(managerId:string)=>{
 }
 
 }
-export {fetchManagerNotification,fetchManagerNotificationCount}
+
+const EventDateChecking=async(eventName:string)=>{
+      try {
+
+        console.log("Traffic",eventName);
+        
+     
+        const response = await MANAGER_API(`/checkIfDateValid?name=${eventName}`, {
+            method: 'GET',
+    
+        });
+
+        const data = response.data;
+   console.log("Data form date validation",data);
+        return data;
+    } catch (error) {
+        console.error("Error during video  call:", error);
+        return undefined;
+    }
+
+}
+export {fetchManagerNotification,fetchManagerNotificationCount,EventDateChecking}

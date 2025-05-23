@@ -48,6 +48,8 @@ const ManagerUserList = ({ managers, onSelectManager, person, setMessages, setSe
       socket.off('new-badge', handleNewBadge);
     };
   }, [socket]);
+
+
   
 
 
@@ -63,7 +65,6 @@ const ManagerUserList = ({ managers, onSelectManager, person, setMessages, setSe
               className="border border-gray-200 p-4 cursor-pointer transition-all duration-200"
               onClick={() => {
                 localStorage.setItem("chatId", chat.chatId);
-                // Use first event if available, or fallback to companyName (or chatId)
                 const selectedEvent = chat.events?.[0] || chat.companyName;
                 setSelectedEvent(selectedEvent);
                 onSelectManager(chat.companyName);

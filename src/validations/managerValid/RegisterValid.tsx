@@ -69,6 +69,7 @@ export interface BookingData {
         phoneNo: string;
         address: string;
     };
+    updatedAt:string;
     eventId: {
         _id: string;
         eventName: string;

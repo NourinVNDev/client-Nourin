@@ -37,7 +37,7 @@ const ListAllEvents = () => {
                     const today = new Date();
                     const upcomingEvents = result.data.filter((event: EventData) => {
                         const startDate = new Date(event.startDate);
-                        return startDate > today;
+                        return startDate >= today;
                     });
                     console.log("Upcomming Events",upcomingEvents);
                     

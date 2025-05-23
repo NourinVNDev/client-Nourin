@@ -1,17 +1,23 @@
 import React,{useState,useEffect} from "react"
-import { Link } from "react-router-dom";
 import { FaBell } from 'react-icons/fa'
 import { useNavigate } from "react-router-dom";
 import useSocket from "../../utils/SocketContext";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { fetchManagerNotificationCount } from "../../service/managerServices/handleNotification";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
-const Header:React.FC=()=>{
+type HeaderProps = {
+  setIsFetch?: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Header: React.FC<HeaderProps> = ({ setIsFetch }) => {
     const {socket}=useSocket();
     const navigate=useNavigate();
     const manager=useSelector((state:RootState)=>state.manager._id);
       const [notificationCount, setNotificationCount] = useState(0);
+      const location=useLocation();
       const  handleNotification=()=>{
         navigate('/Manager/notification')
     
@@ -20,36 +26,46 @@ const Header:React.FC=()=>{
 
         if (!socket) return;
         const messageData = ({ senderId, message,count }: { senderId: string; message: string; count:number}) => {
-            console.log("Hellom");
+            console.log("Hellom",count);
+          setIsFetch && setIsFetch(prev => !prev);
+          if(location.pathname!='/Manager/notification'){
+               setNotificationCount(count);
+          }
             
-          setNotificationCount(count);
+       
 
           console.log("black", senderId, message);
     
         };
-        const messageData1=({unreadCount}:{unreadCount:number})=>{
-          setNotificationCount(unreadCount);
+        const messageData1=({count}:{count:number})=>{
+          console.log("Count caluation",count);
+             setIsFetch && setIsFetch(prev => !prev);
+          if(location.pathname!='/Manager/notification'){
+          setNotificationCount(count);
+        }
         }
     
-        socket.on("receive-notification-message", messageData);
-        socket.on('new-catefication',messageData1)
+        socket.on("new-notification", messageData);
+        socket.on('new-notification1',messageData1)
     
         return () => {
-          socket.off("receive-notification-message", messageData);
+          socket.off("new-notification", messageData);
+          socket.off('new-notification1',messageData1);
         };
-      }, [socket])
+      }, [socket,notificationCount])
       useEffect(()=>{
         const fetchNotificationData=async()=>{
           if(manager){
           const result=await fetchManagerNotificationCount(manager);
           console.log("Result of Manager:",result);
-          setNotificationCount(result.data)
+          setNotificationCount(result.data);
+ 
           
           }
     
         }
         fetchNotificationData();
-      },[])
+      },[notificationCount])
       return (
         <div>
           {/* Header */}

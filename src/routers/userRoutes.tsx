@@ -39,7 +39,7 @@ const userRoutes = [
     { path: '/user/categoryBasedData/:categoryId', element: <PrivateRoute><CategoryBasedData /></PrivateRoute> },
     { path: '/singlePostDetails', element: <PrivateRoute><SinglePostDetails /></PrivateRoute> },
     { path: '/checkEventDetails/:id/:selectedType', element: <PrivateRoute><EventDetails /></PrivateRoute> },
-    { path: '/payment-success/:managerId', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
+    { path: '/payment-success/:managerId/:eventName', element: <PrivateRoute><PaymentSuccess /></PrivateRoute> },
     { path: '/payment-cancel/:bookingId', element: <PrivateRoute><PaymentCancel /></PrivateRoute> },
     { path: '/event-history', element: <PrivateRoute><EventHistory /></PrivateRoute> },
     { path: '/user/chat/:companyName/:eventName', element: <PrivateRoute><UserChat /></PrivateRoute> },

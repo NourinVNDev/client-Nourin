@@ -29,8 +29,6 @@ const UserChat = () => {
   const [senderId, setSenderId] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState('');
 
-  const [messageCount, setMessageCount] = useState(0);
-  const [chatIds, setAllChatIds] = useState<string[]>([])
 
   useEffect(() => {
     if (eventName && companyName) {
@@ -40,7 +38,7 @@ const UserChat = () => {
       setSelectedEvent(eventName);
     }
 
-  }, [eventName, companyName,])
+  }, [eventName, companyName])
   useEffect(() => {
     const fetchManagerNames = async () => {
       if (!userId) return;
@@ -63,31 +61,18 @@ const UserChat = () => {
                 : null,
             };
           });
+          const sortedManager = updatedManagers.sort((a: any, b: any) => {
+                    const dateA = new Date(a.updatedAt);
+                    const dateB = new Date(b.updatedAt);
+                    return dateB.getTime() - dateA.getTime();
+                });
 
-          setAllManagers(updatedManagers);
-        }
-
-
-        // setAllEvents(result.data.eventNames.map((event: string) => event));
-
-        // const formattedMessages = result.data.lastMessages.map((msg: any) => {
-        //   const rawTime = msg.time;
-        //   const date = new Date(rawTime);
-        //   const time = !isNaN(date.getTime())
-        //     ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        //     : "Invalid time";
-
-        //   return {
-        //     message: msg.message || "No message",
-        //     time,
-        //     readCount:msg.count
-        //   };
-        // });
-
-        // setMessages(formattedMessages);
+                console.log("Sorted:",sortedManager);
+                
 
 
-        else {
+          setAllManagers(sortedManager);
+        } else {
           console.error("Unexpected response format:", result);
         }
       } catch (error) {
@@ -108,7 +93,13 @@ const UserChat = () => {
 
 
     try {
-      const sender = userId; const receiver = manager;
+      const sender = userId; 
+      const receiver = manager || companyName;
+
+      console.log("Rec:",receiver);
+if (!receiver) {
+  throw new Error("Receiver is undefined");
+}
       const result = await createConversationSchema(receiver, sender);
       console.log("Result:", result);
 

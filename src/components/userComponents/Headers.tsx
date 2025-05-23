@@ -10,9 +10,10 @@ import useSocket from "../../utils/SocketContext";
 import { useNavigate } from "react-router-dom";
 import { fetchNotificationCount } from "../../service/userServices/userProfile";
 
-
-
-export default function Header() {
+type HeaderProps = {
+  setIsFetch?: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const Header:React.FC<HeaderProps>=({setIsFetch}) =>{
   const [searchParams] = useSearchParams();
   const navigate=useNavigate();
   const location = useLocation();
@@ -26,20 +27,18 @@ export default function Header() {
 
   const { socket } = useSocket();
 
-
-
   useEffect(()=>{
     const fetchNotificationData=async()=>{
       if(user._id){
       const result=await fetchNotificationCount(user._id);
       console.log("Result:",result);
-      setNotificationCount(result.data)
+      setNotificationCount(result.data);
       
       }
 
     }
     fetchNotificationData();
-  },[])
+  },[notificationCount])
 
   useEffect(() => {
     if (profilePhoto) {
@@ -61,16 +60,31 @@ export default function Header() {
       console.log("Hai");
       
       console.log("Count",heading,message,count);
+      setIsFetch && setIsFetch(prev => !prev);
+      if(location.pathname!='/notifications'){
+          setNotificationCount(count);
+
+      }
       
-      setNotificationCount(count);
+    
+    }
+    const messageListener1=({count}:{count:number})=>{
+      console.log("Please");
+     setIsFetch && setIsFetch(prev => !prev);
+      if(location.pathname!='/notifications'){
+         setNotificationCount(count);
+
+      }
+     
     }
  
    
     
       socket.on('new-notification',messageListener);
-    
+      socket.on('new-notification1',messageListener1);
 
-  },[socket])
+
+  },[socket,notificationCount])
   return (
     <header className="bg-gradient-to-r from-blue-600 to-purple-700 shadow-lg">
       <div className="container mx-auto px-6 py-6 flex justify-between items-center">
@@ -142,6 +156,7 @@ export default function Header() {
     </header>
   );
 }
+export default Header;
 
 
 

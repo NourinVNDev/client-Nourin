@@ -9,7 +9,7 @@ import {store,persistor} from '../App/store.ts'
 import { SocketProvider } from './utils/SocketContext.tsx';
 createRoot(document.getElementById('root')!).render(
 
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
   <GoogleOAuthProvider clientId="690093010048-64jvock1lfgfkup7216jgehn5ofpafo4.apps.googleusercontent.com">
     <PersistGate loading={null} persistor={persistor}>
@@ -20,6 +20,6 @@ createRoot(document.getElementById('root')!).render(
   
   </GoogleOAuthProvider>
   </Provider>
-  </StrictMode>
+// </StrictMode>
 
 )

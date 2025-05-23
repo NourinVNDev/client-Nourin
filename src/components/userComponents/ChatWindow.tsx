@@ -19,11 +19,6 @@ interface ChatWindowProps {
   setMessages:React.Dispatch<React.SetStateAction<{ message: string; time: string; readCount:number}[]>>
   setAllManagers: React.Dispatch<React.SetStateAction<ManagerData[]>>;
 }
-
-
-
-
-
 const ChatWindow = ({
   selectedManager,
   setSelectedManager,
@@ -36,21 +31,18 @@ const ChatWindow = ({
   setAllManagers
 }: ChatWindowProps) => {
   const navigate=useNavigate();
-  const user = useSelector((state: RootState) => state.user._id);
-  const manager = useSelector((state: RootState) => state.manager._id);
-  const userId = user || manager;
-
+  const user = useSelector((state: RootState) => state.user);
+  const manager = useSelector((state: RootState) => state.manager);
+  const userId = user._id? user:manager;
+  console.log("Role finding",userId);
   const { socket } = useSocket();
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
- const createRoom = () => {
-  const roomId = uuid();
-  navigate(`/room/${roomId}`);
-};
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
-  }, [allMessages]);
+
+  // useEffect(() => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+  // }, [allMessages]);
 
   
   useEffect(() => {
@@ -107,8 +99,12 @@ const ChatWindow = ({
   
     const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const newMessage = { message, timestamp: currentTime, senderId };
-    const socketMessage = { message, sender: senderId, receiver: managerId };
-  
+    let socketMessage;
+    if(userId.role=='user'){
+      socketMessage = { message, sender: senderId, receiver: managerId,senderModel:'User',receiverModel:'Manager'};
+    }else{
+            socketMessage = { message, sender: senderId, receiver: managerId,senderModel:'Manager',receiverModel:'User'}
+    }
     socket.emit("post-new-message", socketMessage, (response: any) => {
       console.log("Message sent acknowledgment:", response);
       
@@ -152,7 +148,7 @@ const ChatWindow = ({
 
   return (
     <div className={`w-full min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
-      {selectedEvent || selectedManager ? (
+      {managerId || selectedManager ? (
         <div className="flex flex-col h-full">
           {/* Chat Header */}
           {selectedEvent &&selectedManager?(
@@ -182,13 +178,13 @@ const ChatWindow = ({
               allMessages.map((msgObj, index) => (
                 <div
                   key={index}
-                  className={`flex ${msgObj.senderId === userId ? "justify-end" : "justify-start"}`}
+                  className={`flex ${msgObj.senderId === userId._id ? "justify-end" : "justify-start"}`}
                 >
                   <MessageBubble
                     message={msgObj.message}
                     timestamp={msgObj.timestamp}
                     senderId={msgObj.senderId}
-                    userId={userId || ""}
+                  
                   />
                 </div>
               ))
@@ -198,7 +194,7 @@ const ChatWindow = ({
             <div ref={messagesEndRef} /> {/* Auto-scroll reference */}
           </div>
 
-          {/* Input Section */}
+
           <div className="flex items-center p-3 border-t bg-white rounded-b-lg">
             <input
               className="bg-white text-black rounded-lg px-4 py-2 flex-1"
