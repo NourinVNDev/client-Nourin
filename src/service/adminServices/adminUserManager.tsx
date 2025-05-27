@@ -1,129 +1,48 @@
 import ADMIN_API from "../../utils/adminAxiosIntance";
+import { adminApiRequest } from "../../utils/apiHelper/adminApiHelper";
 
 const getUserDetails = async () => {
-    try {
-        const response = await ADMIN_API('/admin/users', {
-            method: 'GET',
-          
-        });
-        const data = response.data;
-        console.log("hello", data);
-        return data; 
-    } catch (error) {
-        console.error('Error fetching user details:', error);
-        return []; 
-    }
+    return await adminApiRequest('/admin/users','GET');
 };
-
-
-
 const getManagerDetails = async (): Promise<any> => {
-    try {
-        const response = await ADMIN_API(`/admin/managers`, {
-            method: 'GET',
-
-
-        });
-        const data = response.data.result;
-
+    const response=await adminApiRequest(`/admin/managers`,'GET');
+        const data = response.result;
         if (!data) {
             console.error("No data found for the given company name");
-            return null; // Or return an error message if needed
+            return null;
         }
-
-        console.log("Manager details:", data);
         return data;
-    } catch (error) {
-        console.error('Error fetching user details:', error);
-        return null; // Handle the error appropriately
-    }
 };
-
 const updateUserBlockStatus = async (userId: string, updatedStatus: boolean) => {
-    try {
-        const response = await ADMIN_API('/admin/toggleIsBlock', {
-            method: 'POST',
-     
-            data: { userId, updatedStatus },
-            
-        });
-
-        console.log("Response", response.data);
-
-        // Validate response structure
-        if (response.data && response.data.result) {
+    const response=await adminApiRequest('/admin/toggleIsBlock','POST',{userId,updatedStatus})
+        if (response && response.result) {
             return {
                 success: true,
-                result: response.data.result, // Pass only the result
+                result: response.result, 
             };
         } else {
             return { success: false, message: "Invalid response format" };
         }
-    } catch (error) {
-        console.error('Error updating user block status:', error);
-        return { success: false, message: "Failed to update user block status" };
-    }
 };
-
-
 const updateMangerBlockStatus = async (managerId: string, updatedStatus: boolean) => {
-    try {
-        const response = await ADMIN_API('/admin/managerIsBlock', {
-            method: 'POST',
-        
-            data: { managerId, updatedStatus },
-       
-        });
-
-        console.log("Response", response.data);
-
-        // Validate response structure
-        if (response.data && response.data.result) {
+    const response=await adminApiRequest('/admin/managerIsBlock','POST',{managerId,updatedStatus});
+        if (response && response.result) {
             return {
                 success: true,
-                result: response.data.result, // Pass only the result
+                result: response.result,
             };
         } else {
             return { success: false, message: "Invalid response format" };
         }
-    } catch (error) {
-        console.error('Error updating user block status:', error);
-        return { success: false, message: "Failed to update user block status" };
-    }
 };
 const fetchEventsAndBookingData=async(managerId:string)=>{
-    console.log("ManagerId:",managerId);
-    try {
-        const response = await ADMIN_API(`/admin/managerEvents/${managerId}`, {
-            method: 'GET',
-      
-
-        });
-        const data = response.data.result;
+    const response=await adminApiRequest(`/admin/managerEvents/${managerId}`,'GET')
+        const data = response.result;
 
         if (!data) {
             console.error("No data found for the given company name");
             return null;
         }
-
-        console.log("Manager details:", data);
         return data;
-    } catch (error) {
-        console.error('Error fetching user details:', error);
-        return null; 
-    }
-
-
-    
-
 }
-
-
-
-
-
-
-
-
-
 export {getUserDetails,getManagerDetails,updateUserBlockStatus,updateMangerBlockStatus,fetchEventsAndBookingData};

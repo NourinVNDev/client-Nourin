@@ -1,119 +1,38 @@
-import ADMIN_API from "../../utils/adminAxiosIntance";
+import { adminApiRequest } from "../../utils/apiHelper/adminApiHelper";
 const getCategoryDetails=async()=>{
-    try {
-       const response = await ADMIN_API('/admin/category', {
-                  method: 'GET',
-                  withCredentials:true
-              });
-              const data = response.data;
-              console.log("hello", data);
-              return data; // Return the resolved data
-          } catch (error) {
-              console.error('Error fetching category details:', error);
-              return []; // Return an empty array or handle it based on your app's needs
-          }
-
+    return await adminApiRequest('/admin/category','GET');
 }
 const updateCategoryBlockStatus = async (categoryId: string, updatedStatus: boolean) => {
-    try {
-        const response = await ADMIN_API('/admin/categoryIsBlock', {
-            method: 'POST',
-            data: { categoryId, updatedStatus },
-            withCredentials: true, // Move this here
-        });
-
-        console.log("Response", response.data);
-
-        // Validate response structure
-        if (response.data && response.data.result) {
+    const response=await adminApiRequest('/admin/categoryIsBlock','POST',{categoryId,updatedStatus});
+        if (response && response.result) {
             return {
                 success: true,
-                result: response.data.result, // Pass only the result
+                result: response.result,
             };
         } else {
             return { success: false, message: "Invalid response format" };
         }
-    } catch (error) {
-        console.error('Error updating user block status:', error);
-        return { success: false, message: "Failed to update user block status" };
-    }
+  
 };
 
 
 const addNewCategoryDetails=async(formData:{[key:string]:string}):Promise<any>=>{
-    console.log("Freak",formData);
-    
-    try {
-        const response = await ADMIN_API('/admin/addCategory', {
-                   method: 'POST',
-                   data:formData,
-                   withCredentials:true
-               });
-               const data1= response.data;
-               console.log("hello", data1);
-               return data1; // Return the resolved data
-           } catch (error) {
-               console.error('Error fetching category details:', error);
-               return []; // Return an empty array or handle it based on your app's needs
-           }
-
+    return await adminApiRequest('/admin/addCategory','POST',formData);
 }
 
 
 const editSelectedCategory=async(category:string,categoryId:string)=>{
-    
-    try {
-        const response = await ADMIN_API(`/admin/editSingleCategory/${categoryId}`, {
-                   method: 'POST',
-                   withCredentials:true,
-                   data:{category}
-               });
-               const data = response.data;
-               console.log("hello hai", data);
-               return data; // Return the resolved data
-           } catch (error) {
-               console.error('Error fetching category details:', error);
-               return []; // Return an empty array or handle it based on your app's needs
-           }
-
+    return await adminApiRequest(`/admin/editSingleCategory/${categoryId}`,'POST',{category})
 }
 
 
 const  fetchSelectedCategory=async(categoryId:string)=>{
-
-
-    try {
-        const response = await ADMIN_API(`/admin/fetchSelectedCategory/${categoryId}`, {
-                   method: 'GET',
-                   withCredentials:true
-               });
-               const data = response.data;
-               console.log("hello", data);
-               return data; // Return the resolved data
-           } catch (error) {
-               console.error('Error fetching category details:', error);
-               return []; // Return an empty array or handle it based on your app's needs
-           }
-    
+return await adminApiRequest(`/admin/fetchSelectedCategory/${categoryId}`,'GET');
 }
 
 const fetchAdminWallet=async()=>{
-    try {
-     
-        const response = await ADMIN_API(`/admin/fetchAdminWallet`, {
-            method: 'GET',
-    
-        });
-    
-        const data = response.data.result;
-    console.log("Data from Admin Wallet",data);
-        return data; 
-    } catch (error) {
-        console.error("Error during cancelling event booking:", error);
-        return undefined; 
-    }
-
-
+    const response=await adminApiRequest(`/admin/fetchAdminWallet`,'GET');
+    return response.result;
 }
 export  {getCategoryDetails,addNewCategoryDetails,updateCategoryBlockStatus,fetchSelectedCategory,editSelectedCategory,fetchAdminWallet};
 

@@ -1,116 +1,27 @@
+import { managerApiRequest } from "../../utils/apiHelper/managerApiHelper";
 import MANAGER_API from "../../utils/managerAxiosInstance";
 import { OfferData } from "../../validations/userValid/TypeValid";
 const getAllOffers=async(managerId:string)=>{
-    const response = await MANAGER_API(`/getOffers/${managerId}`,{
-        method: "GET",
-      
-      });
-      console.log('suucesss from offer');
-      const result = await response.data;
-      console.log("Have",result.message);
-      return result;
-
+  return await managerApiRequest(`/getOffers/${managerId}`,'GET');
 }
 
 const fetchSearchData=async(searchTerm:string)=>{
-
-  try {
-
-    console.log('searching the data',searchTerm );
-    
-    const response = await MANAGER_API(`/searchOfferInput/${searchTerm}`, {
-      method: "GET",
-
-    });
-    const result = response.data; // No need to await here, as response.data is already resolved
-    console.log("result message", result.message);
-    return result;
-  } catch (error) {
-    console.error("Error in updateEvent:", error);
-    throw error; // Rethrow the error to handle it in the calling function
-  }
-
+  return await managerApiRequest(`/searchOfferInput/${searchTerm}`,'GET');
 }
 const addEventOffer = async (formData:{ [key: string]: string }) => {
-  try {
-
-    console.log('data from client123', formData);
-    
-    const response = await MANAGER_API("/addNewOffer", {
-      method: "POST",
- 
-      data: formData,
-     
-    });
-
-    console.log('success');
-    const result = response.data; // No need to await here, as response.data is already resolved
-    console.log("result message", result.message);
-    return result;
-  } catch (error) {
-    console.error("Error in updateEvent:", error);
-    throw error; // Rethrow the error to handle it in the calling function
-  }
+  return await managerApiRequest('/addNewOffer','POST',formData);
 };
 
 const getSpecificOffer = async (offerId: string ) => {
-  try {
-
-    console.log('data from Offer', offerId);
-    
-    const response = await MANAGER_API(`/getSelectedOffer/${offerId}`, {
-      method: "GET",
-    });
-
-    console.log('success');
-    const result = response.data; // No need to await here, as response.data is already resolved
-    console.log("result message", result.message);
-    return result;
-  } catch (error) {
-    console.error("Error in updateEvent:", error);
-    throw error; // Rethrow the error to handle it in the calling function
-  }
+  return await managerApiRequest(`/getSelectedOffer/${offerId}`,'GET');
 };
 
 const updateOffer=async(formData:OfferData)=>{
-  try {console.log("EventData",formData);
-   
-
-    
-    const response = await MANAGER_API("/updateOffer", {
-      method: "POST",
-      data:formData,
-    });
-
-    console.log('success');
-    const result = response.data; // No need to await here, as response.data is already resolved
-    console.log("result message", result.message);
-    return result;
-  } catch (error) {
-    console.error("Error in updateEvent:", error);
-    throw error; // Rethrow the error to handle it in the calling function
-  }
-
+  return await managerApiRequest('/updateOffer','POST',formData);
 }
 
 const fetchManagerWallet=async(managerId:string)=>{
-  console.log("ManagerID",managerId);
-  
-  try {
-     
-    const response = await MANAGER_API(`/fetchManagerWallet/${managerId}`, {
-        method: 'GET',
-
-    });
-
-    const data = response.data;
-console.log("Data from Manager Wallet",data);
-    return data; 
-} catch (error) {
-    console.error("Error during cancelling event booking:", error);
-    return undefined; 
-}
-
+  return await managerApiRequest(`/fetchManagerWallet/${managerId}`,'GET');
 }
 
 

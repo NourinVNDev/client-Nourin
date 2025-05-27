@@ -1,48 +1,11 @@
-import MANAGER_API from "../../utils/managerAxiosInstance"
-
+import { managerApiRequest } from "../../utils/apiHelper/managerApiHelper";
 const fetchUserCountAndRevenue=async(managerId:string)=>{
-    try{
-    const response=await MANAGER_API(`/fetchUserCount/${managerId}`,{
-        method:'GET',
-
-    })
-    const data=response.data;
-    console.log("Data",data);
-    return data;
-}catch (error) {
-    console.error("Error during Dashboard fetching:", error);
-    return undefined;
-  }
-
+    return await managerApiRequest(`/fetchUserCount/${managerId}`,'GET');
 }
-
 const fetchDashboardGraphData=async(managerId:string,selectedType:string,selectedTime:string)=>{
-    try{
-        const response=await MANAGER_API(`/fetchDashboardGraphData/${managerId}/${selectedType}/${selectedTime}`,{
-            method:'GET',
-    
-        })
-        const data=response.data;
-        console.log("Data",data);
-        return data;
-    }catch (error) {
-        console.error("Error during Dashboard fetching:", error);
-        return undefined;
-      } 
+    return await managerApiRequest(`/fetchDashboardGraphData/${managerId}/${selectedType}/${selectedTime}`,'GET');
 }
 const fetchPieChatData=async(managerId:string)=>{
-    try{
-        const response=await MANAGER_API(`/fetchDashboardPieChart/${managerId}`,{
-            method:'GET',
-    
-        })
-        const data=response.data;
-        console.log("Data",data);
-        return data;
-    }catch (error) {
-        console.error("Error during Dashboard fetching:", error);
-        return undefined;
-      }  
-
+    return await managerApiRequest(`/fetchDashboardPieChart/${managerId}`,'GET');
 }
 export {fetchUserCountAndRevenue,fetchDashboardGraphData,fetchPieChatData}

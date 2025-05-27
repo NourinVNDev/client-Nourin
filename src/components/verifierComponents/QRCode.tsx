@@ -21,7 +21,7 @@ const QRCodeScanner = () => {
   const [bookedUser, setBookedUser] = useState<QRCodeData | null>(null);
   const navigate = useNavigate();
 
-  
+
   useEffect(() => {
     if (bookedUser?.BookedID && bookedUser?.User) {
       console.log("Mallu");
@@ -93,7 +93,7 @@ const QRCodeScanner = () => {
           
           if (parsedData) {
             setBookedUser(parsedData);
-            await newScanner.stop(); // stop scanning once valid data is captured
+            await newScanner.stop(); 
             setIsRunning(false);
           } else {
             console.warn("QR code data missing required fields");

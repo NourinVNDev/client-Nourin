@@ -1,19 +1,5 @@
-import API from "../../utils/axiosInstance"
-
+import { apiRequest } from "../../utils/apiHelper/userApiHelper";
 const fetchUserNotificaiton=async(userId:string)=>{
-    try {
-        const response=await API(`/fetchUserNotification/${userId}`,{
-            method:'GET'
-        })
-        const data=response.data;
-        console.log("Res",data);
-        return data;
-        
-        
-        
-    } catch (error) {
-        
-    }
-
+    return await apiRequest(`/fetchUserNotification/${userId}`,'GET');
 }
 export {fetchUserNotificaiton}
