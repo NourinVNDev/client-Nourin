@@ -7,10 +7,10 @@ const PaymentCancel = () => {
   const {bookingId}=useParams();
   console.log("BookingID",bookingId);
   
-  const navigate = useNavigate(); // For navigating to the home page
+  const navigate = useNavigate();
 
   const handleGoHome = () => {
-    navigate('/home'); // Redirect to the home page
+    navigate('/home'); 
   };
   useEffect(()=>{
     const updatePaymentStatus=async()=>{

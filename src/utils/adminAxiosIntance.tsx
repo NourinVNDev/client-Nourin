@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ADMIN_URL } from "./userUrl";
 import { clearAdminDetails } from "../../Features/adminSlice";
-
+import {persistor} from '../../App/store';
 const ADMIN_API = axios.create({ baseURL: ADMIN_URL, withCredentials: true });
 let storeDispatch: any = null;
 
@@ -31,10 +31,13 @@ ADMIN_API.interceptors.response.use(
                 return ADMIN_API(originalRequest);
             } catch (refreshError) {
                 console.error("Token refresh failed:", refreshError);
+
+
                 window.location.href = "/adminlogin";
             }
         } else if (error.response?.status === 404) {
             clearCookies();
+            persistor.purge();
             localStorage.removeItem('adminAuth');
             storeDispatch && storeDispatch(clearAdminDetails());
             window.location.href = '/adminlogin'

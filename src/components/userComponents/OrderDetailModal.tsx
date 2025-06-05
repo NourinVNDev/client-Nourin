@@ -79,7 +79,15 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
             <p><span className="font-semibold">Event Name:</span> {event.eventName}</p>
             <p><span className="font-semibold">Company:</span> {event.companyName}</p>
             <p><span className="font-semibold">Package:</span> {event.title}</p>
-            <p><span className="font-semibold">Persons:</span> {event.bookedUser.map((per: any) => per.user).join(", ")}</p>
+            <p className="col-span-2">
+              <span className="font-semibold">Persons:</span><br />
+              {event.bookedUser.map((per: any, i: number) => (
+                <div key={i} className="ml-2 text-sm text-gray-700">
+                  • {per.user} <span className="text-gray-500">({per.email})</span>
+                </div>
+              ))}
+            </p>
+
             {event.title !== 'Virtual' && (
               <p><span className="font-semibold">Ticket Type:</span> {event.type}</p>
             )}
@@ -103,36 +111,35 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
           </p>
         </ModalBody>
 
-     <ModalFooter>
-  <Button
-    variant="light"
-    className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white"
-    onPress={onClose}
-  >
-    Close
-  </Button>
-  {event.paymentStatus.toLowerCase() !== "cancelled" && 
-   new Date(event.startDate) > new Date() && (
-    <Button
-      className="w-1/2 bg-red-500 hover:bg-red-600 text-white"
-      onPress={handleCancelClick}
-    >
-      Cancel Event
-    </Button>
-  )}
+        <ModalFooter>
+          <Button
+            variant="light"
+            className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white"
+            onPress={onClose}
+          >
+            Close
+          </Button>
+          {event.paymentStatus.toLowerCase() !== "cancelled" && event.paymentStatus.toLowerCase() !=='pending' &&
+            new Date(event.startDate) > new Date() && (
+              <Button
+                className="w-1/2 bg-red-500 hover:bg-red-600 text-white"
+                onPress={handleCancelClick}
+              >
+                Cancel Event
+              </Button>
+            )}
 
-  {/* Retry Payment - Only shown for past events with failed (but not cancelled) payments */}
-  {event.paymentStatus.toLowerCase() === "cancelled" && 
-   new Date(event.startDate) >= new Date() && (
-    <Button
-      variant="light"
-      className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white"
-      onPress={handleRetryPayment}
-    >
-      Retry Payment
-    </Button>
-  )}
-</ModalFooter>
+          {event.paymentStatus.toLowerCase() === "pending" &&
+            new Date(event.startDate) >= new Date() && (
+              <Button
+                variant="light"
+                className="w-1/2 bg-purple-500 hover:bg-purple-600 text-white"
+                onPress={handleRetryPayment}
+              >
+                Retry Payment
+              </Button>
+            )}
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

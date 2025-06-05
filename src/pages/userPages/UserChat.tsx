@@ -21,7 +21,6 @@ const UserChat = () => {
   console.log("Params:", companyName, eventName);
 
   const [allManagers, setAllManagers] = useState<ManagerData[]>([]);
-  // const [allEvents, setAllEvents] = useState<string[]>([]);
   const [messages, setMessages] = useState<{ message: string; time: string, readCount: number }[]>([]);
   const [selectedManager, setSelectedManager] = useState<string>("");
   const [managerId, setManagerId] = useState<string>("");

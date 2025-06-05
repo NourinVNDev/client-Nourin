@@ -19,6 +19,9 @@ const NavBar:React.FC=()=>{
       <Link to="/admin/category" className="block hover:bg-blue-200 rounded p-2 text-black">
       Categories
       </Link>
+      <Link to="/admin/offer" className="block hover:bg-blue-200 rounded p-2 text-black">
+      Offers
+      </Link>
    
       {/* <Link to="/request" className="block hover:bg-blue-200 rounded p-2 text-black">
         Request

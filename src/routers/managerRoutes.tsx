@@ -6,7 +6,7 @@ import ManagerOtpPage from "../pages/managerPages/ManagerOtpPage";
 import ManagerProfile from "../pages/managerPages/ManagerProfile";
 import ManagerEvents from "../pages/managerPages/ManagerEvents";
 import ManagerPrivateRoute from "../components/managerComponents/ManagerPrivateRoute";
-import ManagerOffers from "../pages/managerPages/ManagerOffer";
+import ManagerOffer from '../pages/managerPages/ManagerOffer';
 import ManagerAddOffer from "../pages/managerPages/ManagerAddOffer";
 import ManagerAllEvents from "../pages/managerPages/ManagerAllEvents";
 import ManagerEditSelectedEvents from '../pages/managerPages/ManagerEditSelectedEvent';
@@ -39,7 +39,7 @@ const managerRoutes = [
     { path: '/Manager/events', element: <ManagerPrivateRoute><ManagerAllEvents /></ManagerPrivateRoute> },
     { path: '/Manager/addNewEvent', element: <ManagerPrivateRoute><ManagerEvents /></ManagerPrivateRoute> },
     { path: '/Manager/addNewEvent2/:eventId', element: <ManagerPrivateRoute><ManagerEvents2 /></ManagerPrivateRoute> },
-    { path: '/Manager/offer', element: <ManagerPrivateRoute><ManagerOffers /></ManagerPrivateRoute> },
+    { path: '/Manager/offer', element: <ManagerPrivateRoute><ManagerOffer /></ManagerPrivateRoute> },
     { path: '/Manager/addOffer', element: <ManagerPrivateRoute><ManagerAddOffer /></ManagerPrivateRoute> },
     { path: '/editOfferDetails/:offerId', element: <ManagerPrivateRoute><ManagerEditOffer /></ManagerPrivateRoute> },
     { path: '/editEventDetails/:id', element: <ManagerPrivateRoute><ManagerEditSelectedEvents /></ManagerPrivateRoute> },

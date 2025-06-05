@@ -10,6 +10,9 @@ import AdminEditCategory from "../pages/adminPages/AdminEditCategory";
 import AdminWallet from "../pages/adminPages/AdminWallet";
 import ManagerEventsDetails from "../pages/adminPages/ManagerEventsDetails";
 import CheckIsActive from "../components/userComponents/CheckIsActive";
+import AdminOffers from "../pages/adminPages/AdminOffer";
+import AdminEditOffer from "../pages/adminPages/AdminEditOffer";
+import AdminAddOffer from "../pages/adminPages/AdminAddOffer";
 
 const adminRoutes = [
     { path: '/adminlogin', element:<CheckIsActive><Adminlogin /></CheckIsActive>  },
@@ -19,6 +22,9 @@ const adminRoutes = [
     { path: '/manager/managerEvents/:managerId',element:<AdminPrivateRoute><ManagerEventsDetails/></AdminPrivateRoute>},
     { path: '/admin/category', element: <AdminPrivateRoute><AdminCategory /></AdminPrivateRoute> },
     {path:  '/admin/wallet',element:<AdminPrivateRoute><AdminWallet/></AdminPrivateRoute>},
+    {path:'/admin/offer',element:<AdminPrivateRoute><AdminOffers/></AdminPrivateRoute>},
+    {path:'/editAdminOfferDetails/:offerId',element:<AdminPrivateRoute><AdminEditOffer/></AdminPrivateRoute>},
+    {path:'/admin/addOffer',element:<AdminPrivateRoute><AdminAddOffer/></AdminPrivateRoute>},
     { path: '/admin/editCategory/:id', element: <AdminPrivateRoute><AdminEditCategory /></AdminPrivateRoute> },
     { path: '/admin/addEvents', element: <AdminPrivateRoute><AdminAddCategory /></AdminPrivateRoute> },
     { path: '/adminLogout', element: <AdminLogout /> },

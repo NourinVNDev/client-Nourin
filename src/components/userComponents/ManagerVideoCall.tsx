@@ -23,6 +23,8 @@ const ManagerVideoCall = () => {
   const eventName = searchParams.get('eventName') || ''
   const navigate = useNavigate();
   const [isBooked, setIsBooked] = useState<boolean | null>(null);
+  const bookedId=searchParams.get('bookedId')||'';
+
 
 
   useEffect(() => {
@@ -244,13 +246,13 @@ const ManagerVideoCall = () => {
 
 
   useEffect(() => {
-    if (role === 'user' && isBooked === null && email && eventName) {
+    if (role === 'user' && isBooked === null && email && eventName && bookedId) {
       const checkUserBooked = async () => {
         if (role === 'user') {
           try {
 
             console.log("Email", email, eventName);
-            const result = await checkIfUserIsBooked(email, eventName);
+            const result = await checkIfUserIsBooked(email, eventName,bookedId);
             console.log("Result of data", result);
 
             if (result.message == 'User has booked this event and is allowed to enter') {
@@ -271,6 +273,17 @@ const ManagerVideoCall = () => {
               Swal.fire({
                 title: "Too Early",
                 text: "You can only join the event starting 10 minutes before it begins.",
+                icon: "info",
+                confirmButtonText: "OK",
+                allowOutsideClick: false,
+              }).then(() => {
+                window.location.href = '/home';
+              });
+            }else if(result.message=='Your booking was cancelled. You cannot enter the event'){
+              setIsBooked(false);
+              Swal.fire({
+                title: "Event Cancelled",
+                text:result.message,
                 icon: "info",
                 confirmButtonText: "OK",
                 allowOutsideClick: false,
@@ -304,7 +317,7 @@ const ManagerVideoCall = () => {
 
       checkUserBooked();
     }
-  }, [email, eventName, isBooked]);
+  }, [email, eventName,bookedId]);
 
 
   return (

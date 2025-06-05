@@ -83,7 +83,7 @@ export default function Features() {
 
 
                 <p className="text-lg text-gray-700">
-                  {description} {/* Display the category description */}
+                  {description} 
                 </p>
              
               </div>

@@ -9,6 +9,12 @@ import { handleLikePost, handlePostDetails, getAllEventDataDetails } from "../..
 import SearchBar from "../../components/userComponents/SearchBar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
+type managerOffer = {
+  offerName: string,
+  discount_on: string,
+  discount_value: number,
+
+}
 
 
 const AllEventData = () => {
@@ -26,7 +32,8 @@ const AllEventData = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 4;
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
-
+  const [managerOffer, setManagerOffer] = useState<managerOffer[]>([]);
+  const [adminOffer, setadminOffer] = useState<managerOffer[]>([])
   type Like = {
     user: string;
     _id: string;
@@ -125,36 +132,45 @@ const AllEventData = () => {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
-
   const totalPages = Math.ceil(filteredData.length / eventsPerPage);
-
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = filteredData.slice(indexOfFirstEvent, indexOfLastEvent)|| parsedData.slice(indexOfFirstEvent,indexOfLastEvent);
+  const currentEvents = filteredData.slice(indexOfFirstEvent, indexOfLastEvent) || parsedData.slice(indexOfFirstEvent, indexOfLastEvent);
 
   const goToNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
-
   const goToPreviousPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
-
-
-
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
         const result = await getAllEventDataDetails();
         console.log("Results", result.user);
-
-        setParsedData(result.user.events || []);
+        const events = result.user.events;
+const formattedEvents = events.map((event: any) => ({
+  ...event,
+  managerOffer: Number(event.managerOffer1?.discount_value || 0),
+  adminOffer: Number(event.adminOffer1?.discount_value || 0)
+}));
+setParsedData(formattedEvents);
 
         const category: string[] = Array.from(
           new Set(result?.user?.events?.map((event: any) => event.title))
         );
         console.log("Unique Titles", category);
         setCategoryNames(category);
+        const offers = events
+          .map((event: any) => event.managerOffer)
+          .filter((offer: any) => offer !== null);
+        setManagerOffer(offers);
+
+        const adminOffers = events
+          .map((event: any) => event.adminOffer)
+          .filter((offer: any) => offer !== null);
+
+        setadminOffer(adminOffers);
 
       } catch (error) {
         console.error('Error fetching event details:', error);
@@ -162,9 +178,10 @@ const AllEventData = () => {
     };
     fetchEventDetails();
   }, []);
-
-
   useEffect(() => {
+
+    console.log("ParsedData:",parsedData);
+    
     const initialInteractions = parsedData.reduce((acc, post, index) => {
       acc[index] = {
         liked: Array.isArray(post.likes) && post.likes.some((like: Like) => like.user === userId),
@@ -181,6 +198,8 @@ const AllEventData = () => {
   const handleButtonClick = async (postId: string) => {
     try {
       const result = await handlePostDetails(postId);
+      console.log("Result of result:",result);
+      
       if (result?.message === 'Retrive Post Data successfully') {
         navigate('/singlePostDetails', { state: { data: result } });
       } else {
@@ -364,15 +383,22 @@ const AllEventData = () => {
 
                   <div className="relative group bg-white rounded-lg shadow-md">
 
-                    {post.typesOfTickets &&
-                      post.typesOfTickets[0]?.offerDetails?.offerPercentage > 0 && (
-                        <div className="absolute top-4 right-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                          {post.typesOfTickets[0].offerDetails.offerPercentage}% OFF
-                        </div>
-                      )}
+                    {post.managerOffer && (
+                      <div className="absolute top-4 left-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        {post.managerOffer}% OFF
+                      </div>
+                    )}
+
+
+                    {post.adminOffer && (
+                      <div className="absolute top-4 right-4 z-10 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        {post.adminOffer}% OFF
+                      </div>
+                    )}
+
                     <div className="relative overflow-hidden rounded-lg">
                       <img
-                        src={post.images || "fallback.jpg"}
+                        src={post.images?.[0] || "fallback.jpg"}
                         className="w-full h-72 object-cover cursor-pointer"
                         alt={post.title}
                         onClick={() => handleButtonClick(post._id)}
@@ -380,6 +406,8 @@ const AllEventData = () => {
                       <div className="absolute inset-0 bg-purple-300 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"></div>
                     </div>
                   </div>
+
+
                   <div className="p-6 space-y-4">
                     <h2 className="text-2xl font-bold text-gray-800 truncate">{post.eventName}</h2>
                     {post.title != 'Virtual' ? (
@@ -389,12 +417,13 @@ const AllEventData = () => {
                             <span className="text-xl font-bold text-green-600">₹{post.typesOfTickets[0]?.Amount}</span>
                             <span className="text-sm text-gray-500">per ticket</span>
                           </div><br />
-                          {post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+                          {(post.adminOffer || post.managerOffer) && (
                             <span className="text-sm text-emerald-600 font-medium">
-                              Save {post.typesOfTickets[0].offerDetails.offerPercentage}%
+                              Save {(post.adminOffer || 0) + (post.managerOffer || 0)}%
                             </span>
                           )}
-                        </div><br />
+
+                        </div>
 
                         <div className="flex items-center space-x-3 text-gray-600">
                           <FaBuilding className="text-blue-500 flex-shrink-0" />
@@ -416,11 +445,12 @@ const AllEventData = () => {
                             <span className="text-sm text-gray-500">per ticket</span>
                           </div>
 
-                          {post.typesOfTickets[0]?.offerDetails?.offerPercentage && (
+                          {(post.adminOffer?.discount_value || post.managerOffer?.discount_value) && (
                             <span className="text-sm text-emerald-600 font-medium">
-                              Save {post.typesOfTickets[0].offerDetails.offerPercentage}%
+                              Save {(post.adminOffer?.discount_value || 0) + (post.managerOffer?.discount_value || 0)}%
                             </span>
                           )}
+
                         </div>
                         <br />
 

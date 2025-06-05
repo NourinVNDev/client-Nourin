@@ -7,7 +7,7 @@ import Footer from "../../components/managerComponents/Footer";
 import { updateVerifierStatus } from "../../service/managerServices/handleVerifierService";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { button } from "@nextui-org/react";
+import ReusableTable from "../../components/managerComponents/ReusableTable";
 type VerifierType = {
     _id: string,
     verifierName: string,
@@ -27,6 +27,8 @@ const ListVerifier = () => {
 
     }]);
     const navigate=useNavigate();
+      const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 5;
     const [eventNames, setEventNames] = useState<{ [key: string]: string[] }>({});
 
     const managerName = localStorage.getItem('ManagerName');
@@ -82,7 +84,16 @@ const ListVerifier = () => {
             console.error("Error updating verifier status", error);
         }
     };
+      const totalPages = Math.ceil(verifiers.length / eventsPerPage);
+  const startIndex = (currentPage - 1) * eventsPerPage;
+  const currentVerifiers = verifiers.slice(startIndex, startIndex + eventsPerPage);
 
+  const handlePageChange = (pageNumber: number) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+  const heading=['Name','Company','Email','Events','Status','','Action'];
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
             <Header />
@@ -101,46 +112,80 @@ const ListVerifier = () => {
                                 </button>
                             </Link>
                         </div>
-                        {verifiers && verifiers.length > 0 ? (
-                            <>
-       
-                                <table className="w-full border-collapse border border-gray-300">
-                                    <thead>
-                                        <tr className="bg-gray-200 text-black">
-                                            <th className="border p-2">Name</th>
-                                            <th className="border p-2">Company</th>
-                                            <th className="border p-2">Email</th>
-                                            <th className="border p-2">Events</th>
-                                            <th className="border p-2">Status</th>
-                                            <th className="border p-2"></th>
-                                            <th className="border p-2">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {verifiers.map((verifier) => (
-                                            <tr key={verifier._id} className="border text-center text-black">
-                                                <td className="border p-2">{verifier.verifierName}</td>
-                                                <td className="border p-2">{verifier.companyName}</td>
-                                                <td className="border p-2">{verifier.email}</td>
-                                                <td className="border p-2">
-                                                    {eventNames[verifier._id] && eventNames[verifier._id].length > 0
-                                                        ? eventNames[verifier._id].join(", ")
-                                                        : "No Events"}
-                                                </td>
+           
+                     <ReusableTable
+  headers={heading}
+  data={currentVerifiers}
+  renderRow={(verifier, index) => (
+    <tr key={verifier._id} className="border text-center text-black">
+      <td className="border p-2">{verifier.verifierName}</td>
+      <td className="border p-2">{verifier.companyName}</td>
+      <td className="border p-2">{verifier.email}</td>
+      <td className="border p-2">
+        {eventNames[verifier._id] && eventNames[verifier._id].length > 0
+          ? eventNames[verifier._id].join(", ")
+          : "No Events"}
+      </td>
+      <td className="border p-2 text-green-800">
+        {verifier.isActive ? "Active" : "InActive"}
+      </td>
+      <td className="border p-2">
+        {verifier.isActive ? (
+          <p
+            className="bg-violet-500 text-white p-1 cursor-pointer"
+            onClick={() => handleAcceptRequest(verifier._id)}
+          >
+            InActive
+          </p>
+        ) : (
+          <button
+            className="bg-green-500 text-white p-2"
+            onClick={() => handleAcceptRequest(verifier._id)}
+          >
+            Active
+          </button>
+        )}
+      </td>
+      <td className="border p-2">
+        <button
+          className="bg-blue-500 text-white px-6 py-1"
+          onClick={() => handleEditVerifier(verifier._id)}
+        >
+          Edit
+        </button>
+      </td>
+    </tr>
+  )}
+/>
 
-                                                <td className="border p-2 text-green-800">{verifier.isActive?'Active':'InActive'}</td>
-                                                <td className="border p-2">{verifier.isActive?<p className="bg-violet-500 text-white p-1" onClick={()=>{handleAcceptRequest(verifier._id)}}>InActive</p>:<button  className="bg-green-500 text-white p-2" onClick={()=>{handleAcceptRequest(verifier._id)}}>Active</button>}</td>
-                                                <button className="border p-2 bg-blue-500 text-white px-6" onClick={()=>handleEditVerifier(verifier._id)}>Edit</button>
-                                            </tr>
-
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </>
-                        ) : (
-                            <p className="text-center text-gray-500">No Verifier found for this account.</p>
-
-                        )}
+                            <div className="flex justify-center items-center mt-4 space-x-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => handlePageChange(i + 1)}
+                      className={`px-4 py-2 rounded-lg ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-300 hover:bg-blue-300"
+                        }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                      }`}
+                  >
+                    Next
+                  </button>
+                </div>
 
 
                     </div>

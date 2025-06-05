@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import useSocket from "../../utils/SocketContext";
+import ReusableTable from "../../components/managerComponents/ReusableTable";
 
 
 interface Location {
@@ -108,10 +109,10 @@ const ManagerAllEvents = () => {
 
   const handleSearchEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1); 
   };
 
-const token = '007eJxTYPDo7Pp++166Z+WGqb/Ymr613VhnPyl/wpK/SX0zylvOcm5UYDCyMDC0MEozSrY0SzUxSUqyNDJOMzIwMTVKNU1NSTE1XJ2jn9EQyMiwu2EnMyMDBIL4nAzJ+XkliZl5qUUMDADePCQw';
+const token = '007eJxTYFj574xCWo1js/zLPMWIRBPxU8Y/mmfsOPvCrn3GpC9HbKoUGIwsDAwtjNKMki3NUk1MkpIsjYzTjAxMTI1STVNTUkwNnS1tMxoCGRlmftzOwsgAgSA+J0Nyfl5JYmZeahEDAwAk9SIn';
 
 const startVideoCall = (eventName:string) => {
   navigate(
@@ -142,20 +143,19 @@ const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(t
     }
   };
 
-
+const heading=["EventName", "Images", "Title", "Location/Link", "Date", "Seat Information/Video Call", "Actions"]
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 text-black">
+   <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <div className="flex flex-1">
         <NavBar />
         <div className="flex-1 p-5">
-          <br />
-          <div className="flex flex-col w-full px-8 py-4">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">All Events</h2>
+        
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl text-black font-semibold">All Events</h2>
               <Link to="/Manager/addNewEvent">
-                <button className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600">
+              <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                   Add Event
                 </button>
               </Link>
@@ -188,113 +188,79 @@ const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(t
               </div>
             </div>
             <br /><br />
-            {currentEvents && currentEvents.length > 0 ? (
-              <>
-                <div className="overflow-x-auto bg-white shadow-md rounded">
-                  <table className="min-w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        {["EventName", "Images", "Title", "Location/Link", "Date", "Seat Information/Video Call", "Actions"].map((header) => (
-                          <th
-                            key={header}
-                            className="border border-gray-300 px-4 py-3 text-left text-sm font-medium text-gray-600"
-                          >
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentEvents.map((event, index) => (
-                        <tr
-                          key={index}
-                          className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-                        >
-                          <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
-                          <td className="border border-gray-300 px-4 py-3">
-                            {event.images && event.images.length > 0 ? (
-                              <div className="flex flex-wrap gap-2">
-                                {event.images.map((image, idx) => (
-                                  <img
-                                    key={idx}
-                                    src={image}
-                                    alt={`Event image ${idx + 1}`}
-                                    className="w-16 h-16 object-cover rounded border border-gray-200"
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              "No images"
-                            )}
-                          </td>
-                          <td className="border border-gray-300 px-4 py-3">{event.title}</td>
-                          {event.title != 'Virtual' ? (
-                            <td className="border border-gray-300 px-4 py-3">{event.destination}</td>
-                          ) : (
-                            <div className="px-4 p-10">
-
-
-                              <button
-                                onClick={() => handleGenerateLink(event._id,event.eventName)}
-                                className="ml-4 text-blue-600 underline hover:text-blue-800 text-sm flex"
-                              >
-                                Generate a Link
-                              </button>
-                              {/* <p>Online</p> */}
-
-                            </div>
-
-                          )}
-                          <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
-                          <td className="border  px-4 py-3">
-                            {event.title !== 'Virtual' ? (
-                              <div className="flex flex-col space-y-2">
-                                {event.typesOfTickets.map((ticket, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex items-center justify-between "
-                                  >
-                                    <span className="font-semibold text-indigo-700">{ticket.type}</span>
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
-                                      <span className="text-gray-500 text-sm">
-                                        ({ticket.noOfSeats} seats available)
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition-all duration-300" onClick={()=>startVideoCall(event.eventName)}>
-                                Start Video Call
-                              </button>
-
-                            )}
-
-                          </td>
-                          <td>
-
-                            <div className=" px-4">
-                              <button
-                                onClick={() => handleEventEdit(event._id)}
-                                className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
-                              >
-                                Edit
-                              </button>
-                            </div>
-
-
-
-
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+         <ReusableTable
+         headers={heading}
+         data={currentEvents}
+            renderRow={(event, index) => (
+    <tr
+      key={event._id}
+      className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+    >
+      <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
+      <td className="border border-gray-300 px-4 py-3">
+        {event.images?.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {event.images.map((img: string, idx: number) => (
+              <img
+                key={idx}
+                src={img}
+                alt={`img-${idx}`}
+                className="w-16 h-16 object-cover rounded border border-gray-200"
+              />
+            ))}
+          </div>
+        ) : (
+          "No images"
+        )}
+      </td>
+      <td className="border border-gray-300 px-4 py-3">{event.title}</td>
+      <td className="border border-gray-300 px-4 py-3">
+        {event.title !== "Virtual" ? (
+          event.destination
+        ) : (
+          <button
+            onClick={() => handleGenerateLink(event._id, event.eventName)}
+            className="text-blue-600 underline hover:text-blue-800 text-sm"
+          >
+            Generate a Link
+          </button>
+        )}
+      </td>
+      <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
+      <td className="border border-gray-300 px-4 py-3">
+        {event.title !== "Virtual" ? (
+          <div className="flex flex-col space-y-2">
+            {event.typesOfTickets.map((ticket: any, i: number) => (
+              <div key={i} className="flex justify-between">
+                <span className="text-indigo-700 font-semibold">{ticket.type}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
+                  <span className="text-gray-500 text-sm">({ticket.noOfSeats} seats)</span>
                 </div>
-
-
-                <div className="flex justify-center items-center mt-4 space-x-2">
+              </div>
+            ))}
+          </div>
+        ) : (
+          <button
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl"
+            onClick={() => startVideoCall(event.eventName)}
+          >
+            Start Video Call
+          </button>
+        )}
+      </td>
+      <td className="border border-gray-300 px-4 py-3">
+        <button
+          onClick={() => handleEventEdit(event._id)}
+          className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
+        >
+          Edit
+        </button>
+      </td>
+    </tr>
+  )}
+         />
+               <div className="flex justify-center items-center mt-4 space-x-2">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -322,12 +288,6 @@ const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(t
                     Next
                   </button>
                 </div>
-              </>
-            ) : (
-              <p className="text-center text-gray-500">No event found for this account.</p>
-            )}
-
-          </div>
         </div>
       </div>
       <Footer />

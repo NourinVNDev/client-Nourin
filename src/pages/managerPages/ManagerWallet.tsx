@@ -5,6 +5,7 @@ import { fetchManagerWallet } from "../../service/managerServices/handleOfferSer
 import Footer from "../../components/managerComponents/Footer";
 import Header from "../../components/managerComponents/Header";
 import NavBar from "../../components/managerComponents/NavBar";
+import ReusableTable from "../../components/managerComponents/ReusableTable";
 
 const ManagerWallet = () => {
     const managerId = useSelector((state: RootState) => state.manager._id);
@@ -23,7 +24,7 @@ const ManagerWallet = () => {
         }>,
     });
 
-    // Pagination state
+   
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [transactionsPerPage] = useState<number>(5); // Set the number of transactions per page
 
@@ -83,7 +84,7 @@ const ManagerWallet = () => {
     };
 
 
-    console.log("Manager Wallet",managerWalletData);
+    const heading=['Event Name','NoOfPerson','Amount','Type','Status'];
     
 
     return (
@@ -104,37 +105,41 @@ const ManagerWallet = () => {
                             </div>
     
                             <h3 className="text-lg font-semibold text-gray-800 mb-4">Transaction History</h3>
-                            {managerWalletData.transactionHistory.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-                                        <thead className="bg-gray-200 text-gray-700">
-                                            <tr>
-                                                <th className="py-2 px-4 border-b">Event Name</th>
-                                                <th className="py-2 px-4 border-b">NoOfPerson</th>
-                                                <th className="py-2 px-4 border-b">Amount (₹)</th>
-                                                <th className="py-2 px-4 border-b">Type</th>
-                                                <th className="py-2 px-4 border-b">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {currentTransactions.map((tx) => (
-                                                <tr key={tx.id} className="text-gray-700 text-center border-b">
-                                                    <td className="py-2 px-4">{tx.eventName}</td>
-                                                    <td className="py-2 px-4">{tx.noOfPerson} person</td>
-                                                    <td className="py-2 px-4 font-semibold">₹{tx.amount.toFixed(2)}</td>
-                                                    <td className={`py-2 px-4 ${tx.type === "credit" ? "text-green-500" : "text-red-500"}`}>
-                                                        {tx.type}
-                                                    </td>
-                                                    <td className={`py-2 px-4 font-medium ${tx.status === "completed" ? "text-green-600" : "text-yellow-600"}`}>
-                                                        {tx.status}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-    
-                                    {/* Pagination Controls */}
-                                    <div className="flex justify-center mt-4">
+                        {managerWalletData.transactionHistory.length > 0 ? (
+  <div className="overflow-x-auto">
+    <ReusableTable
+      headers={heading}
+      data={currentTransactions}
+      renderRow={(tx, index) => (
+        <tr key={tx.id} className="text-gray-700 text-center border-b">
+          <td className="py-2 px-4">{tx.eventName}</td>
+          <td className="py-2 px-4">{tx.noOfPerson} person</td>
+          <td className="py-2 px-4 font-semibold">₹{tx.amount.toFixed(2)}</td>
+          <td className={`py-2 px-4 ${tx.type === "credit" ? "text-green-500" : "text-red-500"}`}>
+            {tx.type}
+          </td>
+          <td className={`py-2 px-4 font-medium ${tx.status === "completed" ? "text-green-600" : "text-yellow-600"}`}>
+            {tx.status}
+          </td>
+        </tr>
+      )}
+    />
+  
+  </div>
+) : (
+  <div className="flex justify-center items-center min-h-[60vh]">
+    <p className="text-lg text-gray-500">No transactions found.</p>
+  </div>
+)}
+
+                        </div>
+                    ):(
+                        <div className="flex justify-center items-center min-h-[60vh]">
+                        <p className="text-lg text-gray-500">No Money in the Wallet.</p>
+                    </div> 
+                    )}
+        
+                        <div className="flex justify-center mt-4">
                                         <button
                                             onClick={() => handlePageChange(currentPage - 1)}
                                             disabled={currentPage === 1}
@@ -153,18 +158,6 @@ const ManagerWallet = () => {
                                             Next
                                         </button>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="flex justify-center items-center min-h-[60vh]">
-                                    <p className="text-lg text-gray-500">No transactions found.</p>
-                                </div>
-                            )}
-                        </div>
-                    ):(
-                        <div className="flex justify-center items-center min-h-[60vh]">
-                        <p className="text-lg text-gray-500">No Money in the Wallet.</p>
-                    </div> 
-                    )}
                 </div>
             </div>
             <Footer />

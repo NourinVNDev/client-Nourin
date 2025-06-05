@@ -5,9 +5,11 @@ interface MessageBubbleProps {
     message: string;
     timestamp: string;
     senderId: string;
+    
+
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, timestamp, senderId }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, timestamp, senderId}) => {
     const user = useSelector((state: RootState) => state.user._id);
     const manager = useSelector((state: RootState) => state.manager._id);
 
@@ -18,6 +20,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, timestamp, sende
     const isSender = String(UserID) === String(senderId);
 
     console.log("IsSenderId", isSender);
+    
     
     return (
         <div className={`flex ${isSender ? "justify-end" : "justify-start"} mb-2`}>

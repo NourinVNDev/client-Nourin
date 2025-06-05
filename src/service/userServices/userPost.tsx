@@ -12,8 +12,6 @@ const getAllEventDataDetails=async ()=>{
     const response=await apiRequest(`/post/getAllEventData`,'GET');
         return response.data;
 }
-
-
 const handleLikePost=async (index:number,postId:string,userId:string)=>{
     return await apiRequest(`/post/handleLike`,'POST',{index,postId,userId})
 }
@@ -27,49 +25,32 @@ const getEventData=async (id:string)=>{
     return await apiRequest(`/post/getSelectEvent/${id}`,'GET')
 }
 const makeStripePayment = async (eventData: PaymentData) => {
-   
-
     try {
-     
         const PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-
-
         if (!PUBLISHABLE_KEY) {
             throw new Error("No publishable key provided.");
         }
-
-
         const stripe = await loadStripe(PUBLISHABLE_KEY);
-
         if (!stripe) {
             throw new Error("Stripe failed to initialize.");
         }
-
         const userEventData = { products: eventData };
-
-        
         const response = await API.post("/post/create-checkout-session", userEventData);
         console.log("Response",response);
-        
         if (!response.data || !response.data.success) {
             return { success: false, message: response.data?.message || "Failed to create checkout session" };
         }
-
         const sessionId = response.data.sessionId;
         if (!sessionId) {
             console.error("Invalid session ID from server");
             return { success: false, message: "Seat Sold Out"};
         }
-
         const result = await stripe.redirectToCheckout({ sessionId });
-
         if (result?.error) {
             console.error("Stripe Checkout Error:", result.error.message);
             return { success: false, message: result.error.message };
         }
-
         return { success: true, message: "Redirecting to payment" };
-
     } catch (error) {
         console.error("Error during payment:", error);
         return { success: false, message: error || "Something went wrong" };
@@ -136,8 +117,10 @@ const saveRetryBillingDetails=async(formData:retryBillingData)=>{
     return await apiRequest(`/saveRetryBillingDetails`,'POST',formData);
 }
 
-const checkIfUserIsBooked=async(email:string,eventName:string)=>{
-    const response=await apiRequest(`/checkIfUserValid/${email}/${eventName}`,'GET')
+const checkIfUserIsBooked=async(email:string,eventName:string,bookedId:string)=>{
+    const response=await apiRequest(`/checkIfUserValid/${email}/${eventName}/${bookedId}`,'GET')
+    console.log("Response",response.data);
+    
         return response.data.result.savedEvent;
 }
 

@@ -10,6 +10,8 @@ import { RootState } from "../../../App/store";
 const TotalBooking = () => {
     const [bookings, setBookings] = useState<BookingData[]>([]);
     const managerId = useSelector((state: RootState) => state.manager._id);
+        const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
     useEffect(() => {
         const fetchTotalBookingDetails = async () => {
             if (managerId) {
@@ -33,59 +35,105 @@ const TotalBooking = () => {
 
         fetchTotalBookingDetails();
     }, []);
-    return (
-        <div className="flex flex-col h-screen bg-gray-100">
-            <Header />
-            <div className="flex flex-1 w-full">
-                {/* Navigation Bar */}
-                <NavBar />
-                <main className="flex-1 p-6 overflow-y-auto bg-gray-100">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-800">Total Bookings</h2>
-                    {bookings.length > 0 ? (
-                        <div className="flex justify-center">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl"> {/* Centered grid with max width */}
-                                {bookings.map((booking, index) => (
-                                    <div key={index} className="bg-white shadow-lg rounded-lg p-6 w-full md:w-80 lg:w-96"> {/* Set specific widths for different screen sizes */}
-                                        <h3 className="text-xl font-semibold text-gray-700">
-                                            {booking.billingDetails.firstName} {booking.billingDetails.lastName}
-                                        </h3>
-                                        <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
-                                            <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full">
-                                                <Users className="w-4 h-4" />
-                                                <span>{booking.NoOfPerson} Person</span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full">
-                                                <Calendar className="w-4 h-4" />
-                                                <span>
-                                                    {new Date(booking.bookingDate).toLocaleDateString('en-GB', {
-                                                        day: '2-digit',
-                                                        month: '2-digit',
-                                                        year: 'numeric'
-                                                    })}
-                                                </span>
-                                            </div>
+        const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTransactions = bookings.slice(indexOfFirstItem, indexOfLastItem) || [];
+    const totalPages = bookings ? Math.ceil(bookings.length / itemsPerPage) : 1;
+
+    
+    const handlePrev = () => {
+        setCurrentPage((prev) => Math.max(prev - 1, 1));
+    };
+
+    const handleNext = () => {
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    };
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-100">
+        <Header />
+        <div className="flex flex-1 w-full">
+            <NavBar />
+            <main className="flex-1 p-6 overflow-y-auto">
+                <h2 className="text-4xl font-bold mb-8 text-blue-800">Total Bookings</h2>
+
+                {currentTransactions.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                            {currentTransactions.map((booking, index) => (
+                                <div key={index} className="bg-white border border-gray-200 hover:shadow-2xl transition-shadow duration-300 rounded-xl p-6 w-full">
+                                    <h3 className="text-2xl font-semibold text-gray-800 mb-2">
+                                        {booking.billingDetails.firstName} {booking.billingDetails.lastName}
+                                    </h3>
+
+                                    <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-600">
+                                        <div className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+                                            <Users className="w-4 h-4" />
+                                            <span>{booking.NoOfPerson} Person</span>
                                         </div>
-                                        <p className="text-gray-600 mt-2">Email: {booking.billingDetails.email}</p>
-                                        <p className="text-gray-600">Phone: {booking.billingDetails.phoneNo}</p>
-                                        <p className="text-gray-600">Event Name: {booking.eventId.eventName}</p>
-                                        <p className="text-gray-600">Event Name: {booking.paymentStatus==='Completed'?<span className="text-green-500">Confirmed</span>:<span className="text-red-500">Cancelled</span>}</p>
-                                        <div className="flex justify-between items-center mt-4">
-                                            <span className="text-lg font-bold text-green-600">₹{booking.totalAmount}</span>
+                                        <div className="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+                                            <Calendar className="w-4 h-4" />
+                                            <span>
+                                                {new Date(booking.bookingDate).toLocaleDateString("en-GB", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric"
+                                                })}
+                                            </span>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+
+                                    <div className="mt-4 space-y-1 text-gray-700 text-sm">
+                                        <p><span className="font-semibold">Email:</span> {booking.billingDetails.email}</p>
+                                        <p><span className="font-semibold">Phone:</span> {booking.billingDetails.phoneNo}</p>
+                                        <p><span className="font-semibold">Event:</span> {booking.eventId.eventName}</p>
+                                        <p>
+                                            <span className="font-semibold">Status:</span>{" "}
+                                            {booking.paymentStatus === "Completed" ? (
+                                                <span className="inline-block bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs font-semibold">Confirmed</span>
+                                            ) : (
+                                                <span className="inline-block bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-xs font-semibold">Cancelled</span>
+                                            )}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex justify-between items-center mt-5">
+                                        <span className="text-xl font-bold text-blue-600">₹{booking.totalAmount}</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ) : (
-                        <div className="bg-white shadow-lg rounded-lg p-6 text-center">
-                            <p className="text-gray-600">No bookings found.</p>
+
+                        <div className="flex justify-center mt-10 space-x-6">
+                            <button
+                                onClick={handlePrev}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold disabled:opacity-50 transition"
+                            >
+                                Prev
+                            </button>
+                            <span className="text-gray-800 font-medium self-center">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={handleNext}
+                                disabled={currentPage === totalPages}
+                                className="px-4 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold disabled:opacity-50 transition"
+                            >
+                                Next
+                            </button>
                         </div>
-                    )}
-                </main>
-            </div>
-            <Footer />
+                    </>
+                ) : (
+                    <div className="bg-white shadow-md rounded-lg p-8 text-center max-w-lg mx-auto">
+                        <p className="text-gray-600 text-lg">No bookings found.</p>
+                    </div>
+                )}
+            </main>
         </div>
-    );
+        <Footer />
+    </div>
+);
+
 
 }
 export default TotalBooking;

@@ -3,7 +3,9 @@ import NavBar from "../../components/adminComponents/NavBar";
 import Header from "../../components/adminComponents/Header";
 import Footer from "../../components/adminComponents/Footer";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { getUserDetails, updateUserBlockStatus } from "../../service/adminServices/adminUserManager";
+import ReusableTable from "../../components/adminComponents/ReusableTable";
 
 interface User {
   _id: string;
@@ -18,17 +20,29 @@ interface User {
 const AdminUser = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5; // Define how many users to display per page
+  const usersPerPage = 5;
 
-  const handleUserBlock = async (userId: string, currentStatus: boolean) => {
+const handleUserBlock = async (userId: string, currentStatus: boolean) => {
+  const action = currentStatus ? "unblock" : "block";
+
+  const result = await Swal.fire({
+    title: `Are you sure you want to ${action} this user?`,
+    text: `You are about to ${action} the user.`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: `Yes, ${action} them!`,
+  });
+
+  if (result.isConfirmed) {
     try {
-      const updatedStatus = !currentStatus; // Toggle the status
+      const updatedStatus = !currentStatus;
       const response = await updateUserBlockStatus(userId, updatedStatus);
 
       if (response.success) {
         const updatedUser = response.result;
 
-        // Update the state for the specific user
         setUsers((prevUsers) =>
           prevUsers.map((user) =>
             user._id === updatedUser._id
@@ -37,26 +51,31 @@ const AdminUser = () => {
           )
         );
 
-        console.log(
-          `User block status updated to ${updatedStatus ? "blocked" : "unblocked"}`
+        Swal.fire(
+          `${updatedStatus ? "Blocked" : "Unblocked"}!`,
+          `The user has been ${updatedStatus ? "blocked" : "unblocked"}.`,
+          "success"
         );
       } else {
         console.error("Failed to update user block status:", response.message);
-        alert(`Error: ${response.message}`);
+        Swal.fire("Error", response.message, "error");
       }
     } catch (error) {
       console.error("Error updating user block status:", error);
-      alert("An unexpected error occurred while updating the block status.");
+      Swal.fire("Error", "An unexpected error occurred.", "error");
     }
-  };
+  }
+};
 
-  // Fetch user details on component mount
+
+
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const result = await getUserDetails();
         console.log(result);
-        setUsers(result.result); // Update the users state
+        setUsers(result.result);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -64,14 +83,13 @@ const AdminUser = () => {
     fetchUsers();
   }, []);
 
-  // Calculate the users to display for the current page
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
-  // Calculate total pages
   const totalPages = Math.ceil(users.length / usersPerPage);
-
+  const heading=['No','Name','Email','PhoneNo','Status','Action'];
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-50">
       <Header />
@@ -86,53 +104,30 @@ const AdminUser = () => {
             <h2 className="text-3xl font-extrabold mb-6 text-gray-900 text-center">
               User List
             </h2>
-
-            <table className="w-full border-collapse border border-gray-400">
-              <thead>
-                <tr className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                  <th className="border border-gray-400 p-3 text-left">No.</th>
-                  <th className="border border-gray-400 p-3 text-left">Name</th>
-                  <th className="border border-gray-400 p-3 text-left">Email</th>
-                  <th className="border border-gray-400 p-3 text-left">Phone</th>
-                  <th className="border border-gray-400 p-3 text-left">Status</th>
-                  <th className="border border-gray-400 p-3 text-left">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentUsers.length > 0 ? (
-                  currentUsers.map((user, index) => (
-                    <tr
-                      key={user._id}
-                      className="odd:bg-white even:bg-gray-100 hover:bg-blue-50 text-black"
-                    >
-                      <td className="border border-gray-400 p-3">{indexOfFirstUser + index + 1}</td>
-                      <td className="border border-gray-400 p-3">
-                        {`${user.firstName} ${user.lastName}`}
-                      </td>
-                      <td className="border border-gray-400 p-3">{user.email}</td>
-                      <td className="border border-gray-400 p-3">{user.phoneNo || "Nil"}</td>
-                      <td className="border border-gray-400 p-3">
-                        {user.isBlock ? "Inactive" : "Active"}
-                      </td>
-                      <td className="border border-gray-400 p-3">
-                        <button
-                          onClick={() => handleUserBlock(user._id, user.isBlock)}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {user.isBlock ? "UnBlock" : "Block"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="text-center p-3">
-                      No users found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <ReusableTable 
+            headers={heading}
+            data={currentUsers}
+              renderRow={(user, index) => (
+    <tr key={user._id}>
+      <td className="border px-4 py-2">{indexOfFirstUser + index + 1}</td>
+      <td className="border px-4 py-2">{user.firstName} {user.lastName}</td>
+      <td className="border px-4 py-2">{user.email}</td>
+      <td className="border px-4 py-2">{user.phoneNo || "Nil"}</td>
+      <td className="border px-4 py-2">
+        {user.isBlock ? "Inactive" : "Active"}
+      </td>
+      <td className="border px-4 py-2">
+        <button
+          onClick={() => handleUserBlock(user._id, user.isBlock)}
+          className={`px-2 py-1 rounded ${
+            user.isBlock ? "bg-green-500" : "bg-red-500"
+          } text-white`}
+        >
+          {user.isBlock ? "Unblock" : "Block"}
+        </button>
+      </td>
+    </tr>
+  )}/>
 
             {/* Pagination Controls */}
             <div className="flex justify-center mt-4">

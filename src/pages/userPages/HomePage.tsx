@@ -17,7 +17,6 @@ export default function Home() {
         <Hero />
         <About />
         <Features />
-        {/* <TopEvents /> */}
         <Subscribe />
       </main>
       <Footer />

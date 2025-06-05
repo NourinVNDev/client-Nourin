@@ -12,7 +12,6 @@ interface ManagerListProps {
   onSelectManager: (manager: string) => void;
   person: string;
   setSelectedEvent: React.Dispatch<React.SetStateAction<string>>;
-  // messages: { message: string; time: string; readCount: number }[];
   setMessages: React.Dispatch<React.SetStateAction<{ message: string; time: string; readCount: number }[]>>;
     setAllManagers: React.Dispatch<React.SetStateAction<ManagerData[]>>;
 

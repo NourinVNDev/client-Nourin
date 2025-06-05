@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { Button } from "@nextui-org/react";
 import Header1 from "../../components/userComponents/Header1";
-import { Link } from "react-router-dom";
 import Footer from "../../components/userComponents/Footer";
 import { fetchSocialEventDetails } from "../../service/userServices/register";
 import { EventData } from "../../validations/userValid/TypeValid";

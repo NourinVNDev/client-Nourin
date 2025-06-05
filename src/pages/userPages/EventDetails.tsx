@@ -17,37 +17,53 @@ const EventDetails = () => {
   const [memberEmail, setMemberEmail] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [emails, setEmails] = useState<string[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+const [editIndex, setEditIndex] = useState<number|null>(null);
   const user = useSelector((state: RootState) => state.user);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const userId = localStorage.getItem('userId');
 
 
   const { id, selectedType } = useParams();
-  const handleNoOfPerson = (e: React.FormEvent) => {
-    console.log("why?");
-    e.preventDefault();
-    if (!memberName.trim()) return;
-    console.log("Hai");
-    const updatedMembers = [...members, memberName];
-    const updatedEmail = [...emails, memberEmail];
+const handleNoOfPerson = (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const updatedAmount = (eventData.actualAmount || eventData.amount || 0) * updatedMembers.length;
+  if (!memberName.trim() || !memberEmail.trim()) return;
 
-    setMembers(updatedMembers);
-    setEmails(updatedEmail);
-    setEventData((prev) => ({
-      ...prev,
-      Amount: updatedAmount,
-      amount: updatedAmount,
-      noOfPerson: updatedMembers.length,
-      bookedMembers: updatedMembers,
-      bookedEmails:updatedEmail
-    }));
-    setMemberName("");
-    setMemberEmail("");
+  let updatedMembers: string[] = [];
+  let updatedEmails: string[] = [];
 
-  };
+  if (isEditing && editIndex !== null) {
+    updatedMembers = [...members];
+    updatedEmails = [...emails];
 
+    updatedMembers[editIndex] = memberName;
+    updatedEmails[editIndex] = memberEmail;
+
+    setIsEditing(false);
+    setEditIndex(null);
+  } else {
+    updatedMembers = [...members, memberName];
+    updatedEmails = [...emails, memberEmail];
+  }
+
+  const updatedAmount = (eventData.actualAmount || eventData.amount || 0) * updatedMembers.length;
+
+  setMembers(updatedMembers);
+  setEmails(updatedEmails);
+
+  setEventData((prev) => ({
+    ...prev,
+    Amount: updatedAmount,
+    amount: updatedAmount,
+    noOfPerson: updatedMembers.length,
+    bookedMembers: updatedMembers,
+    bookedEmails: updatedEmails
+  }));
+
+  setMemberName("");
+  setMemberEmail("");
+};
   const [eventData, setEventData] = useState<PaymentData>({
     bookedId: "",
     userId: "",
@@ -70,10 +86,10 @@ const EventDetails = () => {
     bookingId: "",
     actualAmount: 0,
     bookedMembers: [],
-    bookedEmails:[],
+    bookedEmails: [],
     location: '',
     amount: 0,
-    paymentStatus:''
+    paymentStatus: ''
   });
   const makePayment = async () => {
     console.log("Match");
@@ -132,14 +148,14 @@ const EventDetails = () => {
           notIncluded: ticket?.notIncluded || [],
           actualAmount: isVirtual ? 0 : ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
           Amount: isVirtual ? 0 : ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
-          bookedId: prevData.bookedId||'',
-          bookingId: prevData.bookingId||'',
+          bookedId: prevData.bookedId || '',
+          bookingId: prevData.bookingId || '',
           bookedMembers: [],
           startDate: event?.startDate,
-          amount: isVirtual? event.amount:0,
-          paymentStatus:prevData.paymentStatus||'',
-          
-        
+          amount: isVirtual ? event.amount : 0,
+          paymentStatus: prevData.paymentStatus || '',
+
+
         }));
 
 
@@ -154,9 +170,9 @@ const EventDetails = () => {
   }, [id, user]);
 
 
-  useEffect(()=>{
-    console.log("Event PaymentStatus:",eventData.paymentStatus,eventData.bookingId);
-  },[eventData]);
+  useEffect(() => {
+    console.log("Event PaymentStatus:", eventData);
+  }, [eventData]);
 
   const SaveBillingDetails = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,7 +207,7 @@ const EventDetails = () => {
       address: eventData.address,
       ticketType: selectedType || '',
       categoryType: eventData.categoryName,
-   
+
     }
     console.log("Helloo");
 
@@ -205,7 +221,7 @@ const EventDetails = () => {
         ...result.data.billingDetails,
         bookedId: result.data?.data.bookingId,
         bookingId: result.data?.data.id,
-        paymentStatus:result.data?.data.paymentStatus
+        paymentStatus: result.data?.data.paymentStatus
       }));
     } else if (result.message == 'No available seats for the selected ticket type') {
       toast.error(result.message);
@@ -346,12 +362,12 @@ const EventDetails = () => {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-purple-700 text-white py-2 rounded-lg hover:bg-purple-800 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  Add Member
-                </button>
+<button
+  type="submit"
+  className="w-full bg-purple-700 text-white py-2 rounded-lg hover:bg-purple-800 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500"
+>
+  {isEditing ? "Update Member" : "Add Member"}
+</button>
               </form>
             </div>
 
@@ -393,16 +409,32 @@ const EventDetails = () => {
                         <div>{member}</div>
                         <div className="text-sm text-gray-500">{emails[index]}</div>
                       </div>
-                      <button
-                        onClick={() => {
-                          setMembers((mem) => mem.filter((_, i) => i !== index));
-                          setEmails((em) => em.filter((_, i) => i !== index));
-                        }}
-                        aria-label="Remove member"
-                        className="text-gray-600 hover:text-purple-500 transition"
-                      >
-                        ✖
-                      </button>
+                      <div className="flex gap-2 items-center">
+                       
+                        <button
+                          onClick={() => {
+    setMemberName(members[index]);
+    setMemberEmail(emails[index]);
+    setIsEditing(true);
+    setEditIndex(index);
+  }}
+                          aria-label="Edit member"
+                          className="text-gray-600 hover:text-blue-500 transition"
+                        >
+                          ✎
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setMembers((mem) => mem.filter((_, i) => i !== index));
+                            setEmails((em) => em.filter((_, i) => i !== index));
+                          }}
+                          aria-label="Remove member"
+                          className="text-gray-600 hover:text-purple-500 transition"
+                        >
+                          ✖
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>

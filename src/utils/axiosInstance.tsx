@@ -1,6 +1,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { USER_URL } from "./userUrl";
+import {persistor} from '../../App/store';
 
 import { clearUserDetails } from "../../Features/userSlice";
 
@@ -48,16 +49,22 @@ API.interceptors.response.use(
             }).then(() => {
                 clearCookies();
                 localStorage.removeItem('userAuth');
+                   localStorage.removeItem('userId');
+                   persistor.purge();
               storeDispatch && storeDispatch(clearUserDetails());
                 window.location.href = '/';
             
             });
             
         }else  if(error.response?.status===404){
+            //refresh token illatha case
             console.log("Yes");
             clearCookies();
+
             localStorage.removeItem('userAuth');
+              localStorage.removeItem('userId');
         storeDispatch && storeDispatch(clearUserDetails());
+          persistor.purge();
             window.location.href='/'
 
         }

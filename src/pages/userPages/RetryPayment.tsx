@@ -55,6 +55,8 @@ bookedId: "",
   const [memberEmail, setMemberEmail] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [emails, setEmails] = useState<string[]>([]);
+   const [isEditing, setIsEditing] = useState(false);
+const [editIndex, setEditIndex] = useState<number|null>(null);
 
    const saveBillingDetails = async (e: React.FormEvent) => {
      e.preventDefault();
@@ -106,27 +108,45 @@ bookedId: "",
      }
    };
 
-  const handleNoOfPerson = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (memberName && memberEmail) {
-      const updatedMembers = [...members, memberName];
-      const updatedEmails = [...emails, memberEmail];
-      const basePricePerPerson = eventData.amount / Math.max(1, members.length);
-      const updatedAmount = basePricePerPerson * updatedMembers.length;
-      
-      setMembers(updatedMembers);
-      setEmails(updatedEmails);
-      setEventData(prev => ({
-        ...prev,
-        amount: updatedAmount,
-        bookedMembers: updatedMembers,
-        bookedEmails: updatedEmails,
-        noOfPerson:updatedMembers.length
-      }));
-      setMemberName("");
-      setMemberEmail("");
-    }
-  };
+const handleNoOfPerson = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!memberName.trim() || !memberEmail.trim()) return;
+
+  let updatedMembers: string[] = [];
+  let updatedEmails: string[] = [];
+
+  if (isEditing && editIndex !== null) {
+    updatedMembers = [...members];
+    updatedEmails = [...emails];
+
+    updatedMembers[editIndex] = memberName;
+    updatedEmails[editIndex] = memberEmail;
+
+    setIsEditing(false);
+    setEditIndex(null);
+  } else {
+    updatedMembers = [...members, memberName];
+    updatedEmails = [...emails, memberEmail];
+  }
+
+  const updatedAmount = (eventData.actualAmount || eventData.amount || 0) * updatedMembers.length;
+
+  setMembers(updatedMembers);
+  setEmails(updatedEmails);
+
+  setEventData((prev) => ({
+    ...prev,
+    Amount: updatedAmount,
+    amount: updatedAmount,
+    noOfPerson: updatedMembers.length,
+    bookedMembers: updatedMembers,
+    bookedEmails: updatedEmails
+  }));
+
+  setMemberName("");
+  setMemberEmail("");
+};
 
   const makePayment = async () => {
     console.log("Match");
@@ -409,6 +429,19 @@ useEffect(() => {
                         <div>{member}</div>
                         <div className="text-sm text-gray-500">{emails[index]}</div>
                       </div>
+                        <div className="flex gap-2 items-center">
+                           <button
+                          onClick={() => {
+    setMemberName(members[index]);
+    setMemberEmail(emails[index]);
+    setIsEditing(true);
+    setEditIndex(index);
+  }}
+                          aria-label="Edit member"
+                          className="text-gray-600 hover:text-blue-500 transition"
+                        >
+                          ✎
+                        </button>
                       <button
                          onClick={() => removeMember(index)}
                         aria-label="Remove member"
@@ -416,6 +449,7 @@ useEffect(() => {
                       >
                         ✖
                       </button>
+                    </div>
                     </li>
                   ))}
                 </ul>

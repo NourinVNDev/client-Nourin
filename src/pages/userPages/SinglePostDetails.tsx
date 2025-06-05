@@ -8,8 +8,6 @@ import 'react-day-picker/dist/style.css';
 import { Link } from "react-router-dom";
 import { format } from 'date-fns';
 
-
-
 const SinglePostDetails = () => {
   const location = useLocation();
   const data = JSON.stringify(location.state?.data);
@@ -54,21 +52,6 @@ const [dateRange, setDateRange] = useState<DateRange>({
 });
   const [activeTab, setActiveTab] = useState("information");
 
-  // const isHighlightedDate = (date: Date) => {
-  //   const [start, end] = dateRange;
-  //   return date >= start && date <= end;
-  // };
-
-
-  // const handleDateChange: CalendarProps['onChange'] = (value) => {
-  //   if (Array.isArray(value)) {
-  //     setDateRange(value as [Date, Date]);
-  //   } else if (value instanceof Date) {
-  //     setDateRange([value, value]);
-  //   } else {
-  //     setDateRange([new Date(), new Date()]);
-  //   }
-  // };
 const customStyles = `
   /* Base calendar styles */
   .rdp {
@@ -89,7 +72,7 @@ const customStyles = `
     color: #000000 !important;  /* Force black text for all dates */
   }
 
-  /* Selected range styling */
+
   .rdp-day_selected:not(.rdp-day_disabled):not(.rdp-day_outside) {
     background-color: var(--rdp-accent-color);
     color: white !important;  /* White text for selected dates */
@@ -140,7 +123,7 @@ const customStyles = `
 
   /* Hover effects - subtle change */
   .rdp-day:not(.rdp-day_disabled):not(.rdp-day_selected):hover {
-    background-color: #f3f4f6;
+   background-color: #f3f4f6;
   }
 
   /* Rest of your styles remain the same */
@@ -150,7 +133,6 @@ const customStyles = `
     align-items: center;
     padding: 0 8px 12px;
   }
-
   .rdp-caption_label {
     font-weight: 600;
     color: #1e293b;
@@ -187,8 +169,7 @@ const customStyles = `
     color: #000 !important;
     pointer-events: none !important;
     cursor: default !important;
-  }
-`;
+  }`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 relative overflow-x-hidden">
@@ -213,7 +194,7 @@ const customStyles = `
                 >
                   Information
                 </button>
-                <button
+                {parsedData.data.result.savedEvent.title!='Virtual' &&<button
                   className={`text-lg font-semibold px-4 py-2 rounded ${activeTab === "seatPlan"
                     ? "bg-purple-700 text-white"
                     : "text-gray-700 hover:bg-gray-200"
@@ -221,7 +202,7 @@ const customStyles = `
                   onClick={() => setActiveTab("seatPlan")}
                 >
                   Seat Plans
-                </button>
+                </button>}
                 <button
                   className={`text-lg font-semibold px-4 py-2 rounded ${activeTab === "Offer-info"
                     ? "bg-purple-700 text-white"
@@ -251,10 +232,6 @@ const customStyles = `
                               Chat with us
                             </Link>
                           </div>
-
-
-
-
                           <span className="text-lg text-green-600 font-semibold">
                             {parsedData?.data?.result?.savedEvent?.companyName || "Company Name"}
                           </span>
@@ -295,8 +272,6 @@ const customStyles = `
                               : "Start Date"}
                           </p>
                         </div>
-
-                        {/* End Date */}
                         <div className="flex  items-center">
                           <h2 className="text-violet-700 font-semibold">End Date:</h2>
                           <p className="text-yellow-700 pl-2">
@@ -391,69 +366,93 @@ const customStyles = `
 
                   </div>
                 )}
-                {activeTab === "Offer-info" && (
-                  <div className="p-6 bg-white rounded-lg shadow-lg border border-gray-300">
-                    <h2 className="text-2xl font-bold mb-4 text-gray-900">Offer Information</h2>
+           {activeTab === "Offer-info" && (
+  <div className="p-6 bg-white rounded-lg shadow-lg border border-gray-300">
+    <h2 className="text-2xl font-bold mb-4 text-gray-900">Offer Information</h2>
 
-                    {parsedData?.data?.result?.savedEvent?.offer ? (
-                      <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4 p-4 bg-gray-100 rounded-lg shadow-sm">
-                          <div>
-                            <span className="block text-lg font-semibold text-gray-700">Offer Name:</span>
-                            <span className="block text-xl text-indigo-600 font-bold">{parsedData?.data?.result?.savedEvent?.offer.offerName}</span>
-                          </div>
+    {(parsedData?.data?.result?.savedEvent?.managerOffer || parsedData?.data?.result?.savedEvent?.adminOffer) ? (
+      <div className="space-y-6">
 
-                          <div>
-                            <span className="block text-lg font-semibold text-gray-700">Discount On:</span>
-                            <span className="block text-lg text-indigo-600 font-medium">{parsedData?.data?.result?.savedEvent?.offer.discount_on}</span>
-                          </div>
+        {/* Manager Offer */}
+        {parsedData?.data?.result?.savedEvent?.managerOffer && (
+          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-100 rounded-lg shadow-sm">
+            <h3 className="col-span-2 text-xl font-semibold text-purple-700">Manager Offer</h3>
+            <div>
+              <span className="block font-semibold text-gray-700">Offer Name:</span>
+              <span className="block text-indigo-600 font-bold">{parsedData.data.result.savedEvent.managerOffer.offerName}</span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">Discount On:</span>
+              <span className="block text-indigo-600">{parsedData.data.result.savedEvent.managerOffer.discount_on}</span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">Discount Value:</span>
+              <span className="block text-red-600">{parsedData.data.result.savedEvent.managerOffer.discount_value}%</span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">Start Date:</span>
+              <span className="block text-green-600">
+                {new Date(parsedData.data.result.savedEvent.managerOffer.startDate).toLocaleDateString("en-US")}
+              </span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">End Date:</span>
+              <span className="block text-red-600">
+                {new Date(parsedData.data.result.savedEvent.managerOffer.endDate).toLocaleDateString("en-US")}
+              </span>
+            </div>
+          </div>
+        )}
 
-                          <div>
-                            <span className="block text-lg font-semibold text-gray-700">Discount Value:</span>
-                            <span className="block text-lg text-red-600 font-medium">{parsedData?.data?.result?.savedEvent?.offer.discount_value}%</span>
-                          </div>
+        {/* Admin Offer */}
+        {parsedData?.data?.result?.savedEvent?.adminOffer && (
+          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-100 rounded-lg shadow-sm">
+            <h3 className="col-span-2 text-xl font-semibold text-red-700">Admin Offer</h3>
+            <div>
+              <span className="block font-semibold text-gray-700">Offer Name:</span>
+              <span className="block text-indigo-600 font-bold">{parsedData.data.result.savedEvent.adminOffer.offerName}</span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">Discount On:</span>
+              <span className="block text-indigo-600">{parsedData.data.result.savedEvent.adminOffer.discount_on}</span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">Discount Value:</span>
+              <span className="block text-red-600">{parsedData.data.result.savedEvent.adminOffer.discount_value}%</span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">Start Date:</span>
+              <span className="block text-green-600">
+                {new Date(parsedData.data.result.savedEvent.adminOffer.startDate).toLocaleDateString("en-US")}
+              </span>
+            </div>
+            <div>
+              <span className="block font-semibold text-gray-700">End Date:</span>
+              <span className="block text-red-600">
+                {new Date(parsedData.data.result.savedEvent.adminOffer.endDate).toLocaleDateString("en-US")}
+              </span>
+            </div>
+          </div>
+        )}
 
-                          <div>
-                            <span className="block text-lg font-semibold text-gray-700">Start Date:</span>
-                            <span className="block text-lg text-green-600 font-medium">
-                              {new Date(parsedData?.data?.result?.savedEvent?.offer.startDate).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </span>
-                          </div>
+        {/* Ticket Types */}
+        <h3 className="text-xl font-bold text-gray-800">Available Ticket Types</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {parsedData?.data?.result?.savedEvent?.typesOfTickets?.map((ticket: any, index: number) => (
+            <div key={index} className="p-4 bg-gray-50 border border-gray-300 rounded-lg shadow-sm">
+              <h4 className="text-lg font-semibold text-indigo-700">{ticket.type.toUpperCase()}</h4>
+              <p className="text-gray-600">Price: ₹{ticket.offerDetails.offerAmount}</p>
+              <p className="text-gray-600">Available Seat: {ticket.noOfSeats}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <p className="text-gray-500 text-lg">No active offers available.</p>
+    )}
+  </div>
+)}
 
-                          <div>
-                            <span className="block text-lg font-semibold text-gray-700">End Date:</span>
-                            <span className="block text-lg text-red-600 font-medium">
-                              {new Date(parsedData?.data?.result?.savedEvent?.offer.endDate).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </span>
-                          </div>
-
-
-                        </div>
-
-                        <h3 className="text-xl font-bold text-gray-800">Available Ticket Types</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {parsedData?.data?.result?.savedEvent?.typesOfTickets?.map((ticket: any, index: number) => (
-                            <div key={index} className="p-4 bg-gray-50 border border-gray-300 rounded-lg shadow-sm">
-                              <h4 className="text-lg font-semibold text-indigo-700">{ticket.type.toUpperCase()}</h4>
-                              <p className="text-gray-600">Price: ₹{ticket.offerDetails.offerAmount}</p>
-                              <p className="text-gray-600">Available Seat: {ticket.noOfSeats}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-gray-500 text-lg">No active offers available.</p>
-                    )}
-                  </div>
-                )}
 
 
 

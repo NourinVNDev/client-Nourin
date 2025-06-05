@@ -2,6 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { MANAGER_URL } from "./userUrl";
 import { clearManagerDetails } from "../../Features/managerSlice";
+import {persistor} from '../../App/store';
 const MANAGER_API = axios.create({ baseURL: MANAGER_URL, withCredentials: true });
 
 let storeDispatch: any = null;
@@ -43,6 +44,7 @@ MANAGER_API.interceptors.response.use(
                 localStorage.removeItem('managerAuth');
                 localStorage.removeItem('ManagerName')
                 storeDispatch && storeDispatch(clearManagerDetails());
+                persistor.purge();
                 window.location.href = '/mLogin';
                 
 
@@ -51,7 +53,8 @@ MANAGER_API.interceptors.response.use(
             console.log("Yes");
             clearCookies();
             localStorage.removeItem('managerAuth');
-            localStorage.removeItem('ManagerName')
+            localStorage.removeItem('ManagerName');
+            persistor.purge();
             storeDispatch && storeDispatch(clearManagerDetails());
             window.location.href = '/mLogin'
 

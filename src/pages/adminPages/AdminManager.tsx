@@ -4,9 +4,11 @@
 import NavBar from "../../components/adminComponents/NavBar";
 import Header from "../../components/adminComponents/Header";
 import Footer from "../../components/adminComponents/Footer";
+import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
 import { getManagerDetails, updateMangerBlockStatus } from "../../service/adminServices/adminUserManager";
 import { useNavigate } from "react-router-dom";
+import ReusableTable from "../../components/adminComponents/ReusableTable";
 interface Manager {
   _id: string; 
   firmName: string;
@@ -24,15 +26,27 @@ const AdminManager = () => {
   const [itemsPerPage] = useState(5);
   const navigate=useNavigate();
 
-  const handleManagerIsBlock = async (managerId: string, currentStatus: boolean) => {
+ const handleManagerIsBlock = async (managerId: string, currentStatus: boolean) => {
+  const action = currentStatus ? "unblock" : "block";
+
+  const result = await Swal.fire({
+    title: `Are you sure you want to ${action} this manager?`,
+    text: `You are about to ${action} the manager.`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: `Yes, ${action} them!`,
+  });
+
+  if (result.isConfirmed) {
     try {
-      const updatedStatus = !currentStatus; // Toggle the status
+      const updatedStatus = !currentStatus;
       const response = await updateMangerBlockStatus(managerId, updatedStatus);
 
       if (response.success) {
         const updatedUser = response.result;
 
-        // Update the state for the specific user
         setManagers((prevManager) =>
           prevManager.map((manager) =>
             manager._id === updatedUser._id
@@ -41,23 +55,28 @@ const AdminManager = () => {
           )
         );
 
-        console.log(`User block status updated to ${updatedStatus ? "blocked" : "unblocked"}`);
+        Swal.fire(
+          `${updatedStatus ? "Blocked" : "Unblocked"}!`,
+          `The manager has been ${updatedStatus ? "blocked" : "unblocked"}.`,
+          "success"
+        );
       } else {
         console.error("Failed to update user block status:", response.message);
-        alert(`Error: ${response.message}`);
+        Swal.fire("Error", response.message, "error");
       }
     } catch (error) {
       console.error("Error updating user block status:", error);
-      alert("An unexpected error occurred while updating the block status.");
+      Swal.fire("Error", "An unexpected error occurred.", "error");
     }
-  };
+  }
+};
 
-  // Fetch user details on component mount
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const result = await getManagerDetails();
-        setManagers(result.user); // Update the users state
+        setManagers(result.user);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -65,7 +84,7 @@ const AdminManager = () => {
     fetchUsers();
   }, []);
 
-  // Pagination logic
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentManagers = managers.slice(indexOfFirstItem, indexOfLastItem);
@@ -75,6 +94,10 @@ const showManagerInformation=(managerId:string)=>{
   
   navigate(`/manager/managerEvents/${managerId}`)
 }
+
+const heading=['Name','Email','Experience','PhoneNo','Status','Block/UnBlock'];
+
+
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-50">
 
@@ -85,48 +108,42 @@ const showManagerInformation=(managerId:string)=>{
         <NavBar />
 
         <div className="flex flex-col items-center flex-1 bg-gradient-to-br from-gray-100 to-gray-300">
+            <div className="mt-10"></div>
           <div className="w-full max-w-5xl bg-white p-6 rounded-lg shadow-xl">
             <h2 className="text-3xl font-extrabold mb-6 text-gray-900 text-center">Manager's List</h2>
 
-            <table className="w-full border-collapse border border-gray-400">
-              <thead>
-                <tr className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                  <th className="border border-gray-400 p-3 text-left">Name</th>
-                  <th className="border border-gray-400 p-3 text-left">Email</th>
-                  <th className="border border-gray-400 p-3 text-left">Experience</th>
-                  <th className="border border-gray-400 p-3 text-left">Phone</th>
-                  <th className="border border-gray-400 p-3 text-left">Status</th>
-                  <th className="border border-gray-400 p-3 text-left">Block/unblock</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentManagers.length > 0 ? (
-                  currentManagers.map((manager) => (
-                    <tr key={manager._id} className="odd:bg-white even:bg-gray-100 hover:bg-blue-50 text-black">
-                      <td  onClick={() => showManagerInformation(manager._id)} className="border border-gray-400 p-3">{manager.firmName}</td>
-                      <td className="border border-gray-400 p-3">{manager.email}</td>
-                      <td className="border border-gray-400 p-3">{manager.experience}</td>
-                      <td className="border border-gray-400 p-3">{manager.phoneNo}</td>
-                      <td className="border border-gray-400 p-3">{manager.isBlock ? "Inactive" : "Active"}</td>
-                      <td className="border border-gray-400 p-3">
-                        <button
-                          onClick={() => handleManagerIsBlock(manager._id, manager.isBlock)}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {manager.isBlock ? "UnBlock" : "Block"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="text-center p-3">
-                      No managers found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+
+            <ReusableTable
+            headers={heading}
+            data={currentManagers}
+            renderRow={(manager: Manager, index: number) => (
+  <tr
+    key={manager._id}
+    className="odd:bg-white even:bg-gray-100 hover:bg-blue-50 text-black"
+  >
+    <td
+      onClick={() => showManagerInformation(manager._id)}
+      className="border border-gray-400 p-3 cursor-pointer hover:underline"
+    >
+      {manager.firmName}
+    </td>
+    <td className="border border-gray-400 p-3">{manager.email}</td>
+    <td className="border border-gray-400 p-3">{manager.experience}</td>
+    <td className="border border-gray-400 p-3">{manager.phoneNo}</td>
+    <td className="border border-gray-400 p-3">
+      {manager.isBlock ? "Inactive" : "Active"}
+    </td>
+    <td className="border border-gray-400 p-3">
+      <button
+        onClick={() => handleManagerIsBlock(manager._id, manager.isBlock)}
+        className="text-blue-600 hover:underline"
+      >
+        {manager.isBlock ? "UnBlock" : "Block"}
+      </button>
+    </td>
+  </tr>
+)}
+/>
 
             {/* Pagination Controls */}
             <div className="flex justify-center mt-4">

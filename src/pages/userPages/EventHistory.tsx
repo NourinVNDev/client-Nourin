@@ -10,6 +10,7 @@ import ProfileNavbar from "../../components/userComponents/ProfileNavbar";
 import { getExistingReviewAndRating } from '../../service/userServices/userProfile';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/store';
+import { animateScroll as scroll } from "react-scroll";
 // Define an interface for the event object
 interface EventDetails {
   eventName: string;
@@ -30,6 +31,8 @@ const EventHistory = () => {
     review: "",
     rating: 0
   });
+    const [currentPage, setCurrentPage] = useState(1);
+    const eventsPerPage = 3;
 
   const [eventDetails, setEventDetails] = useState<EventDetails[]>([]);
   const userId=useSelector((state:RootState)=>state.user._id);
@@ -64,7 +67,16 @@ const EventHistory = () => {
 
     fetchEventHistory();
   }, []);
-
+    const indexOfLastEvent = currentPage * eventsPerPage;
+    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+    const currentEvents = [...eventDetails].reverse().slice(indexOfFirstEvent, indexOfLastEvent);
+  
+    const totalPages = Math.ceil(eventDetails.length / eventsPerPage);
+  
+    const handlePageChange = (newPage: number) => {
+      setCurrentPage(newPage);
+      scroll.scrollToTop({ duration: 800, smooth: "easeInOutQuad" });
+    };
   useEffect(() => {
     console.log("Modal state changed:", isModalOpen);
   }, [isModalOpen]);
@@ -95,24 +107,25 @@ const EventHistory = () => {
 
 
   return (
-    <div className="min-h-screen flex flex-col">
+       <div className="min-h-screen flex flex-col w-full">
       <Header />
-      <div className="flex-1 flex">
+      <div className="flex-1 flex w-full">
         <aside className="hidden md:block w-64 bg-gray-800 text-white min-h-[calc(100vh-4rem)] shadow-lg">
           <ProfileNavbar />
         </aside>
 
-        <main className="flex-1 p-4 lg:p-8 bg-gray-50">
+        <main className="flex-1 p-4 lg:p-8 bg-gray-50 w-full">
           
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto w-full">
             <h1 className="text-2xl font-bold mb-6 text-gray-800">Event History</h1>
 
-            {eventDetails.length > 0 ? (
-              eventDetails.map((event, index) => (
-                <Card key={index} className="bg-white shadow-md rounded-lg mb-6">
-                  <div className="flex flex-col md:flex-row items-start gap-6 p-4 md:p-6">
-                    {/* Image Container */}
-                    <div className="w-full md:w-40 h-40 rounded-full overflow-hidden mx-auto md:mx-0 flex-shrink-0">
+            {currentEvents.length > 0 ? (
+              <>
+              {currentEvents.map((event, index) => (
+                <Card key={index} className="bg-white shadow-md rounded-lg mb-4">
+                  <div className="flex flex-col md:flex-row items-start gap-4 p-3 md:p-4 w-full">
+           
+                    <div className="w-full md:w-32 h-32 rounded-full overflow-hidden mx-auto md:mx-0 flex-shrink-0">
                       <img
                         src={event.image}
                         alt={event.eventName || "Event Image"}
@@ -121,38 +134,38 @@ const EventHistory = () => {
                     </div>
 
                     {/* Content Container */}
-                    <div className="flex-1 w-full space-y-4">
+                    <div className="flex-1 w-full space-y-3">
                       <div>
-                        <h2 className="text-2xl font-bold text-gray-900">{event.eventName}</h2>
-                        <div className="flex flex-wrap gap-x-6 gap-y-2 mt-2 text-gray-600">
-                          <p className="text-sm">
+                        <h2 className="text-xl font-bold text-gray-900">{event.eventName}</h2>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-gray-600">
+                          <p className="text-xs">
                             Agency: <span className="text-green-700 font-medium">{event.companyName}</span>
                           </p>
-                          <p className="text-sm">
+                          <p className="text-xs">
                             Package: <span className="text-gray-900 font-medium">{event.title}</span>
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full">
-                          <Users className="w-4 h-4" />
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                        <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                          <Users className="w-3 h-3" />
                           <span>{event.noOfPerson} Person</span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-full">
-                          <Calendar className="w-4 h-4" />
+                        <div className="flex items-center gap-1 bg-gray-100  py-1 rounded-full">
+                          <Calendar className="w-3 h-3" />
                           <span>{event.noOfDays} Days</span>
                         </div>
-                        <div className="bg-gray-100 px-3 py-1.5 rounded-full">
+                        <div className="bg-gray-100 px-2 py-1 rounded-full">
                           Date: <span className="text-gray-900 font-medium">{event.endDate}</span>
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
-                        <p className="text-2xl font-bold text-orange-500">₹{event.amount.toLocaleString()}</p>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 pt-1">
+                        <p className="text-xl font-bold text-orange-500">₹{event.amount.toLocaleString()}</p>
                      <Button
-                          className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600"
-                          onClick={() => {
+                          className="w-full sm:w-auto bg-green-500 text-white text-sm px-3 py-1 hover:bg-green-600"
+                          onPress={() => {
                             if (!event.eventId || !event.userId) {
                               console.error("Invalid event data!", event);
                               return;
@@ -163,6 +176,7 @@ const EventHistory = () => {
                         >
                           Review & Rating
                         </Button>
+                        
 
 
                         <ReviewModal
@@ -176,10 +190,35 @@ const EventHistory = () => {
                     </div>
                   </div>
                 </Card>
-              ))
+              ))}
+                {totalPages > 1 && (
+      <div className="flex justify-center items-center gap-4 mt-6">
+        <Button
+          disabled={currentPage === 1}
+          onPress={() => handlePageChange(currentPage - 1)}
+          className="px-4 py-2 bg-gray-500 text-white rounded disabled:opacity-50"
+        >
+          Previous
+        </Button>
+        <span className="text-gray-800 font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          disabled={currentPage === totalPages}
+          onPress={() => handlePageChange(currentPage + 1)}
+          className="px-4 py-2 bg-gray-500 text-white rounded disabled:opacity-50"
+        >
+          Next
+        </Button>
+      </div>
+    )}
+              
+              </>
             ) : (
               <div className="text-center text-gray-600 col-span-full">No event History found.</div>
             )}
+             
+
           </div>
         </main>
       </div>

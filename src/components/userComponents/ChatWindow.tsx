@@ -4,7 +4,6 @@ import MessageBubble from "../userComponents/MessageBubble";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuid } from "uuid";
 import { ManagerData } from "../../pages/userPages/UserChat";
 
 
@@ -38,22 +37,47 @@ const ChatWindow = ({
   const { socket } = useSocket();
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
+const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   // useEffect(() => {
   //   messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   // }, [allMessages]);
 
+  useEffect(() => {
+    const messagesContainer = messagesContainerRef.current;
+    if (!messagesContainer) return;
+
+    // Check if user is near the bottom (within 100px)
+    const isNearBottom =
+      messagesContainer.scrollHeight - messagesContainer.scrollTop <=
+      messagesContainer.clientHeight + 100;
+
+    // Auto-scroll only if near bottom or user sent the message
+    const lastMessage = allMessages[allMessages.length - 1];
+    const isUserMessage = lastMessage?.senderId === userId._id;
+
+    if (isNearBottom || isUserMessage) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [allMessages, userId._id]);
+
   
   useEffect(() => {
     if (!socket) return;
   
-    const messageListener = ({ senderId, message, timestamp,totalMessage ,chatId}: { senderId: string; message: string; timestamp: string ,totalMessage:number,chatId:string}) => {
+    const messageListener = ({ senderId, message, timestamp,totalMessage ,chatId,receiverId,unreadCount}: { senderId: string; message: string; timestamp: string ,totalMessage:number,chatId:string,receiverId:string,unreadCount:number}) => {
       const date = new Date(timestamp);
+      console.log("UnreadCount:",unreadCount);
       if (!isNaN(date.getTime())) {
         const formattedTime = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-        
-        setAllMessages(prev => [...prev, { message, timestamp: formattedTime, senderId }]);
+    if (localStorage.getItem("chatId") === chatId) {
+          setAllMessages((prev) => [
+            ...prev,
+            { message, timestamp: formattedTime, senderId },
+          ]);
+        }
+
+    
         if (localStorage.getItem('chatId') === chatId) {
           setMessages(prev => [...prev, { message, time: formattedTime, readCount: 0 }]);
         } else {
@@ -73,10 +97,12 @@ const ChatWindow = ({
                   lastMessage: {
                     message,
                     time: formattedTime,
-                    readCount:0
+                   
                   },
+               unreadCount: chat.chatId === localStorage.getItem("chatId") ? 0 : unreadCount
                 }
-              : chat
+              :chat
+              
           )
         );
         
@@ -103,7 +129,7 @@ const ChatWindow = ({
     if(userId.role=='user'){
       socketMessage = { message, sender: senderId, receiver: managerId,senderModel:'User',receiverModel:'Manager'};
     }else{
-            socketMessage = { message, sender: senderId, receiver: managerId,senderModel:'Manager',receiverModel:'User'}
+      socketMessage = { message, sender: senderId, receiver: managerId,senderModel:'Manager',receiverModel:'User'}
     }
     socket.emit("post-new-message", socketMessage, (response: any) => {
       console.log("Message sent acknowledgment:", response);
@@ -139,13 +165,12 @@ const ChatWindow = ({
         }
       }
     });
-  
-    // Update UI immediately
     setAllMessages(prev => [...prev, newMessage]);
     setMessage("");
   };
   
-
+const maxMessages = 15;
+  const displayedMessages = allMessages.slice(-maxMessages);
   return (
     <div className={`w-full min-h-screen p-4 transition-all ${selectedManager ? "block" : "hidden md:block"}`}>
       {managerId || selectedManager ? (
@@ -157,8 +182,6 @@ const ChatWindow = ({
                <h2 className="text-lg font-bold">{selectedEvent}</h2>
                <h4 className="font-semibold">{selectedManager}</h4>
              </div>
-             {/* <Button onPress={() => setSelectedManager(null)}>Close</Button> */}
-             {/* <button onClick={createRoom}>Start New Call</button> */}
            </div>
 
           ):(
@@ -166,25 +189,29 @@ const ChatWindow = ({
             <div>
               <h2 className="text-lg font-bold">{selectedManager}</h2>
             </div>
-            {/* <button onClick={createRoom}>Start New Call</button>; */}
+
           </div>
           )}
          
 
 
           {/* Messages Container with Scrolling */}
-          <div className="flex-1 overflow-y-auto max-h-[600px] p-4 bg-gray-100 rounded-b-lg">
-            {allMessages.length > 0 ? (
-              allMessages.map((msgObj, index) => (
+    <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto max-h-[600px] p-4 bg-gray-100 rounded-b-lg"
+          >
+            {displayedMessages.length > 0 ? (
+              displayedMessages.map((msgObj, index) => (
                 <div
                   key={index}
-                  className={`flex ${msgObj.senderId === userId._id ? "justify-end" : "justify-start"}`}
+                  className={`flex ${
+                    msgObj.senderId === userId._id ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <MessageBubble
                     message={msgObj.message}
                     timestamp={msgObj.timestamp}
                     senderId={msgObj.senderId}
-                  
                   />
                 </div>
               ))

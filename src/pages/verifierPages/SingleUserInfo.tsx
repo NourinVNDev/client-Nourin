@@ -22,6 +22,7 @@ export interface Booking {
     _id?: string;
     eventId?: string;
     ticketDetails?: any;
+    paymentStatus:string;
 }
 
 const SingleUserInfo = () => {
@@ -40,6 +41,12 @@ const SingleUserInfo = () => {
         };
         fetchBookedUserDetails();
     }, [bookedId, userName]);
+
+    useEffect(()=>{
+        console.log("Booking",booking);
+        
+
+    },[booking])
 
  const handleMarkAttendance = async () => {
     if (!booking) return;
@@ -111,6 +118,7 @@ const SingleUserInfo = () => {
                                     <th className="border px-6 py-3 text-left">No. of Person</th>
                                     <th className="border px-6 py-3 text-left">Phone</th>
                                     <th className="border px-6 py-3">Total Amount</th>
+                                    <th className="border px-6 py-3">Payment Status</th>
                                     <th className="border px-6 py-3 text-center">Action</th>
                                 </tr>
                             </thead>
@@ -124,15 +132,16 @@ const SingleUserInfo = () => {
                                     <td className="border px-6 py-4">{booking.noOfPerson}</td>
                                     <td className="border px-6 py-4">{booking.phoneNo}</td>
                                     <td className="border px-6 py-4">₹{booking.totalAmount}</td>
+                                    <td className="border px-6 py-4">{booking.paymentStatus}</td>
                                     <td className="border px-6 py-4 text-center bg-white">
-                                        <Button
+                                    {booking.paymentStatus!=='Cancelled' && <Button
                                             onPress={handleShowModal}
                                             className="bg-gradient-to-r from-indigo-500 to-purple-400 text-white font-semibold rounded-lg shadow-md hover:scale-105 transition-transform duration-200"
                                             size="sm"
                                             radius="lg"
                                         >
                                             Show More
-                                        </Button>
+                                        </Button>}
                                     </td>
                                 </tr>
                             </tbody>
