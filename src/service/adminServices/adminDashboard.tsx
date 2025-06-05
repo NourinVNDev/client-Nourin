@@ -12,4 +12,9 @@ const fetchAdminDashboardGraphData=async(selectedType:string,selectedTime:string
 const fetchPieChatData=async()=>{
     return await adminApiRequest(`/fetchDashboardPieChart`,'GET');
 }
-export{fetchUserManagerCountAndRevenue,fetchAdminDashboardGraphData,fetchPieChatData}
+const fetchBarChartDataForEvent=async(selectCompany:string)=>{
+    console.log("eve",selectCompany);
+    
+    return await adminApiRequest(`/fetchDashboardBarChart/${selectCompany}`,'GET');
+}
+export{fetchUserManagerCountAndRevenue,fetchAdminDashboardGraphData,fetchPieChatData,fetchBarChartDataForEvent}

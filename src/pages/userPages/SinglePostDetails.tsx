@@ -438,13 +438,28 @@ const customStyles = `
         {/* Ticket Types */}
         <h3 className="text-xl font-bold text-gray-800">Available Ticket Types</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {parsedData?.data?.result?.savedEvent?.typesOfTickets?.map((ticket: any, index: number) => (
-            <div key={index} className="p-4 bg-gray-50 border border-gray-300 rounded-lg shadow-sm">
-              <h4 className="text-lg font-semibold text-indigo-700">{ticket.type.toUpperCase()}</h4>
-              <p className="text-gray-600">Price: ₹{ticket.offerDetails.offerAmount}</p>
-              <p className="text-gray-600">Available Seat: {ticket.noOfSeats}</p>
-            </div>
-          ))}
+      {parsedData?.data?.result?.savedEvent?.typesOfTickets?.map((ticket: any, index: number) => {
+  const managerDiscount = Number(parsedData?.data?.result?.savedEvent?.managerOffer?.discount_value || 0);
+  const adminDiscount = Number(parsedData?.data?.result?.savedEvent?.adminOffer?.discount_value || 0);
+ 
+
+  const totalDiscount = Math.min(managerDiscount + adminDiscount, 100); // cap at 100%
+  const discountedPrice = Math.floor(ticket.Amount * (1 - totalDiscount / 100));
+
+  return (
+    <div key={index} className="p-4 bg-gray-50 border border-gray-300 rounded-lg shadow-sm">
+      <h4 className="text-lg font-semibold text-indigo-700">{ticket.type.toUpperCase()}</h4>
+      <p className="text-gray-600">
+        Original Price: <span className="line-through text-red-500">₹{ticket.Amount}</span><br />
+        Discounted Price: <span className="text-green-600 font-semibold">
+          {discountedPrice === 0 ? "Free Ticket" : `₹${discountedPrice}`}
+        </span>
+      </p>
+      <p className="text-gray-600">Available Seat: {ticket.noOfSeats}</p>
+    </div>
+  );
+})}
+
         </div>
       </div>
     ) : (
@@ -452,10 +467,6 @@ const customStyles = `
     )}
   </div>
 )}
-
-
-
-
               </div>
             </div>
             <div className="w-full md:w-2/4 rounded-lg shadow-md p-4 mt-4 md:mt-0">

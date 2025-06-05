@@ -24,6 +24,7 @@ export type PaymentData = {
     amount:number;
     bookedEmails:string[];
     paymentStatus:string;
+    totalPercentage:number
    
   };
 

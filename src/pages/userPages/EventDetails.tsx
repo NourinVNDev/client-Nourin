@@ -89,7 +89,8 @@ const handleNoOfPerson = (e: React.FormEvent) => {
     bookedEmails: [],
     location: '',
     amount: 0,
-    paymentStatus: ''
+    paymentStatus: '',
+    totalPercentage:0
   });
   const makePayment = async () => {
     console.log("Match");
@@ -112,62 +113,71 @@ const handleNoOfPerson = (e: React.FormEvent) => {
     }
   };
 
-  useEffect(() => {
-    const fetchEventData = async () => {
-      try {
-        if (!id) throw new Error("ID is not found");
+useEffect(() => {
+  const fetchEventData = async () => {
+    try {
+      if (!id) throw new Error("ID is not found");
 
-        const result = await getEventData(id);
-        console.log("Results12:", result);
+      const result = await getEventData(id);
+      console.log("Results12:", result);
 
-        const event = result?.data?.result?.savedEvent || {};
-        const ticket = event?.typesOfTickets?.find(
-          (ticket: any) => ticket.type.toLowerCase() === selectedType
-        );
+      const event = result?.data?.result?.savedEvent || {};
+      const ticket = event?.typesOfTickets?.find(
+        (ticket: any) => ticket.type.toLowerCase() === selectedType
+      );
 
-        const isVirtual = event.title === 'Virtual';
+      const managerDiscount = Number(event?.managerOffer?.discount_value || 0);
+      const adminDiscount = Number(event?.adminOffer?.discount_value || 0);
+      const totalDiscount = Math.min(managerDiscount + adminDiscount, 100);
 
-        setEventData((prevData) => ({
-          ...prevData,
-          userId: user?._id || prevData.userId,
-          firstName: user?.firstName || prevData.firstName || "",
-          lastName: user?.lastName || prevData.lastName || "",
-          email: user?.email || prevData.email || "",
-          phoneNo: user?.phoneNo || prevData.phoneNo || '',
-          address: user?.Address || prevData.address,
-          categoryName: event?.title || prevData.categoryName,
-          companyName: event?.companyName || prevData.companyName,
-          images: event?.images || prevData.images,
-          eventName: event?.eventName || prevData.eventName,
-          location: event?.address,
-          noOfPerson: event?.noOfPerson || prevData.noOfPerson,
-          noOfDays: event?.noOfDays || prevData.noOfDays,
-          type: selectedType || "",
-          managerId: event?.Manager || prevData.managerId,
-          Included: ticket?.Included || [],
-          notIncluded: ticket?.notIncluded || [],
-          actualAmount: isVirtual ? 0 : ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
-          Amount: isVirtual ? 0 : ticket?.offerDetails?.offerAmount ?? ticket?.Amount ?? prevData.Amount,
-          bookedId: prevData.bookedId || '',
-          bookingId: prevData.bookingId || '',
-          bookedMembers: [],
-          startDate: event?.startDate,
-          amount: isVirtual ? event.amount : 0,
-          paymentStatus: prevData.paymentStatus || '',
+      const isVirtual = event.title === 'Virtual';
 
+      const baseTicketAmount = ticket?.Amount ?? 0;
+      const discountedTicketAmount = Math.floor(baseTicketAmount * (1 - totalDiscount / 100));
 
-        }));
+      const baseEventAmount = event?.amount ?? 0;
+      const discountedEventAmount = Math.floor(baseEventAmount * (1 - totalDiscount / 100));
 
+      setEventData((prevData) => ({
+        ...prevData,
+        userId: user?._id || prevData.userId,
+        firstName: user?.firstName || prevData.firstName || "",
+        lastName: user?.lastName || prevData.lastName || "",
+        email: user?.email || prevData.email || "",
+        phoneNo: user?.phoneNo || prevData.phoneNo || '',
+        address: user?.Address || prevData.address,
+        categoryName: event?.title || prevData.categoryName,
+        companyName: event?.companyName || prevData.companyName,
+        images: event?.images || prevData.images,
+        eventName: event?.eventName || prevData.eventName,
+        location: event?.address,
+        noOfPerson: event?.noOfPerson || prevData.noOfPerson,
+        noOfDays: event?.noOfDays || prevData.noOfDays,
+        type: selectedType || "",
+        managerId: event?.Manager || prevData.managerId,
+        Included: ticket?.Included || [],
+        notIncluded: ticket?.notIncluded || [],
+        actualAmount: isVirtual
+          ? discountedEventAmount
+          : discountedTicketAmount,
+        Amount: isVirtual
+          ? 0
+          : discountedTicketAmount,
+        bookedId: prevData.bookedId || '',
+        bookingId: prevData.bookingId || '',
+        bookedMembers: [],
+        startDate: event?.startDate,
+        amount: isVirtual ? discountedEventAmount : 0,
+        paymentStatus: prevData.paymentStatus || '',
+      }));
+    } catch (error) {
+      console.error("Error fetching event data:", error);
+    }
+  };
 
+  fetchEventData();
+}, [id, user, selectedType]);
 
-      } catch (error) {
-        console.error("Error fetching event data:", error);
-      }
-    };
-
-
-    fetchEventData();
-  }, [id, user]);
 
 
   useEffect(() => {

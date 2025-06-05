@@ -40,10 +40,7 @@ const AllEventData = () => {
     createdAt: string;
   };
 
-  useEffect(() => {
-    console.log("Hello");
-
-  }, [])
+  
   const handleSearchChange = (coords: [number, number], placeName: string) => {
     setSearchQuery(placeName);
     setCoordinates(coords);
@@ -149,12 +146,12 @@ const AllEventData = () => {
         const result = await getAllEventDataDetails();
         console.log("Results", result.user);
         const events = result.user.events;
-const formattedEvents = events.map((event: any) => ({
-  ...event,
-  managerOffer: Number(event.managerOffer1?.discount_value || 0),
-  adminOffer: Number(event.adminOffer1?.discount_value || 0)
-}));
-setParsedData(formattedEvents);
+        const formattedEvents = events.map((event: any) => ({
+          ...event,
+          managerOffer: Number(event.managerOffer1?.discount_value||0),
+          adminOffer: Number(event.adminOffer1?.discount_value||0)
+        }));
+        setParsedData(formattedEvents);
 
         const category: string[] = Array.from(
           new Set(result?.user?.events?.map((event: any) => event.title))
@@ -180,8 +177,8 @@ setParsedData(formattedEvents);
   }, []);
   useEffect(() => {
 
-    console.log("ParsedData:",parsedData);
-    
+    console.log("ParsedData:", parsedData);
+
     const initialInteractions = parsedData.reduce((acc, post, index) => {
       acc[index] = {
         liked: Array.isArray(post.likes) && post.likes.some((like: Like) => like.user === userId),
@@ -198,8 +195,8 @@ setParsedData(formattedEvents);
   const handleButtonClick = async (postId: string) => {
     try {
       const result = await handlePostDetails(postId);
-      console.log("Result of result:",result);
-      
+      console.log("Result of result:", result);
+
       if (result?.message === 'Retrive Post Data successfully') {
         navigate('/singlePostDetails', { state: { data: result } });
       } else {
@@ -376,25 +373,31 @@ setParsedData(formattedEvents);
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
             {currentEvents.length > 0 ? (
               currentEvents.map((post, index) => (
-                <div
-                  key={post._id || index}
-                  className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 w-full max-w-[400px] mx-auto"
-                >
-
-                  <div className="relative group bg-white rounded-lg shadow-md">
-
-                    {post.managerOffer && (
-                      <div className="absolute top-4 left-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                        {post.managerOffer}% OFF
-                      </div>
-                    )}
+               <div
+  key={post._id || index}
+  className="flex flex-col justify-between h-full bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 w-full max-w-[400px] mx-auto"
+>
 
 
-                    {post.adminOffer && (
-                      <div className="absolute top-4 right-4 z-10 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                        {post.adminOffer}% OFF
-                      </div>
-                    )}
+                <div className="relative group rounded-lg shadow-md">
+
+
+                 {(post.managerOffer > 0 || post.adminOffer > 0) && (
+  <>
+    {post.managerOffer > 0 && (
+      <div className="absolute top-4 left-4 z-10 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+        {post.managerOffer}% OFF
+      </div>
+    )}
+    {post.adminOffer > 0 && (
+      <div className="absolute top-4 right-4 z-10 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+        {post.adminOffer}% OFF
+      </div>
+    )}
+  </>
+)}
+
+
 
                     <div className="relative overflow-hidden rounded-lg">
                       <img

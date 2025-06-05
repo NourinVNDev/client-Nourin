@@ -8,4 +8,7 @@ const fetchDashboardGraphData=async(managerId:string,selectedType:string,selecte
 const fetchPieChatData=async(managerId:string)=>{
     return await managerApiRequest(`/fetchDashboardPieChart/${managerId}`,'GET');
 }
-export {fetchUserCountAndRevenue,fetchDashboardGraphData,fetchPieChatData}
+const fetchBarChartDataForEvent=async(selectedEvent:string)=>{
+        return await managerApiRequest(`/fetchDashboardBarChart/${selectedEvent}`,'GET');
+}
+export {fetchUserCountAndRevenue,fetchDashboardGraphData,fetchPieChatData,fetchBarChartDataForEvent}

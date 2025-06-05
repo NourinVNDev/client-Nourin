@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import NavBar from '../../components/managerComponents/NavBar';
-import { LineChart, Line, XAxis, YAxis, PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LabelList, Bar, BarChart } from 'recharts';
 import Header from '../../components/managerComponents/Header';
 import Footer from '../../components/managerComponents/Footer';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/store';
-import { fetchUserCountAndRevenue, fetchDashboardGraphData, fetchPieChatData } from '../../service/managerServices/handleDashboard';
+import { fetchUserCountAndRevenue, fetchDashboardGraphData, fetchPieChatData ,fetchBarChartDataForEvent} from '../../service/managerServices/handleDashboard';
 
 
 const COLORS = ["#FF6B00", "#36A2EB", "#4BC0C0", "#FF5252", "#9966FF"];
@@ -38,6 +38,9 @@ const DashboardPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState("Booking");
   const [graphData, setGraphData] = useState([]);
   const [pieData, setPieData] = useState([]);
+  const [barChartData, setBarChartData] = useState([]);
+  const [eventOptions, setEventOptions] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState("");
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTime(event.target.value);
@@ -68,6 +71,10 @@ const DashboardPage: React.FC = () => {
             name: item.eventName,
             value: item.noOfBookings,
           }));
+          setEventOptions(result.data.map((event: any) => event.eventName));
+          if (result.data.length > 0) {
+            setSelectedEvent(result.data[0].eventName);
+          }
 
           setPieData(formatted);
         }
@@ -92,7 +99,18 @@ const DashboardPage: React.FC = () => {
         );
       })
       : chartData;
+  useEffect(() => {
+    const fetchBarChartData = async () => {
+      if (!selectedEvent) return;
+      const response = await fetchBarChartDataForEvent(selectedEvent);
+      console.log("Respponse of Bar chart", response);
 
+      if (response.message == '7-day booking count fetched successfully') {
+        setBarChartData(response.data);
+      }
+    };
+    fetchBarChartData();
+  }, [selectedEvent]);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-white">
@@ -186,53 +204,111 @@ const DashboardPage: React.FC = () => {
 
             </div>
           </section>
+          <section className="grid grid-cols-4 gap-8">
+            <div className="col-span-4 grid grid-cols-2 gap-8">
+              {/* Left side - Pie Charts */}
+              <div className="space-y-6">
+                <div className="bg-white shadow-md rounded p-4 h-60 w-fit">
+                  <h4 className="font-bold mb-4 text-black">Top Events</h4>
+                  <ResponsiveContainer width={400} height={160}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
 
-          <section className="grid grid-cols-2 gap-8 mt-12">
-            <div className="bg-white shadow-md rounded p-4 h-60">
-              <h4 className="font-bold mb-4 text-black">Top Events</h4>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
+                <div className="bg-white shadow-md rounded p-4 h-60 w-fit">
+                  <h4 className="font-bold mb-4 text-black">Event Participation</h4>
+                  <ResponsiveContainer width={400} height={160}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="bg-white shadow-md rounded p-4">
+                <h2 className="text-xl font-bold text-black mb-4">Company-wise Booking</h2>
+
+                <div className="mb-4">
+                  <label className="text-black font-medium mr-2">Select Event:</label>
+                  <select
+                    value={selectedEvent}
+                    onChange={(e) => setSelectedEvent(e.target.value)}
+                    className="rounded px-4 py-2 bg-white text-black border"
                   >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {eventOptions.map((eventName, idx) => (
+                      <option key={idx} value={eventName}>{eventName}</option>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+                  </select>
+                </div>
+    <div className="h-80 bg-white shadow-md rounded-2xl p-4 border border-red-500">
+                  <ResponsiveContainer width={500} height={300}>
+                    <BarChart
+                      data={barChartData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#36A2EB" stopOpacity={0.8} />
+                          <stop offset="95%" stopColor="#36A2EB" stopOpacity={0.2} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis
+                        dataKey="label"
+                        stroke="#555"
+                        tick={{ fontSize: 12 }}
+                        interval={0}
+                      />
+                      <YAxis stroke="#555" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "#f9f9f9", borderRadius: "10px" }}
+                        labelStyle={{ color: "#8884d8" }}
+                      />
+                      <Bar
+                        dataKey="value"
+                        fill="url(#colorValue)"
+                        radius={[10, 10, 0, 0]}
+                        barSize={40}
+                      >
+                        {/* Add labels above bars */}
+                        <LabelList dataKey="value" position="top" fill="#555" fontSize={12} />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
 
-            <div className="bg-white shadow-md rounded p-4 h-60">
-              <h4 className="font-bold mb-4 text-black">Event Participation</h4>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={40}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              </div>
             </div>
           </section>
         </main>
+
       </div>
       <Footer />
     </div>
