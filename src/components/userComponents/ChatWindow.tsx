@@ -3,7 +3,6 @@ import useSocket from "../../utils/SocketContext";
 import MessageBubble from "../userComponents/MessageBubble";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
-import { useNavigate } from "react-router-dom";
 import { ManagerData } from "../../pages/userPages/UserChat";
 
 
@@ -29,7 +28,7 @@ const ChatWindow = ({
   setMessages,
   setAllManagers
 }: ChatWindowProps) => {
-  const navigate=useNavigate();
+
   const user = useSelector((state: RootState) => state.user);
   const manager = useSelector((state: RootState) => state.manager);
   const userId = user._id? user:manager;

@@ -30,6 +30,14 @@ const handleNoOfPerson = (e: React.FormEvent) => {
 
   if (!memberName.trim() || !memberEmail.trim()) return;
 
+  const isDuplicateEmail =
+    !isEditing && emails.includes(memberEmail.trim().toLowerCase());
+
+  if (isDuplicateEmail) {
+    alert("Email already exists. Please enter a unique email.");
+    return;
+  }
+
   let updatedMembers: string[] = [];
   let updatedEmails: string[] = [];
 
@@ -37,14 +45,24 @@ const handleNoOfPerson = (e: React.FormEvent) => {
     updatedMembers = [...members];
     updatedEmails = [...emails];
 
+    // Allow updating to the same email, but check if changed to another duplicate
+    const updatedEmail = memberEmail.trim().toLowerCase();
+    const emailExistsElsewhere =
+      emails.some((email, index) => email === updatedEmail && index !== editIndex);
+
+    if (emailExistsElsewhere) {
+      alert("Email already exists. Please enter a unique email.");
+      return;
+    }
+
     updatedMembers[editIndex] = memberName;
-    updatedEmails[editIndex] = memberEmail;
+    updatedEmails[editIndex] = updatedEmail;
 
     setIsEditing(false);
     setEditIndex(null);
   } else {
     updatedMembers = [...members, memberName];
-    updatedEmails = [...emails, memberEmail];
+    updatedEmails = [...emails, memberEmail.trim().toLowerCase()];
   }
 
   const updatedAmount = (eventData.actualAmount || eventData.amount || 0) * updatedMembers.length;
@@ -64,6 +82,7 @@ const handleNoOfPerson = (e: React.FormEvent) => {
   setMemberName("");
   setMemberEmail("");
 };
+
   const [eventData, setEventData] = useState<PaymentData>({
     bookedId: "",
     userId: "",
@@ -177,12 +196,6 @@ useEffect(() => {
 
   fetchEventData();
 }, [id, user, selectedType]);
-
-
-
-  useEffect(() => {
-    console.log("Event PaymentStatus:", eventData);
-  }, [eventData]);
 
   const SaveBillingDetails = async (e: React.FormEvent) => {
     e.preventDefault();

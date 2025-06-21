@@ -112,7 +112,7 @@ const ManagerAllEvents = () => {
     setCurrentPage(1); 
   };
 
-const token = '007eJxTYFj574xCWo1js/zLPMWIRBPxU8Y/mmfsOPvCrn3GpC9HbKoUGIwsDAwtjNKMki3NUk1MkpIsjYzTjAxMTI1STVNTUkwNnS1tMxoCGRlmftzOwsgAgSA+J0Nyfl5JYmZeahEDAwAk9SIn';
+const token = '007eJxTYGDesOHc8U9eAbn6Qnosl9ZFfE+4/chFI/NHsU5QzceDVToKDEYWBoYWRmlGyZZmqSYmSUmWRsZpRgYmpkappqkpKaaGq6qdMhoCGRn0/LJYGBkgEMTnZEjOzytJzMxLLWJgAADbOCCu';
 
 const startVideoCall = (eventName:string) => {
   navigate(

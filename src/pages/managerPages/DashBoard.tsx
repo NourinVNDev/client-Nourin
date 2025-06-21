@@ -5,7 +5,7 @@ import Header from '../../components/managerComponents/Header';
 import Footer from '../../components/managerComponents/Footer';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../App/store';
-import { fetchUserCountAndRevenue, fetchDashboardGraphData, fetchPieChatData ,fetchBarChartDataForEvent} from '../../service/managerServices/handleDashboard';
+import { fetchUserCountAndRevenue, fetchDashboardGraphData, fetchPieChatData, fetchBarChartDataForEvent } from '../../service/managerServices/handleDashboard';
 
 
 const COLORS = ["#FF6B00", "#36A2EB", "#4BC0C0", "#FF5252", "#9966FF"];
@@ -13,7 +13,7 @@ const COLORS = ["#FF6B00", "#36A2EB", "#4BC0C0", "#FF5252", "#9966FF"];
 const DashboardPage: React.FC = () => {
   const [dash, setDash] = useState({ userCount: 0, revenue: 0 });
   const managerId = useSelector((state: RootState) => state.manager._id);
-
+  const [isBarChartLoading, setIsBarChartLoading] = useState(true);
   useEffect(() => {
     const fetchUserAndRevenue = async () => {
       if (managerId) {
@@ -99,18 +99,44 @@ const DashboardPage: React.FC = () => {
         );
       })
       : chartData;
-  useEffect(() => {
-    const fetchBarChartData = async () => {
-      if (!selectedEvent) return;
-      const response = await fetchBarChartDataForEvent(selectedEvent);
-      console.log("Respponse of Bar chart", response);
+useEffect(() => {
+  const fetchBarChartData = async () => {
+  if (!selectedEvent) {
+    console.log("No event selected - clearing data");
+    setBarChartData([]);
+    return;
+  }
 
-      if (response.message == '7-day booking count fetched successfully') {
-        setBarChartData(response.data);
-      }
-    };
-    fetchBarChartData();
-  }, [selectedEvent]);
+  console.log("Starting fetch for:", selectedEvent);
+  setIsBarChartLoading(true);
+  
+  try {
+    const response = await fetchBarChartDataForEvent(selectedEvent);
+    console.log("Raw API response:", response);
+
+    // Add validation
+    if (!response || !response.data || !Array.isArray(response.data)) {
+      throw new Error("Invalid response format");
+    }
+
+    console.log("Pre-setting data:", response.data);
+    setBarChartData(response.data);
+    console.log("Data should be set now");
+    
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    setBarChartData([]);
+  } finally {
+    setIsBarChartLoading(false);
+  }
+};
+  
+  fetchBarChartData();
+}, [selectedEvent]);
+
+useEffect(() => {
+  console.log("barChartData state updated:", barChartData);
+}, [barChartData]);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-white">
@@ -269,39 +295,51 @@ const DashboardPage: React.FC = () => {
                   </select>
                 </div>
     <div className="h-80 bg-white shadow-md rounded-2xl p-4 border border-red-500">
-                  <ResponsiveContainer width={500} height={300}>
-                    <BarChart
-                      data={barChartData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <defs>
-                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#36A2EB" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="#36A2EB" stopOpacity={0.2} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis
-                        dataKey="label"
-                        stroke="#555"
-                        tick={{ fontSize: 12 }}
-                        interval={0}
-                      />
-                      <YAxis stroke="#555" />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: "#f9f9f9", borderRadius: "10px" }}
-                        labelStyle={{ color: "#8884d8" }}
-                      />
-                      <Bar
-                        dataKey="value"
-                        fill="url(#colorValue)"
-                        radius={[10, 10, 0, 0]}
-                        barSize={40}
+  {isBarChartLoading ? (
+    <div className="flex items-center justify-center h-full">
+      <p>Loading chart data...</p>
+    </div>
+  ) : barChartData.length === 0 ? (
+    <div className="flex items-center justify-center h-full">
+      <p className='text-black'>No data available for {selectedEvent || "selected event"}</p>
+    </div>
+  ) : (
+    <div className="h-full w-full"> 
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={barChartData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       >
-                        {/* Add labels above bars */}
-                        <LabelList dataKey="value" position="top" fill="#555" fontSize={12} />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                        <defs>
+                          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#36A2EB" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#36A2EB" stopOpacity={0.2} />
+                          </linearGradient>
+                        </defs>
+                        <XAxis
+                          dataKey="label"
+                          stroke="#555"
+                          tick={{ fontSize: 12 }}
+                          interval={0}
+                        />
+                        <YAxis stroke="#555" domain={[0, 'dataMax + 1']} />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: "#f9f9f9", borderRadius: "10px" }}
+                          labelStyle={{ color: "#8884d8" }}
+                        />
+                        <Bar
+                          dataKey="value"
+                          fill="url(#colorValue)"
+                          radius={[10, 10, 0, 0]}
+                          barSize={40}
+                          animationDuration={1500}
+                        >
+                          <LabelList dataKey="value" position="top" fill="#555" fontSize={12} />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                    </div>
+                  )}
                 </div>
 
               </div>

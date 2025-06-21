@@ -12,7 +12,6 @@ export const apiRequest = async <T = any>(
       url,
       ...(body && { data: body }),
     };
-
     const response = await API(config);
     return response.data;
   } catch (error: any) {
