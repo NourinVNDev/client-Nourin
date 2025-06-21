@@ -1,6 +1,5 @@
 
 import { apiRequest } from "../../utils/apiHelper/userApiHelper";
-import API from "../../utils/axiosInstance";
 import MANAGER_API from "../../utils/managerAxiosInstance";
 const getExistingReviewAndRating = async (eventId: string, userId: string) => {
     return await apiRequest(`/getExistingReview/${eventId}/${userId}`,'GET')

@@ -116,7 +116,7 @@ const ListVerifier = () => {
                      <ReusableTable
   headers={heading}
   data={currentVerifiers}
-  renderRow={(verifier, index) => (
+  renderRow={(verifier, _) => (
     <tr key={verifier._id} className="border text-center text-black">
       <td className="border p-2">{verifier.verifierName}</td>
       <td className="border p-2">{verifier.companyName}</td>

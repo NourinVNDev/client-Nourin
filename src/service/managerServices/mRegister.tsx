@@ -34,6 +34,9 @@ const mVerifyOtp=async(otpData:string,formData:{[key:string]:string})=>{
             return response.message; 
     }
 const getmanagerDetails = async (otpData:string,email:string) => {
+
+    console.log(otpData,email);
+    
         return await managerApiRequest('/Manager/getOffers','GET');
     }
     const updateManagerData = async (formData:{[key:string]:string}) => {

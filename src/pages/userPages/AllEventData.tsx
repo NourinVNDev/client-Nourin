@@ -24,7 +24,7 @@ const AllEventData = () => {
   const userId = localStorage.getItem('userId');
   const [interactions, setInteractions] = useState<{ [key: number]: { liked: boolean, newComment: string, comments: string[] } }>({});
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedPrice, setSelectedPrice] = useState('')
+
   const [filteredData, setFilteredData] = useState(parsedData);
   const { socket } = useSocket();
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +42,8 @@ const AllEventData = () => {
 
   
   const handleSearchChange = (coords: [number, number], placeName: string) => {
+    console.log(adminOffer,managerOffer);
+    
     setSearchQuery(placeName);
     setCoordinates(coords);
     console.log("Query:", placeName);
@@ -90,17 +92,17 @@ const AllEventData = () => {
     }
 
 
-    if (selectedPrice === "Price: Low - High") {
-      updatedData.sort((a, b) => a.Amount - b.Amount);
-    } else if (selectedPrice === "Price: High - Low") {
-      updatedData.sort((a, b) => b.Amount - a.Amount);
-    }
+    // if (selectedPrice === "Price: Low - High") {
+    //   updatedData.sort((a, b) => a.Amount - b.Amount);
+    // } else if (selectedPrice === "Price: High - Low") {
+    //   updatedData.sort((a, b) => b.Amount - a.Amount);
+    // }
 
     console.log("Final filtered data:", updatedData);
     setFilteredData(updatedData);
     console.log("Fill:", filteredData);
 
-  }, [parsedData, selectedCategory, selectedPrice, searchQuery, coordinates]);
+  }, [parsedData, selectedCategory, searchQuery, coordinates]);
   function haversineDistance2(lat1: number, lon1: number, lat2: number, lon2: number) {
     const toRad = (x: number) => (x * Math.PI) / 180;
     const R = 6371; // Earth's radius in km
@@ -297,15 +299,15 @@ const AllEventData = () => {
 
 
 
-    console.log(selectedPrice, "soumya");
-    if (selectedPrice === "Price: Low - High") {
-      updatedData.sort((a, b) => a.Amount - b.Amount);
-    } else if (selectedPrice === "Price: High - Low") {
-      updatedData.sort((a, b) => b.Amount - a.Amount);
-    }
+    // console.log(selectedPrice, "soumya");
+    // if (selectedPrice === "Price: Low - High") {
+    //   updatedData.sort((a, b) => a.Amount - b.Amount);
+    // } else if (selectedPrice === "Price: High - Low") {
+    //   updatedData.sort((a, b) => b.Amount - a.Amount);
+    // }
 
     setFilteredData(updatedData);
-  }, [selectedCategory, selectedPrice]);
+  }, [selectedCategory]);
 
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

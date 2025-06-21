@@ -49,7 +49,7 @@ const userSlice = createSlice({
       state.role=action.payload.role
     },
 
-    clearUserDetails: (state) => {
+    clearUserDetails: () => {
       return initialState
     },
     updateAddress: (state, action: PayloadAction<string>) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getSpecificOffer, updateOffer } from "../../service/adminServices/adminOffer";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/adminComponents/Header";

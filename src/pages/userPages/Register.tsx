@@ -52,28 +52,28 @@ const Register: React.FC = () => {
   }, [isOtp,timer]);
 
 
-  const TimerCount=async()=>{
-    let countdown: number | null = null;
-    if (isOtp) {
-      setTimer(30);
-      setResendVisible(false);
-      countdown = window.setInterval(() => {
-        setTimer((prevTimer) => {
-          if (prevTimer <= 1) {
-            clearInterval(countdown!);
-            setResendVisible(true);
-            return 0;
-          }
-          return prevTimer - 1;
-        });
-      }, 1000);
-    }
+  // const TimerCount=async()=>{
+  //   let countdown: number | null = null;
+  //   if (isOtp) {
+  //     setTimer(30);
+  //     setResendVisible(false);
+  //     countdown = window.setInterval(() => {
+  //       setTimer((prevTimer) => {
+  //         if (prevTimer <= 1) {
+  //           clearInterval(countdown!);
+  //           setResendVisible(true);
+  //           return 0;
+  //         }
+  //         return prevTimer - 1;
+  //       });
+  //     }, 1000);
+  //   }
 
-    return () => {
-      if (countdown) clearInterval(countdown);
-    };
+  //   return () => {
+  //     if (countdown) clearInterval(countdown);
+  //   };
 
-  }
+  // }
 
     
     const handleResendOtp = async () => {

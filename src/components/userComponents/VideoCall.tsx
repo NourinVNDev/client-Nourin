@@ -18,6 +18,8 @@ const VideoCall=()=>{
 
     useEffect(() => {
         if(!socket)return;
+        console.log(peers);
+        
         const init = async () => {
           const stream = await navigator.mediaDevices.getUserMedia({
             video: true,

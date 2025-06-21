@@ -24,7 +24,7 @@ const ManagerChat = () => {
     const [userId, setUserId] = useState<string>("");
     const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string,senderId:string }[]>([]);
     const [senderId, setSenderId] = useState<string>("");
-    const [chatIds,setAllChatIds]=useState<string[]>([])
+
    
   
 
@@ -33,6 +33,8 @@ useEffect(() => {
     const fetchUserNames = async () => {
         if (!managerName) return;
         try {
+          console.log(messages);
+          
             const result = await getUserNames(managerName);
             console.log("Reee",result.data);
             if (Array.isArray(result.data)) {
@@ -133,7 +135,6 @@ useEffect(() => {
                 <ManagerUserList managers={allUsers}  onSelectManager={createChatSchema} setMessages={setMessages} setSelectedEvent={setSelectedManager}  person='User' setAllManagers={setAllUsers}/>
                 <ChatWindow
                     selectedManager={selectedManager}
-                    setSelectedManager={((setSelectedManager))}
                     allMessages={allMessages}
                     setAllMessages={setAllMessages}
                     senderId={senderId}

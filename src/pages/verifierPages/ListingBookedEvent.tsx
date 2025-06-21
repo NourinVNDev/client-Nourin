@@ -1,12 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
-import { fetchAllBooking, markUserEntry } from "../../service/verifierServices/verifierLogin";
-import { useParams } from "react-router-dom";
-import { Toaster, toast } from "react-hot-toast";
-import Footer from "../../components/verifierComponents/Footer";
-import Header from "../../components/verifierComponents/Header";
-import BookingModal from "../../components/verifierComponents/BookingModal";
-import { Button } from "@nextui-org/react";
-import { useNavigate } from "react-router-dom";
+
 import QRScanner from "../../components/verifierComponents/QRCode";
 
 export interface Booking {
@@ -29,14 +21,7 @@ export interface Booking {
 }
 
 const ListingBookedEvent = () => {
-    const { eventId } = useParams<{ eventId: string }>();
-    const [bookings, setBookings] = useState<Booking[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const navigate=useNavigate();
+ 
 // const bookingsPerPage = 5;
 
 //     useEffect(() => {

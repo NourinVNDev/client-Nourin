@@ -3,7 +3,7 @@ import Header from "../../components/managerComponents/Header";
 import NavBar from "../../components/managerComponents/NavBar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useFormik } from "formik";
 import { addEventOffer } from "../../service/managerServices/handleOfferService";
 import { offerValidSchema, OfferFormValues } from "../../validations/managerValid/offerValidSchema";

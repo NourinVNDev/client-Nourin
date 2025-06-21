@@ -3,7 +3,7 @@ import connectionImage from '../../../src/assets/new.avif';
 import '../TailwindSetup.css';
 import { AdminLogin } from '../../service/adminServices/adminlogin';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, UseDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setAdminDetails } from '../../../Features/adminSlice';
 
 const Adminlogin: React.FC = () => {

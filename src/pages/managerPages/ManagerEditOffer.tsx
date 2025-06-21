@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { offerValidSchema, OfferFormValues } from "../../validations/managerValid/offerValidSchema";
 import { updateOffer, getSpecificOffer } from "../../service/managerServices/handleOfferService";
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import {  useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../App/store";
 import Header from "../../components/managerComponents/Header";

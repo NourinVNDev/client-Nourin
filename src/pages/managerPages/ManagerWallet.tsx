@@ -32,6 +32,8 @@ const ManagerWallet = () => {
         const getManagerWallet = async () => {
             if (managerId) {
                 try {
+                    console.log(error);
+                    
                     const result = await fetchManagerWallet(managerId);
                     console.log("Result of Wallet:", result.data);
                     if (result.success) {
@@ -110,7 +112,7 @@ const ManagerWallet = () => {
     <ReusableTable
       headers={heading}
       data={currentTransactions}
-      renderRow={(tx, index) => (
+      renderRow={(tx, _) => (
         <tr key={tx.id} className="text-gray-700 text-center border-b">
           <td className="py-2 px-4">{tx.eventName}</td>
           <td className="py-2 px-4">{tx.noOfPerson} person</td>

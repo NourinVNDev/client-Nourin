@@ -3,7 +3,7 @@ import React, { useState,useEffect } from "react";
 import '../TailwindSetup.css';
 import {verifyOtpForForgot,forgotPassword} from '../../service/userServices/register';
 import { useParams } from "react-router-dom";
-import toast,{Toaster} from "react-hot-toast";
+
 
 
 

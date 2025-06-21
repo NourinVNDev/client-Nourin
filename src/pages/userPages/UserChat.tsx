@@ -43,6 +43,8 @@ const UserChat = () => {
       if (!userId) return;
       try {
         const result = await getManagerNames(userId);
+        console.log(messages,senderId);
+        
 
         console.log("Result789:", result);
         if (result.success && Array.isArray(result.data)) {
@@ -142,7 +144,6 @@ if (!receiver) {
           <ManagerUserList managers={allManagers} onSelectManager={createChatSchema} setSelectedEvent={setSelectedEvent} setMessages={setMessages} person='Event Manager' setAllManagers={setAllManagers} />
           <ChatWindow
             selectedManager={selectedManager}
-            setSelectedManager={setSelectedManager}
             allMessages={allMessages}
             setAllMessages={setAllMessages}
             senderId={userId as string}

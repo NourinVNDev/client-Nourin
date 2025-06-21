@@ -1,4 +1,4 @@
-import ADMIN_API from "../../utils/adminAxiosIntance";
+
 import { adminApiRequest } from "../../utils/apiHelper/adminApiHelper";
 
 const getUserDetails = async () => {

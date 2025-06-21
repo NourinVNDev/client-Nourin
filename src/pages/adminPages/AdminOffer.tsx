@@ -34,11 +34,11 @@ const AdminOffers = () => {
   const startIndex = (currentPage - 1) * offersPerPage;
   const currentOffers = filteredOffers.slice(startIndex, startIndex + offersPerPage);
 
-  const handlePageChange = (pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
-  };
+  // const handlePageChange = (pageNumber: number) => {
+  //   if (pageNumber >= 1 && pageNumber <= totalPages) {
+  //     setCurrentPage(pageNumber);
+  //   }
+  // };
 
   // Fetching all offers
   useEffect(() => {

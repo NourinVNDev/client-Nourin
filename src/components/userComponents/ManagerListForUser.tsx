@@ -2,19 +2,19 @@ import React from 'react';
 import { useEffect,useState } from 'react';
 import { getManagerNames } from '../../service/userServices/userProfile';
 import { createConversationSchema } from '../../service/userServices/userProfile';
-interface ManagerListProps {
-  allManagers: string[];
+// interface ManagerListProps {
+//   allManagers: string[];
 
-}
+// }
 
 
 const ManagerList: React.FC = () => {
-  const [managerId, setManagerId] = useState<string>("");
-  const [senderId,setSenderId]=useState('');
+  // const [managerId, setManagerId] = useState<string>("");
+  // const [senderId,setSenderId]=useState('');
   const [allManagers, setAllManagers] = useState<string[]>([]);
 
-  const [selectedManager, setSelectedManager] = useState<string | null>(null);
-  const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string }[]>([]);
+  // const [selectedManager, setSelectedManager] = useState<string | null>(null);
+  // const [allMessages, setAllMessages] = useState<{ message: string; timestamp: string }[]>([]);
     const userId=localStorage.getItem('userId');
     useEffect(() => {
         const fetchManagerNames = async () => {
@@ -44,15 +44,15 @@ const ManagerList: React.FC = () => {
           console.log("Chat Schema Response:", result.data.data);
       
           if (result?.data?.data?.managerId) {
-            setManagerId(result.data?.data?.managerId);
-            setSenderId(result?.data?.data.conversation?.participants[0])
-            setSelectedManager(manager);
-            setAllMessages(
-              result.data.data.allMessages.map((msg: any) => ({
-                message: msg.message,
-                timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-              })) || []
-            );
+            // setManagerId(result.data?.data?.managerId);
+            // setSenderId(result?.data?.data.conversation?.participants[0])
+            // setSelectedManager(manager);
+            // setAllMessages(
+            //   result.data.data.allMessages.map((msg: any) => ({
+            //     message: msg.message,
+            //     timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            //   })) || []
+            // );
             
             
           } else {

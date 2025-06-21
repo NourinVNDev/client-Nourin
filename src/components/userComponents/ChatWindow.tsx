@@ -8,7 +8,6 @@ import { ManagerData } from "../../pages/userPages/UserChat";
 
 interface ChatWindowProps {
   selectedManager: string | null;
-  setSelectedManager: React.Dispatch<React.SetStateAction<string>>;
   allMessages: { message: string; timestamp: string, senderId: string }[];
   setAllMessages: React.Dispatch<React.SetStateAction<{ message: string; timestamp: string, senderId: string }[]>>;
   senderId: string;
@@ -19,7 +18,7 @@ interface ChatWindowProps {
 }
 const ChatWindow = ({
   selectedManager,
-  setSelectedManager,
+ 
   allMessages,
   setAllMessages,
   senderId,
@@ -64,7 +63,7 @@ const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!socket) return;
   
-    const messageListener = ({ senderId, message, timestamp,totalMessage ,chatId,receiverId,unreadCount}: { senderId: string; message: string; timestamp: string ,totalMessage:number,chatId:string,receiverId:string,unreadCount:number}) => {
+    const messageListener = ({ senderId, message, timestamp,totalMessage ,chatId,unreadCount}: { senderId: string; message: string; timestamp: string ,totalMessage:number,chatId:string,receiverId:string,unreadCount:number}) => {
       const date = new Date(timestamp);
       console.log("UnreadCount:",unreadCount);
       if (!isNaN(date.getTime())) {

@@ -29,6 +29,8 @@ const AdminWallet = () => {
     const itemsPerPage = 5; // Set the number of items per page
 
     useEffect(() => {
+        console.log(error);
+        
         const getAdminWallet = async () => {
             try {
                 const result = await fetchAdminWallet();
@@ -72,9 +74,9 @@ const AdminWallet = () => {
     );
 
     // Handle page change
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+    // const handlePageChange = (page: number) => {
+    //     setCurrentPage(page);
+    // };
     const heading = ['Booked ID', 'Date', 'Event Name', 'Company Name', 'Total Amount', 'Manager Amount', 'Type', 'Status'];
 
     return (

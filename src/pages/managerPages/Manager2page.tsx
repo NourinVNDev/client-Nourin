@@ -36,6 +36,8 @@ const Manager2Page = () => {
         const fetchEventDetails = async () => {
             if (id) {
                 try {
+                    console.log(ticketDetails);
+                    
                     const result = await fetchSocialEventDetails(id);
                     if (Array.isArray(result.data) && result.data.length > 0) {
                         setTicketDetails(result.data);

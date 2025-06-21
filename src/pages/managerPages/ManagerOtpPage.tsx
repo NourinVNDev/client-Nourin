@@ -62,12 +62,12 @@ const ManagerOtpPage:React.FC=()=>{
 
             const result = await verifyOtpForgotForManager(otpValue, email); 
             console.log("cheat",result);
-            if(result?.data.message==='OTP Matched'){
+            if(result?.response.message==='OTP Matched'){
                 console.log("Black");
                 navigate(`/manager/Reset-password/${email}`);
             }
 
-            if (result?.data.message==='OTP is not matched!') {
+            if (result?.response.message==='OTP is not matched!') {
                 setOTPError('Invalid OTP. Try Again');
               }
           

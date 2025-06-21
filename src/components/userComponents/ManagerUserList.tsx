@@ -58,7 +58,7 @@ const ManagerUserList = ({ managers, onSelectManager, person, setMessages, setSe
       <h2 className="text-xl font-bold mb-4">{person}</h2>
       <ul className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 space-y-2 px-4 py-2">
         {managers.length > 0 ? (
-          managers.map((chat, index) => (
+          managers.map((chat,_) => (
             <li
               key={chat.chatId}
               className="border border-gray-200 p-4 cursor-pointer transition-all duration-200"

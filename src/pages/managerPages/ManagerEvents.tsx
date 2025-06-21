@@ -120,6 +120,8 @@ const ManagerEvents: React.FC = () => {
   useEffect(() => {
     const fetchCategoryEventType = async (): Promise<void> => {
       try {
+        console.log(location,isScriptLoaded);
+        
         const result = await getCategoryEventType() as CategoryEvent[];
         if (Array.isArray(result)) {
           const categoryNames = result.map(item => item.categoryName);

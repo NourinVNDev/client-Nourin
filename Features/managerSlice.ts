@@ -23,7 +23,7 @@ const ManagerSlice=createSlice({
             state._id=action.payload._id;
             state.role=action.payload.role;
         },
-        clearManagerDetails:(state)=>{
+        clearManagerDetails:()=>{
             console.log("Maahn checking");
             
          return initialState

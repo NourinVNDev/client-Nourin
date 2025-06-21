@@ -29,6 +29,8 @@ const UserWallet: React.FC = () => {
             if (userId) {
                 try {
                     const result = await fetchUserWallet(userId);
+                    console.log(error);
+                    
                     if (result.success) {
                         setUserWalletData({
                             balance: result.data.balance,

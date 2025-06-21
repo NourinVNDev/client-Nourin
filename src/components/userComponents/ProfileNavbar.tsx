@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { postUserProfilePicture } from "../../service/userServices/userProfile";
 import { setUserDetails } from "../../../Features/userSlice"; // Import Redux action
 import { AppDispatch } from "../../../App/store";
-import toast,{Toaster} from "react-hot-toast";
+import toast from "react-hot-toast";
 import Cropper,{Area} from 'react-easy-crop';
 import getCroppedImg from "./CropUserProfile";
 

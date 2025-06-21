@@ -28,6 +28,8 @@ const ManagerVideoCall = () => {
 
 
   useEffect(() => {
+    console.log(remoteUsers);
+    
     const handleUserJoinedWrapper = (user: any, mediaType: any) => handleUserJoined(user, mediaType);
     const handleUserLeftWrapper = (user: any) => handleUserLeft(user);
 

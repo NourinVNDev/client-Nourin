@@ -116,7 +116,7 @@ const heading=['Name','Email','Experience','PhoneNo','Status','Block/UnBlock'];
             <ReusableTable
             headers={heading}
             data={currentManagers}
-            renderRow={(manager: Manager, index: number) => (
+            renderRow={(manager: Manager, _: number) => (
   <tr
     key={manager._id}
     className="odd:bg-white even:bg-gray-100 hover:bg-blue-50 text-black"

@@ -3,7 +3,7 @@ import { getCategoryDetails } from "../../service/adminServices/adminCategoryAnd
 import Header from "../../components/adminComponents/Header";
 import NavBar from "../../components/adminComponents/NavBar";
 import Footer from "../../components/adminComponents/Footer";
-import { Navigate, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { updateCategoryBlockStatus } from '../../service/adminServices/adminCategoryAndWallet';
 import ReusableTable from "../../components/adminComponents/ReusableTable";
 interface Category {

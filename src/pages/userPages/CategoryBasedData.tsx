@@ -28,8 +28,7 @@ const CategoryBasedData = () => {
   const [categoryName, setCategoryNames] = useState<string[]>([])
   const [interactions, setInteractions] = useState<{ [key: number]: { liked: boolean, newComment: string, comments: string[] } }>({});
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedPrice, setSelectedPrice] = useState('');
+
   const [filteredData, setFilteredData] = useState(parsedData);
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,6 +46,8 @@ const CategoryBasedData = () => {
   useEffect(()=>{
     console.log("Latitude",userLat);
     console.log("Longitude",userLon);
+    console.log(categoryName);
+    
   },[userLat,userLon])
 
 
@@ -92,17 +93,17 @@ const CategoryBasedData = () => {
 
 
 
-    if (selectedPrice === "Price: Low - High") {
-      updatedData.sort((a, b) => a.Amount - b.Amount);
-    } else if (selectedPrice === "Price: High - Low") {
-      updatedData.sort((a, b) => b.Amount - a.Amount);
-    }
+    // if (selectedPrice === "Price: Low - High") {
+    //   updatedData.sort((a, b) => a.Amount - b.Amount);
+    // } else if (selectedPrice === "Price: High - Low") {
+    //   updatedData.sort((a, b) => b.Amount - a.Amount);
+    // }
 
     console.log("Final filtered data:", updatedData);
     setFilteredData(updatedData);
     console.log("Fill:", filteredData);
 
-  }, [parsedData, selectedCategory, selectedPrice, searchQuery, coordinates,userLat,userLon]);
+  }, [parsedData, searchQuery, coordinates,userLat,userLon]);
   function haversineDistance2(lat1: number, lon1: number, lat2: number, lon2: number) {
     const toRad = (x: number) => (x * Math.PI) / 180;
     const R = 6371; // Earth's radius in km
@@ -295,24 +296,14 @@ const CategoryBasedData = () => {
 
 
 
-  useEffect(() => {
-    let updatedData = [...parsedData];
-    console.log(selectedPrice, "soumya");
-    if (selectedPrice === "Price: Low - High") {
-      updatedData.sort((a, b) => a.Amount - b.Amount);
-    } else if (selectedPrice === "Price: High - Low") {
-      updatedData.sort((a, b) => b.Amount - a.Amount);
-    }
-    setFilteredData(updatedData);
-  }, [selectedPrice]);
 
 
 
 
 
-  const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedPrice(event.target.value);
-  }
+  // const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedPrice(event.target.value);
+  // }
 
 
 

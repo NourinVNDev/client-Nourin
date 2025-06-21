@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import person from '../../assets/person.png';
+
 import { useSearchParams } from "react-router-dom";
 
 

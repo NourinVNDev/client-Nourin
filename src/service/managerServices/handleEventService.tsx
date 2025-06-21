@@ -1,6 +1,6 @@
 
 import { managerApiRequest } from "../../utils/apiHelper/managerApiHelper";
-import MANAGER_API from "../../utils/managerAxiosInstance";
+
 export interface eventSeat {
   Included: string[];
   notIncluded: string[];

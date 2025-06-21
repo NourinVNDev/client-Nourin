@@ -142,7 +142,7 @@ const ManagerOffer = () => {
                     <ReusableTable
                     headers={heading}
                     data={currentOffers}
-                  renderRow={(offer, index) => (
+                  renderRow={(offer, _) => (
     <tr key={offer._id} className="hover:bg-gray-50">
       <td className="px-4 py-3">{offer.offerName}</td>
       <td className="px-4 py-3">{offer.item_description}</td>

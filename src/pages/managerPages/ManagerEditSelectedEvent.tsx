@@ -12,15 +12,15 @@ import { eventFormValues, eventValidSchema } from "../../validations/managerVali
 import { useFormik } from "formik";
 import MapboxAutocomplete from "../../components/managerComponents/LocationSearch";
 import { Link } from "react-router-dom";
-interface LocationState {
-  lat: number;
-  lng: number;
-  place: string;
-}
+// interface LocationState {
+//   lat: number;
+//   lng: number;
+//   place: string;
+// }
 const ManagerEditSelectedEvents = () => {
   const navigate = useNavigate();
   const { id: eventId } = useParams<{ id: string }>();
-  const managerCompanyName = localStorage.getItem('ManagerName') ?? " ";
+  // const managerCompanyName = localStorage.getItem('ManagerName') ?? " ";
     const [location, setLocation] = useState('');
 
   const formik = useFormik<eventFormValues>({
