@@ -23,7 +23,7 @@ const mVerifyOtp=async(otpData:string,formData:{[key:string]:string})=>{
             email:email
         }
         const response=await managerApiRequest('/verifyForgotOtpM','POST',dataToSend)
-      return {response,email}; 
+      return {response,email};
     }
     const ManagerResetPassword1 = async (email:string,formData:{ [key: string]: string }) => {
         const dataToSend={
