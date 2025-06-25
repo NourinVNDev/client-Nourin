@@ -1,8 +1,8 @@
 import axios from "axios";
-import { ADMIN_URL } from "./userUrl";
+
 import { clearAdminDetails } from "../../Features/adminSlice";
 import {persistor} from '../../App/store';
-const ADMIN_API = axios.create({ baseURL: ADMIN_URL, withCredentials: true });
+const ADMIN_API = axios.create({ baseURL: import.meta.env.VITE_ADMIN_URL, withCredentials: true });
 let storeDispatch: any = null;
 
 export const setAxiosDispatch = (dispatch: any) => {

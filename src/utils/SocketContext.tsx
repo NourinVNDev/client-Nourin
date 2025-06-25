@@ -43,7 +43,7 @@ import React, {
         if (loggedUser) {
           const role = getRole();
           console.log("Role being sent to backend:", role);
-          const newSocket = io("http://localhost:3001", { 
+          const newSocket = io("https://nourin.space/meetcraft", { 
             query: {
               userId: loggedUser,
               role,

@@ -1,12 +1,12 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-import { USER_URL } from "./userUrl";
+
 import {persistor} from '../../App/store';
 
 import { clearUserDetails } from "../../Features/userSlice";
 
 
-const API = axios.create({ baseURL: USER_URL, withCredentials: true });
+const API = axios.create({ baseURL: import.meta.env.VITE_USER_URL, withCredentials: true });
 let storeDispatch: any = null;
 
 export const setAxiosDispatch = (dispatch: any) => {
