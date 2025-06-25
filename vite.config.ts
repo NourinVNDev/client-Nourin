@@ -9,7 +9,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://nourin.space/meetcraft',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),
