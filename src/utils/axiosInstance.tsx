@@ -1,6 +1,5 @@
 import axios from "axios";
 import Swal from "sweetalert2";
-
 import {persistor} from '../../App/store';
 
 import { clearUserDetails } from "../../Features/userSlice";
