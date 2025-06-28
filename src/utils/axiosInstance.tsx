@@ -5,7 +5,7 @@ import {persistor} from '../../App/store';
 import { clearUserDetails } from "../../Features/userSlice";
 
 
-const API = axios.create({ baseURL: import.meta.env.VITE_USER_URL, withCredentials: true });
+const API = axios.create({ baseURL: import.meta.env.VITE_USER_URL?.trim().replace(/\/$/, ''), withCredentials: true });
 let storeDispatch: any = null;
 
 export const setAxiosDispatch = (dispatch: any) => {
