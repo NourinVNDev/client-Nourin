@@ -1,7 +1,7 @@
 import axios from "axios";
 import { clearVerifierDetails } from "../../Features/verifierSlice";
 import {persistor} from '../../App/store';
-const VERIFIER_API = axios.create({ baseURL: import.meta.env.VITE_VERIFIER_URL, withCredentials: true });
+const VERIFIER_API = axios.create({ baseURL: import.meta.env.VITE_VERIFIER_URL?.trim().replace(/\/$/, ''), withCredentials: true });
 let storeDispatch: any = null;
 
 export const setAxiosDispatch = (dispatch: any) => {

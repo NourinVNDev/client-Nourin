@@ -2,7 +2,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { clearManagerDetails } from "../../Features/managerSlice";
 import {persistor} from '../../App/store';
-const MANAGER_API = axios.create({ baseURL: import.meta.env.VITE_MANAGER_URL, withCredentials: true });
+const MANAGER_API = axios.create({ baseURL: import.meta.env.VITE_MANAGER_URL?.trim().replace(/\/$/, ''), withCredentials: true });
 
 let storeDispatch: any = null;
 
