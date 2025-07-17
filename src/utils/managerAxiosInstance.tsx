@@ -23,7 +23,7 @@ MANAGER_API.interceptors.response.use(
             console.log('Data from if-case')
             originalRequest._retry = true;
             try {
-                const res = await MANAGER_API.post("/refresh-token");
+             const res = await MANAGER_API.post("/refresh-token", {}, { withCredentials: true });
                 document.cookie = `accessToken=${res.data.accessToken};`;
                 originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
                 return MANAGER_API(originalRequest);
