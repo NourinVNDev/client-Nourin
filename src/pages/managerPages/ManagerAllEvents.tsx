@@ -188,78 +188,91 @@ const heading=["EventName", "Images", "Title", "Location/Link", "Date", "Seat In
               </div>
             </div>
             <br /><br />
-         <ReusableTable
-         headers={heading}
-         data={currentEvents}
-            renderRow={(event, index) => (
-    <tr
-      key={event._id}
-      className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-    >
-      <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
-      <td className="border border-gray-300 px-4 py-3">
-        {event.images?.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {event.images.map((img: string, idx: number) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`img-${idx}`}
-                className="w-16 h-16 object-cover rounded border border-gray-200"
-              />
-            ))}
-          </div>
-        ) : (
-          "No images"
-        )}
-      </td>
-      <td className="border border-gray-300 px-4 py-3">{event.title}</td>
-      <td className="border border-gray-300 px-4 py-3">
-        {event.title !== "Virtual" ? (
-          event.destination
-        ) : (
-          <button
-            onClick={() => handleGenerateLink(event._id, event.eventName)}
-            className="text-blue-600 underline hover:text-blue-800 text-sm"
-          >
-            Generate a Link
-          </button>
-        )}
-      </td>
-      <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
-      <td className="border border-gray-300 px-4 py-3">
-        {event.title !== "Virtual" ? (
-          <div className="flex flex-col space-y-2">
-            {event.typesOfTickets.map((ticket: any, i: number) => (
-              <div key={i} className="flex justify-between">
-                <span className="text-indigo-700 font-semibold">{ticket.type}</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
-                  <span className="text-gray-500 text-sm">({ticket.noOfSeats} seats)</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <button
-            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl"
-            onClick={() => startVideoCall(event.eventName)}
-          >
-            Start Video Call
-          </button>
-        )}
-      </td>
-      <td className="border border-gray-300 px-4 py-3">
-        <button
-          onClick={() => handleEventEdit(event._id)}
-          className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
-        >
-          Edit
-        </button>
-      </td>
-    </tr>
-  )}
-         />
+     <ReusableTable
+ headers={heading}
+ data={currentEvents}
+ renderRow={(event, index) => {
+   if (currentEvents.length === 0) {
+     return (
+       <tr>
+         <td colSpan={heading.length} className="text-center text-gray-500 py-6">
+           No events found.
+         </td>
+       </tr>
+     );
+   }
+
+   return (
+     <tr
+       key={event._id}
+       className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+     >
+       <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
+       <td className="border border-gray-300 px-4 py-3">
+         {event.images?.length > 0 ? (
+           <div className="flex flex-wrap gap-2">
+             {event.images.map((img: string, idx: number) => (
+               <img
+                 key={idx}
+                 src={img}
+                 alt={`img-${idx}`}
+                 className="w-16 h-16 object-cover rounded border border-gray-200"
+               />
+             ))}
+           </div>
+         ) : (
+           "No images"
+         )}
+       </td>
+       <td className="border border-gray-300 px-4 py-3">{event.title}</td>
+       <td className="border border-gray-300 px-4 py-3">
+         {event.title !== "Virtual" ? (
+           event.destination
+         ) : (
+           <button
+             onClick={() => handleGenerateLink(event._id, event.eventName)}
+             className="text-blue-600 underline hover:text-blue-800 text-sm"
+           >
+             Generate a Link
+           </button>
+         )}
+       </td>
+       <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
+       <td className="border border-gray-300 px-4 py-3">
+         {event.title !== "Virtual" ? (
+           <div className="flex flex-col space-y-2">
+             {event.typesOfTickets.map((ticket: any, i: number) => (
+               <div key={i} className="flex justify-between">
+                 <span className="text-indigo-700 font-semibold">{ticket.type}</span>
+                 <div className="flex items-center space-x-2">
+                   <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
+                   <span className="text-gray-500 text-sm">({ticket.noOfSeats} seats)</span>
+                 </div>
+               </div>
+             ))}
+           </div>
+         ) : (
+           <button
+             className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl"
+             onClick={() => startVideoCall(event.eventName)}
+           >
+             Start Video Call
+           </button>
+         )}
+       </td>
+       <td className="border border-gray-300 px-4 py-3">
+         <button
+           onClick={() => handleEventEdit(event._id)}
+           className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
+         >
+           Edit
+         </button>
+       </td>
+     </tr>
+   );
+ }}
+/>
+
                <div className="flex justify-center items-center mt-4 space-x-2">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
