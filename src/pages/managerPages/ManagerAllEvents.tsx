@@ -71,6 +71,7 @@ const ManagerAllEvents = () => {
       try {
         if (managerId) {
           const response: EventData[] = await getAllEventData(managerId);
+          console.log("Fetched Events:", response);
           setEvents(response);
         }
       } catch (error) {
@@ -80,6 +81,10 @@ const ManagerAllEvents = () => {
 
     fetchAllEvents();
   }, [managerId]);
+  useEffect(() => {
+  console.log("Rendering with events:", events);
+}, [events]);
+
 
   // Sort events
   const sortedEvents = [...events].sort((a, b) => {
@@ -187,6 +192,7 @@ const heading=["EventName", "Images", "Title", "Location/Link", "Date", "Seat In
                 />
               </div>
             </div>
+            
             <br /><br />
      <ReusableTable
  headers={heading}
