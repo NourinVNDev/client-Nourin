@@ -129,9 +129,10 @@ const ManagerEditSelectedEvents = () => {
   
       try {
         const result = await handlePreviousEvents(eventId);
-        console.log("Result from API:", result);
+        console.log("Result from API hash:", result);
   
         if (result?.result) {
+          console.log("hh");
           console.log("Set Event Details", result.result);
           setEventDetails(result.result);
   
