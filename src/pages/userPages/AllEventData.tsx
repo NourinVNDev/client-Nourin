@@ -147,7 +147,7 @@ const AllEventData = () => {
       try {
         const result = await getAllEventDataDetails();
         console.log("Results", result);
-        const events = result.user.events;
+        const events = result.data;
         const formattedEvents = events.map((event: any) => ({
           ...event,
           managerOffer: Number(event.managerOffer1?.discount_value||0),
@@ -156,7 +156,7 @@ const AllEventData = () => {
         setParsedData(formattedEvents);
 
         const category: string[] = Array.from(
-          new Set(result?.user?.events?.map((event: any) => event.title))
+          new Set(result?.data?.map((event: any) => event.title))
         );
         console.log("Unique Titles", category);
         setCategoryNames(category);
