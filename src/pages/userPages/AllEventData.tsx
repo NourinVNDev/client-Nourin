@@ -146,7 +146,7 @@ const AllEventData = () => {
     const fetchEventDetails = async () => {
       try {
         const result = await getAllEventDataDetails();
-        console.log("Results", result.user);
+        console.log("Results", result);
         const events = result.user.events;
         const formattedEvents = events.map((event: any) => ({
           ...event,
