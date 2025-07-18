@@ -131,25 +131,25 @@ const ManagerEditSelectedEvents = () => {
         const result = await handlePreviousEvents(eventId);
         console.log("Result from API:", result);
   
-        if (result?.data?.result) {
-          console.log("Set Event Details", result.data.result);
-          setEventDetails(result.data.result);
+        if (result?.result) {
+          console.log("Set Event Details", result.result);
+          setEventDetails(result.result);
   
           formik.setValues((prevValues) => ({
             ...prevValues,
-            ...result.data.result,
-            address:result.data.result.address||"",
-            amount:result.data.result.amount||0,
-            time:result.data.result.time||'',
+            ...result.result,
+            address:result.result.address||"",
+            amount:result.result.amount||0,
+            time:result.result.time||'',
          
-            images: result.data.result.images || [],
+            images: result.result.images || [],
           }));
-          setLocation(result.data.result.address);
+          setLocation(result.result.address);
         } else {
           console.error("Invalid data structure:", result);
         }
   
-        const categoryNames = result.data.category.map(
+        const categoryNames = result.category.map(
           (cat: { categoryName: string }) => cat.categoryName
         );
         setCategoryName(categoryNames);
