@@ -29,7 +29,7 @@ const getCategoryEventType = async () => {
 }
 const getAllEventData = async (managerId: string) => {
   const response=await managerApiRequest(`/Manager/getAllEventData/${managerId}`,'GET');
-    return response.data.data;
+    return response.data;
 }
 const handlePreviousEvents = async (id: string) => {
   const response=await managerApiRequest(`/getPreviousEventDetails/${id}`,'GET');
