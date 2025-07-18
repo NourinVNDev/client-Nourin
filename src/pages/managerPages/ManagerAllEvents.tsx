@@ -11,7 +11,6 @@ import { RootState } from "../../../App/store";
 import useSocket from "../../utils/SocketContext";
 import ReusableTable from "../../components/managerComponents/ReusableTable";
 
-
 interface Location {
   address: string;
   city: string;
@@ -53,6 +52,8 @@ const ManagerAllEvents = () => {
   const { socket } = useSocket();
   const [events, setEvents] = useState<EventData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const eventsPerPage = 5;
   const navigate = useNavigate();
   const managerId = useSelector((state: RootState) => state.manager._id);
@@ -66,25 +67,37 @@ const ManagerAllEvents = () => {
     return `${day}-${month}-${year}`;
   };
 
-  useEffect(() => {
-    const fetchAllEvents = async () => {
-      try {
-        if (managerId) {
-          const response: EventData[] = await getAllEventData(managerId);
-          console.log("Fetched Events:", response);
-          setEvents(response);
-        }
-      } catch (error) {
-        console.error("Error fetching events:", error);
+  const fetchAllEvents = async (retryCount = 0) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (managerId) {
+        const response: EventData[] = await getAllEventData(managerId);
+        console.log("Fetched Events:", response);
+        setEvents(response);
       }
-    };
+    } catch (error: any) {
+      console.error("Error fetching events:", error);
+      
+      // If it's a 401 error and we haven't retried yet, wait and retry
+      if (error.response?.status === 401 && retryCount < 2) {
+        console.log(`Retrying fetch after token refresh... Attempt ${retryCount + 1}`);
+        setTimeout(() => {
+          fetchAllEvents(retryCount + 1);
+        }, 1000); // Wait 1 second before retrying
+        return;
+      }
+      
+      setError("Failed to fetch events. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchAllEvents();
   }, [managerId]);
-  useEffect(() => {
-  console.log("Rendering with events:", events);
-}, [events]);
-
 
   // Sort events
   const sortedEvents = [...events].sort((a, b) => {
@@ -117,29 +130,25 @@ const ManagerAllEvents = () => {
     setCurrentPage(1); 
   };
 
-const token = '007eJxTYGDesOHc8U9eAbn6Qnosl9ZFfE+4/chFI/NHsU5QzceDVToKDEYWBoYWRmlGyZZmqSYmSUmWRsZpRgYmpkappqkpKaaGq6qdMhoCGRn0/LJYGBkgEMTnZEjOzytJzMxLLWJgAADbOCCu';
+  const token = '007eJxTYGDesOHc8U9eAbn6Qnosl9ZFfE+4/chFI/NHsU5QzceDVToKDEYWBoYWRmlGyZZmqSYmSUmWRsZpRgYmpkappqkpKaaGq6qdMhoCGRn0/LJYGBkgEMTnZEjOzytJzMxLLWJgAADbOCCu';
 
-const startVideoCall = (eventName:string) => {
-  navigate(
-    '/Manager/videoCall?channelName=container' +
-    '&role=manager' +
-    '&eventName='+eventName+
-    '&token=' + encodeURIComponent(token)
-  );
-};
+  const startVideoCall = (eventName: string) => {
+    navigate(
+      '/Manager/videoCall?channelName=container' +
+      '&role=manager' +
+      '&eventName=' + eventName +
+      '&token=' + encodeURIComponent(token)
+    );
+  };
 
-
-  const handleGenerateLink = async (eventId: string,eventName:string) => {
+  const handleGenerateLink = async (eventId: string, eventName: string) => {
     try {
-const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(token)}&eventName=${eventName}`;
-      console.log("Join LInk", joinLink);
+      const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(token)}&eventName=${eventName}`;
+      console.log("Join Link", joinLink);
       const socketMessage = { link: joinLink, managerId: managerId, eventId: eventId }
       socket?.emit('post-videoCallLink', socketMessage, (response: any) => {
-        console.log("Message sent Aknowledgement", response);
-
+        console.log("Message sent Acknowledgement", response);
       })
-
-
 
       alert('Notification sent with join link!');
     } catch (error) {
@@ -148,165 +157,205 @@ const joinLink = `join-stream?channelName=container&token=${encodeURIComponent(t
     }
   };
 
-const heading=["EventName", "Images", "Title", "Location/Link", "Date", "Seat Information/Video Call", "Actions"]
+  const heading = ["EventName", "Images", "Title", "Location/Link", "Date", "Seat Information/Video Call", "Actions"]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-100">
+        <Header />
+        <div className="flex flex-1">
+          <NavBar />
+          <div className="flex-1 p-5 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading events...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-100">
+        <Header />
+        <div className="flex flex-1">
+          <NavBar />
+          <div className="flex-1 p-5 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-red-600 mb-4">{error}</p>
+              <button 
+                onClick={() => fetchAllEvents()}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-   <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       <Header />
       <div className="flex flex-1">
         <NavBar />
         <div className="flex-1 p-5">
-        
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl text-black font-semibold">All Events</h2>
-              <Link to="/Manager/addNewEvent">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl text-black font-semibold">All Events</h2>
+            <Link to="/Manager/addNewEvent">
               <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                  Add Event
-                </button>
-              </Link>
-            </div>
-            <div className="max-w-md mx-auto">
-              <div className="relative flex items-center w-full h-12 bg-white rounded-lg focus-within:shadow-lg overflow-hidden">
-                <div className="grid place-items-center h-full w-12 text-gray-300">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </div>
-                <input
-                  className="peer h-full w-full outline-none text-sm  bg-white text-gray-700 pr-2"
-                  type="text"
-                  id="search"
-                  onChange={handleSearchEvent}
-                  placeholder="Search by Event Name..."
-                />
+                Add Event
+              </button>
+            </Link>
+          </div>
+          <div className="max-w-md mx-auto">
+            <div className="relative flex items-center w-full h-12 bg-white rounded-lg focus-within:shadow-lg overflow-hidden">
+              <div className="grid place-items-center h-full w-12 text-gray-300">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
               </div>
+              <input
+                className="peer h-full w-full outline-none text-sm bg-white text-gray-700 pr-2"
+                type="text"
+                id="search"
+                onChange={handleSearchEvent}
+                placeholder="Search by Event Name..."
+              />
             </div>
-            
-            <br /><br />
-     <ReusableTable
- headers={heading}
- data={currentEvents}
- renderRow={(event, index) => {
-   if (currentEvents.length === 0) {
-     return (
-       <tr>
-         <td colSpan={heading.length} className="text-center text-gray-500 py-6">
-           No events found.
-         </td>
-       </tr>
-     );
-   }
+          </div>
+          
+          <br /><br />
+          <ReusableTable
+            headers={heading}
+            data={currentEvents}
+            renderRow={(event, index) => {
+              if (currentEvents.length === 0) {
+                return (
+                  <tr>
+                    <td colSpan={heading.length} className="text-center text-gray-500 py-6">
+                      No events found.
+                    </td>
+                  </tr>
+                );
+              }
 
-   return (
-     <tr
-       key={event._id}
-       className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
-     >
-       <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
-       <td className="border border-gray-300 px-4 py-3">
-         {event.images?.length > 0 ? (
-           <div className="flex flex-wrap gap-2">
-             {event.images.map((img: string, idx: number) => (
-               <img
-                 key={idx}
-                 src={img}
-                 alt={`img-${idx}`}
-                 className="w-16 h-16 object-cover rounded border border-gray-200"
-               />
-             ))}
-           </div>
-         ) : (
-           "No images"
-         )}
-       </td>
-       <td className="border border-gray-300 px-4 py-3">{event.title}</td>
-       <td className="border border-gray-300 px-4 py-3">
-         {event.title !== "Virtual" ? (
-           event.destination
-         ) : (
-           <button
-             onClick={() => handleGenerateLink(event._id, event.eventName)}
-             className="text-blue-600 underline hover:text-blue-800 text-sm"
-           >
-             Generate a Link
-           </button>
-         )}
-       </td>
-       <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
-       <td className="border border-gray-300 px-4 py-3">
-         {event.title !== "Virtual" ? (
-           <div className="flex flex-col space-y-2">
-             {event.typesOfTickets.map((ticket: any, i: number) => (
-               <div key={i} className="flex justify-between">
-                 <span className="text-indigo-700 font-semibold">{ticket.type}</span>
-                 <div className="flex items-center space-x-2">
-                   <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
-                   <span className="text-gray-500 text-sm">({ticket.noOfSeats} seats)</span>
-                 </div>
-               </div>
-             ))}
-           </div>
-         ) : (
-           <button
-             className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl"
-             onClick={() => startVideoCall(event.eventName)}
-           >
-             Start Video Call
-           </button>
-         )}
-       </td>
-       <td className="border border-gray-300 px-4 py-3">
-         <button
-           onClick={() => handleEventEdit(event._id)}
-           className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
-         >
-           Edit
-         </button>
-       </td>
-     </tr>
-   );
- }}
-/>
-
-               <div className="flex justify-center items-center mt-4 space-x-2">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 rounded-lg ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
-                      }`}
-                  >
-                    Previous
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => (
+              return (
+                <tr
+                  key={event._id}
+                  className={`text-gray-800 ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                >
+                  <td className="border border-gray-300 px-4 py-3">{event.eventName}</td>
+                  <td className="border border-gray-300 px-4 py-3">
+                    {event.images?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {event.images.map((img: string, idx: number) => (
+                          <img
+                            key={idx}
+                            src={img}
+                            alt={`img-${idx}`}
+                            className="w-16 h-16 object-cover rounded border border-gray-200"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      "No images"
+                    )}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3">{event.title}</td>
+                  <td className="border border-gray-300 px-4 py-3">
+                    {event.title !== "Virtual" ? (
+                      event.destination
+                    ) : (
+                      <button
+                        onClick={() => handleGenerateLink(event._id, event.eventName)}
+                        className="text-blue-600 underline hover:text-blue-800 text-sm"
+                      >
+                        Generate a Link
+                      </button>
+                    )}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3">{formatDate(event.startDate)}</td>
+                  <td className="border border-gray-300 px-4 py-3">
+                    {event.title !== "Virtual" ? (
+                      <div className="flex flex-col space-y-2">
+                        {event.typesOfTickets.map((ticket: any, i: number) => (
+                          <div key={i} className="flex justify-between">
+                            <span className="text-indigo-700 font-semibold">{ticket.type}</span>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-green-600 font-medium">₹{ticket.Amount}</span>
+                              <span className="text-gray-500 text-sm">({ticket.noOfSeats} seats)</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <button
+                        className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-xl"
+                        onClick={() => startVideoCall(event.eventName)}
+                      >
+                        Start Video Call
+                      </button>
+                    )}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-3">
                     <button
-                      key={i + 1}
-                      onClick={() => handlePageChange(i + 1)}
-                      className={`px-4 py-2 rounded-lg ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-300 hover:bg-blue-300"
-                        }`}
+                      onClick={() => handleEventEdit(event._id)}
+                      className="px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded hover:bg-blue-600"
                     >
-                      {i + 1}
+                      Edit
                     </button>
-                  ))}
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
-                      }`}
-                  >
-                    Next
-                  </button>
-                </div>
+                  </td>
+                </tr>
+              );
+            }}
+          />
+
+          <div className="flex justify-center items-center mt-4 space-x-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                }`}
+            >
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => handlePageChange(i + 1)}
+                className={`px-4 py-2 rounded-lg ${currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-300 hover:bg-blue-300"
+                  }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"
+                }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
       <Footer />
