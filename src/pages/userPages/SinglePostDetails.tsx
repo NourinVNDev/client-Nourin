@@ -15,8 +15,8 @@ const SinglePostDetails = () => {
   if (!data) {
   return <div>Loading event details...</div>;
 }
-  const parsedData = data ? JSON.parse(decodeURIComponent(data)) : null;
-  console.log("ParsedData:", parsedData);
+const parsedData = data;
+console.log("ParsedData:", parsedData);
   const generalTicketAmount =
     parsedData?.data?.result?.savedEvent?.typesOfTickets?.find(
       (ticket: any) => ticket.type === "general"
