@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 const SinglePostDetails = () => {
   const location = useLocation();
   const data = location.state?.data;
-  console.log("Data for checking", data)
+  console.log("Data for checking react", data)
   if (!data) {
   return <div>Loading event details...</div>;
 }
