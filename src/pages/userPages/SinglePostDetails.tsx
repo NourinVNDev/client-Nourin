@@ -45,16 +45,21 @@ console.log("ParsedData:", parsedData);
     }))
 
 
-  const initialStartDate = parsedData?.data?.result?.singleEvent?.startDate
-    ? new Date(parsedData.data?.result?.singleEvent?.startDate)
-    : new Date();
-  const initialEndDate = parsedData?.data?.result?.singleEvent?.endDate
-    ? new Date(parsedData.data?.result?.singleEvent?.endDate)
-    : new Date();
+const singleEvent = parsedData?.data?.result?.singleEvent;
+
+const initialStartDate = singleEvent?.startDate
+  ? new Date(singleEvent.startDate)
+  : undefined;
+
+const initialEndDate = singleEvent?.endDate
+  ? new Date(singleEvent.endDate)
+  : undefined;
+
 const [dateRange, setDateRange] = useState<DateRange>({
   from: initialStartDate,
   to: initialEndDate
 });
+
   const [activeTab, setActiveTab] = useState("information");
 
 const customStyles = `
