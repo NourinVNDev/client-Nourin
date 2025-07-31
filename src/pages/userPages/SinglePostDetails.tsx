@@ -32,6 +32,8 @@ console.log("ParsedData:", parsedData);
   }
 
   console.log('Amount:', generalTicketAmount);
+  console.log("Date:",parsedData?.data?.result?.savedEvent?.startDate);
+  
   const [selectedTicket, setSelectedTicket] = useState<selectTicket>();
 
   
@@ -43,11 +45,11 @@ console.log("ParsedData:", parsedData);
     }))
 
 
-  const initialStartDate = parsedData?.data?.result.savedEvent.startDate
-    ? new Date(parsedData.data?.result.savedEvent.startDate)
+  const initialStartDate = parsedData?.data?.result?.savedEvent?.startDate
+    ? new Date(parsedData.data?.result?.savedEvent?.startDate)
     : new Date();
-  const initialEndDate = parsedData?.data?.result.savedEvent.endDate
-    ? new Date(parsedData.data?.result.savedEvent.endDate)
+  const initialEndDate = parsedData?.data?.result?.savedEvent?.endDate
+    ? new Date(parsedData.data?.result?.savedEvent?.endDate)
     : new Date();
 const [dateRange, setDateRange] = useState<DateRange>({
   from: initialStartDate,
