@@ -10,8 +10,11 @@ import { format } from 'date-fns';
 
 const SinglePostDetails = () => {
   const location = useLocation();
-  const data = JSON.stringify(location.state?.data);
+  const data = location.state?.data;
   console.log("Data for checking", data)
+  if (!data) {
+  return <div>Loading event details...</div>;
+}
   const parsedData = data ? JSON.parse(decodeURIComponent(data)) : null;
   console.log("ParsedData:", parsedData);
   const generalTicketAmount =
