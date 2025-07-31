@@ -48,8 +48,8 @@ console.log("ParsedData:", parsedData);
   const initialStartDate = parsedData?.data?.result?.singleEvent?.startDate
     ? new Date(parsedData.data?.result?.singleEvent?.startDate)
     : new Date();
-  const initialEndDate = parsedData?.data?.result?.savedEvent?.endDate
-    ? new Date(parsedData.data?.result?.savedEvent?.endDate)
+  const initialEndDate = parsedData?.data?.result?.singleEvent?.endDate
+    ? new Date(parsedData.data?.result?.singleEvent?.endDate)
     : new Date();
 const [dateRange, setDateRange] = useState<DateRange>({
   from: initialStartDate,
@@ -199,7 +199,7 @@ const customStyles = `
                 >
                   Information
                 </button>
-                {parsedData.data.result.savedEvent.title!='Virtual' &&<button
+                {parsedData.data.result.singleEvent.title!='Virtual' &&<button
                   className={`text-lg font-semibold px-4 py-2 rounded ${activeTab === "seatPlan"
                     ? "bg-purple-700 text-white"
                     : "text-gray-700 hover:bg-gray-200"
@@ -228,24 +228,24 @@ const customStyles = `
                         <div className="flex flex-col">
                           <div className="flex items-center justify-between  gap-44 flex-nowrap w-full">
                             <span className="text-2xl font-bold text-gray-800">
-                              {parsedData?.data?.result?.savedEvent?.eventName || "Event Name"}
+                              {parsedData?.data?.result?.singleEvent?.eventName || "Event Name"}
                             </span>
                             <Link
-                              to={`/user/chat/${parsedData?.data?.result?.savedEvent?.companyName}/${parsedData?.data?.result?.savedEvent.eventName}`}
+                              to={`/user/chat/${parsedData?.data?.result?.singleEvent?.companyName}/${parsedData?.data?.result?.singleEvent.eventName}`}
                               className="text-blue-600 hover:underline font-medium"
                             >
                               Chat with us
                             </Link>
                           </div>
                           <span className="text-lg text-green-600 font-semibold">
-                            {parsedData?.data?.result?.savedEvent?.companyName || "Company Name"}
+                            {parsedData?.data?.result?.singleEvent?.companyName || "Company Name"}
                           </span>
                         </div>
                       </div>
 
                       <div>
                         <p className="text-gray-700 text-base">
-                          {parsedData?.data?.result?.savedEvent?.content ||
+                          {parsedData?.data?.result?.singleEvent?.content ||
                             "Details about the event description go here."}
                         </p>
                       </div>
@@ -255,8 +255,8 @@ const customStyles = `
                         <div className="flex  items-center">
                           <h2 className="text-violet-700 font-semibold">Destination:</h2>
                           <p className="text-yellow-700 pl-2 ">
-                            {parsedData?.data?.result?.savedEvent?.address
-                              ? `${parsedData.data.result.savedEvent.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '')}`
+                            {parsedData?.data?.result?.singleEvent?.address
+                              ? `${parsedData.data.result.singleEvent.address.split(' ').slice(0, 3).join(' ').replace(/,\s*$/, '')}`
                               : "Virtual"}
                           </p>
                         </div>
@@ -265,8 +265,8 @@ const customStyles = `
                         <div className="flex items-center">
                           <h2 className="text-violet-700 font-semibold">Start Date:</h2>
                           <p className="text-yellow-700 p;-2">
-                            {parsedData?.data?.result?.savedEvent?.startDate
-                              ? new Date(parsedData.data?.result?.savedEvent?.startDate).toLocaleDateString(
+                            {parsedData?.data?.result?.singleEvent?.startDate
+                              ? new Date(parsedData.data?.result?.singleEvent?.startDate).toLocaleDateString(
                                 "en-US",
                                 {
                                   year: "numeric",
@@ -280,8 +280,8 @@ const customStyles = `
                         <div className="flex  items-center">
                           <h2 className="text-violet-700 font-semibold">End Date:</h2>
                           <p className="text-yellow-700 pl-2">
-                            {parsedData?.data?.result?.savedEvent?.endDate
-                              ? new Date(parsedData.data?.result?.savedEvent?.endDate).toLocaleDateString(
+                            {parsedData?.data?.result?.singleEvent?.endDate
+                              ? new Date(parsedData.data?.result?.singleEvent?.endDate).toLocaleDateString(
                                 "en-US",
                                 {
                                   year: "numeric",
@@ -375,66 +375,66 @@ const customStyles = `
   <div className="p-6 bg-white rounded-lg shadow-lg border border-gray-300">
     <h2 className="text-2xl font-bold mb-4 text-gray-900">Offer Information</h2>
 
-    {(parsedData?.data?.result?.savedEvent?.managerOffer || parsedData?.data?.result?.savedEvent?.adminOffer) ? (
+    {(parsedData?.data?.result?.singleEvent?.managerOffer || parsedData?.data?.result?.singleEvent?.adminOffer) ? (
       <div className="space-y-6">
 
         {/* Manager Offer */}
-        {parsedData?.data?.result?.savedEvent?.managerOffer && (
+        {parsedData?.data?.result?.singleEvent?.managerOffer && (
           <div className="grid grid-cols-2 gap-4 p-4 bg-gray-100 rounded-lg shadow-sm">
             <h3 className="col-span-2 text-xl font-semibold text-purple-700">Manager Offer</h3>
             <div>
               <span className="block font-semibold text-gray-700">Offer Name:</span>
-              <span className="block text-indigo-600 font-bold">{parsedData.data.result.savedEvent.managerOffer.offerName}</span>
+              <span className="block text-indigo-600 font-bold">{parsedData.data.result.singleEvent.managerOffer.offerName}</span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">Discount On:</span>
-              <span className="block text-indigo-600">{parsedData.data.result.savedEvent.managerOffer.discount_on}</span>
+              <span className="block text-indigo-600">{parsedData.data.result.singleEvent.managerOffer.discount_on}</span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">Discount Value:</span>
-              <span className="block text-red-600">{parsedData.data.result.savedEvent.managerOffer.discount_value}%</span>
+              <span className="block text-red-600">{parsedData.data.result.singleEvent.managerOffer.discount_value}%</span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">Start Date:</span>
               <span className="block text-green-600">
-                {new Date(parsedData.data.result.savedEvent.managerOffer.startDate).toLocaleDateString("en-US")}
+                {new Date(parsedData.data.result.singleEvent.managerOffer.startDate).toLocaleDateString("en-US")}
               </span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">End Date:</span>
               <span className="block text-red-600">
-                {new Date(parsedData.data.result.savedEvent.managerOffer.endDate).toLocaleDateString("en-US")}
+                {new Date(parsedData.data.result.singleEvent.managerOffer.endDate).toLocaleDateString("en-US")}
               </span>
             </div>
           </div>
         )}
 
         {/* Admin Offer */}
-        {parsedData?.data?.result?.savedEvent?.adminOffer && (
+        {parsedData?.data?.result?.singleEvent?.adminOffer && (
           <div className="grid grid-cols-2 gap-4 p-4 bg-gray-100 rounded-lg shadow-sm">
             <h3 className="col-span-2 text-xl font-semibold text-red-700">Admin Offer</h3>
             <div>
               <span className="block font-semibold text-gray-700">Offer Name:</span>
-              <span className="block text-indigo-600 font-bold">{parsedData.data.result.savedEvent.adminOffer.offerName}</span>
+              <span className="block text-indigo-600 font-bold">{parsedData.data.result.singleEvent.adminOffer.offerName}</span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">Discount On:</span>
-              <span className="block text-indigo-600">{parsedData.data.result.savedEvent.adminOffer.discount_on}</span>
+              <span className="block text-indigo-600">{parsedData.data.result.singleEvent.adminOffer.discount_on}</span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">Discount Value:</span>
-              <span className="block text-red-600">{parsedData.data.result.savedEvent.adminOffer.discount_value}%</span>
+              <span className="block text-red-600">{parsedData.data.result.singleEvent.adminOffer.discount_value}%</span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">Start Date:</span>
               <span className="block text-green-600">
-                {new Date(parsedData.data.result.savedEvent.adminOffer.startDate).toLocaleDateString("en-US")}
+                {new Date(parsedData.data.result.singleEvent.adminOffer.startDate).toLocaleDateString("en-US")}
               </span>
             </div>
             <div>
               <span className="block font-semibold text-gray-700">End Date:</span>
               <span className="block text-red-600">
-                {new Date(parsedData.data.result.savedEvent.adminOffer.endDate).toLocaleDateString("en-US")}
+                {new Date(parsedData.data.result.singleEvent.adminOffer.endDate).toLocaleDateString("en-US")}
               </span>
             </div>
           </div>
@@ -443,9 +443,9 @@ const customStyles = `
         {/* Ticket Types */}
         <h3 className="text-xl font-bold text-gray-800">Available Ticket Types</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {parsedData?.data?.result?.savedEvent?.typesOfTickets?.map((ticket: any, index: number) => {
-  const managerDiscount = Number(parsedData?.data?.result?.savedEvent?.managerOffer?.discount_value || 0);
-  const adminDiscount = Number(parsedData?.data?.result?.savedEvent?.adminOffer?.discount_value || 0);
+      {parsedData?.data?.result?.singleEvent?.typesOfTickets?.map((ticket: any, index: number) => {
+  const managerDiscount = Number(parsedData?.data?.result?.singleEvent?.managerOffer?.discount_value || 0);
+  const adminDiscount = Number(parsedData?.data?.result?.singleEvent?.adminOffer?.discount_value || 0);
  
 
   const totalDiscount = Math.min(managerDiscount + adminDiscount, 100); // cap at 100%
@@ -534,9 +534,9 @@ const customStyles = `
 
               <br />
               <div className="bg-gray-200 p-6 rounded-lg shadow-md flex justify-center items-center">
-                {selectedTicket || (parsedData.data?.result?.savedEvent?.title == 'Virtual' && selectedTicket !== null) ? (
+                {selectedTicket || (parsedData.data?.result?.singleEvent?.title == 'Virtual' && selectedTicket !== null) ? (
                   <Link
-                    to={`/checkEventDetails/${parsedData.data?.result?.savedEvent?._id}/${selectedTicket?.type?.toLowerCase()}`}
+                    to={`/checkEventDetails/${parsedData.data?.result?.singleEvent?._id}/${selectedTicket?.type?.toLowerCase()}`}
                     className="w-full" // Make link take full width
                   >
                     <button className="bg-purple-700 text-white px-6 py-3 rounded-lg hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-200 w-full">
@@ -548,7 +548,7 @@ const customStyles = `
                     disabled
                     className="bg-gray-400 text-gray-600 px-6 py-3 rounded-lg cursor-not-allowed w-full"
                   >
-                    {parsedData.data?.result?.savedEvent?.title === 'Virtual' ?
+                    {parsedData.data?.result?.singleEvent?.title === 'Virtual' ?
                       "Select a Ticket First" :
                       "Select a Ticket Type First"}
                   </button>
